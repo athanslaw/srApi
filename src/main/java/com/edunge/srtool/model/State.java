@@ -8,4 +8,13 @@ import java.util.Set;
 public class State extends AbstractBaseModel {
     @OneToMany(mappedBy="state")
     Set<Lga> lgaSet;
+
+    @OneToMany(mappedBy="state")
+    Set<PolingUnit> polingUnits;
+
+    @OneToMany(mappedBy="state")
+    Set<Ward> wards;
+
+    @OneToMany(mappedBy="state")
+    Set<SenatorialDistrict> senatorialDistricts;
 }
