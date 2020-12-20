@@ -17,5 +17,5 @@ public class SenatorialDistrict extends AbstractBaseModel {
     Set<Ward> wards;
 
     @OneToMany(mappedBy="senatorialDistrict")
-    Set<PolingUnit> polingUnits;
+    Set<PollingUnit> pollingUnits;
 }

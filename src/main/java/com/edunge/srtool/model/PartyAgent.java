@@ -21,7 +21,7 @@ public class PartyAgent extends AbstractBaseModel{
     private Ward ward;
 
     @ManyToOne
-    @JoinColumn(name = "poling_unit_id", nullable = false)
-    private PolingUnit polingUnit;
+    @JoinColumn(name = "polling_unit_id", nullable = false)
+    private PollingUnit pollingUnit;
 
 }

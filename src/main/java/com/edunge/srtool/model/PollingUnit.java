@@ -7,7 +7,7 @@ import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
-public class PolingUnit extends AbstractBaseModel{
+public class PollingUnit extends AbstractBaseModel{
     @ManyToOne
     @JoinColumn(name = "state_id")
     private State state;
@@ -24,7 +24,7 @@ public class PolingUnit extends AbstractBaseModel{
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
-    @OneToMany(mappedBy = "polingUnit")
-    private Set<PolingUnit> polingUnits;
+    @OneToMany(mappedBy = "pollingUnit")
+    private Set<PartyAgent> partyAgents;
 
 }

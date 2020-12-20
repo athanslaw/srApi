@@ -10,7 +10,7 @@ public class State extends AbstractBaseModel {
     Set<Lga> lgaSet;
 
     @OneToMany(mappedBy="state")
-    Set<PolingUnit> polingUnits;
+    Set<PollingUnit> pollingUnits;
 
     @OneToMany(mappedBy="state")
     Set<Ward> wards;
