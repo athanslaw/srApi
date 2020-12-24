@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-//@Table(name = "senatorial_district")
 public class SenatorialDistrict extends AbstractBaseModel {
     @ManyToOne
     @JoinColumn(name = "state_id")
@@ -18,4 +17,12 @@ public class SenatorialDistrict extends AbstractBaseModel {
 
     @OneToMany(mappedBy="senatorialDistrict")
     Set<PollingUnit> pollingUnits;
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
 }

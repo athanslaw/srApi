@@ -18,4 +18,20 @@ public class Lga extends AbstractBaseModel {
 
     @OneToMany(mappedBy = "lga")
     private Set<PartyAgent> partyAgent;
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public SenatorialDistrict getSenatorialDistrict() {
+        return senatorialDistrict;
+    }
+
+    public void setSenatorialDistrict(SenatorialDistrict senatorialDistrict) {
+        this.senatorialDistrict = senatorialDistrict;
+    }
 }
