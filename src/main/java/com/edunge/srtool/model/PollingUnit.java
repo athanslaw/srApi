@@ -27,4 +27,35 @@ public class PollingUnit extends AbstractBaseModel{
     @OneToMany(mappedBy = "pollingUnit")
     private Set<PartyAgent> partyAgents;
 
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public SenatorialDistrict getSenatorialDistrict() {
+        return senatorialDistrict;
+    }
+
+    public void setSenatorialDistrict(SenatorialDistrict senatorialDistrict) {
+        this.senatorialDistrict = senatorialDistrict;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
+    }
+
+    public Ward getWard() {
+        return ward;
+    }
+
+    public void setWard(Ward ward) {
+        this.ward = ward;
+    }
 }
