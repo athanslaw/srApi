@@ -121,6 +121,15 @@ public class WardServiceImpl implements WardService {
         return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), wards);
     }
 
+    @Override
+    public WardResponse filterByName(String name) throws NotFoundException {
+        Ward ward = wardRepository.findByNameLike(name);
+        if(ward!=null){
+            return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
+        }
+        throw new NotFoundException("Ward not found.");
+    }
+
 
     private Lga getLga(Long id) throws NotFoundException {
         Optional<Lga> currentLga = lgaRepository.findById(id);

@@ -7,6 +7,7 @@ import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,25 @@ import java.util.Optional;
 @Service
 public class StateServiceImpl implements StateService {
     private final StateRepository stateRepository;
+    private static final String SERVICE_NAME = "State";
 
+    @Value("${notfound.message.template}")
+    private String notFoundTemplate;
+
+    @Value("${success.message.template}")
+    private String successTemplate;
+
+    @Value("${duplicate.message.template}")
+    private String duplicateTemplate;
+
+    @Value("${update.message.template}")
+    private String updateTemplate;
+
+    @Value("${delete.message.template}")
+    private String deleteTemplate;
+
+    @Value("${fetch.message.template}")
+    private String fetchRecordTemplate;
     @Autowired
     public StateServiceImpl(StateRepository stateRepository) {
         this.stateRepository = stateRepository;
@@ -60,6 +79,15 @@ public class StateServiceImpl implements StateService {
     public StateResponse deleteStateById(Long id) throws NotFoundException {
         State currentState = getState(id);
         return new StateResponse("00",String.format("%s deleted successfully.",currentState.getCode()));
+    }
+
+    @Override
+    public StateResponse filterByName(String name) throws NotFoundException {
+        State state = stateRepository.findByNameLike(name);
+        if(state!=null){
+            return new StateResponse("00", String.format(successTemplate,SERVICE_NAME), state);
+        }
+        throw new NotFoundException("State not found.");
     }
 
     @Override

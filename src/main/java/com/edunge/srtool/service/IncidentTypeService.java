@@ -11,4 +11,5 @@ public interface IncidentTypeService {
     IncidentTypeResponse editIncidentType(Long id, IncidentType IncidentType) throws NotFoundException;
     IncidentTypeResponse deleteIncidentTypeById(Long id) throws NotFoundException;
     IncidentTypeResponse findAll() ;
+    IncidentTypeResponse filterByName(String name) throws NotFoundException;
 }

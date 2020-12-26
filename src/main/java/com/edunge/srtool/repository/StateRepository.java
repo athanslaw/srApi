@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StateRepository extends JpaRepository<State, Long> {
     State findByCode(String code);
+    State findByNameLike(String name);
 }

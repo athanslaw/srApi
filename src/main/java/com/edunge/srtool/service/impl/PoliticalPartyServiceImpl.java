@@ -3,13 +3,9 @@ package com.edunge.srtool.service.impl;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.PoliticalParty;
-import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.PoliticalPartyRepository;
-import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.PoliticalPartyResponse;
-import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.PoliticalPartyService;
-import com.edunge.srtool.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -79,6 +75,16 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
         currentPoliticalParty.setName(politicalParty.getName());
         politicalPartyRepository.save(currentPoliticalParty);
         return new PoliticalPartyResponse("00", String.format(updateTemplate, SERVICE_NAME), currentPoliticalParty);
+    }
+
+
+    @Override
+    public PoliticalPartyResponse filterByName(String name) throws NotFoundException {
+        PoliticalParty politicalParty = politicalPartyRepository.findByNameLike(name);
+        if(politicalParty!=null){
+            return new PoliticalPartyResponse("00", String.format(successTemplate,SERVICE_NAME), politicalParty);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
@@ -11,6 +10,7 @@ import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
 import com.edunge.srtool.service.SenatorialDistrictService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +21,25 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     private final StateRepository stateRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
+    private static final String SERVICE_NAME = "State";
 
+    @Value("${notfound.message.template}")
+    private String notFoundTemplate;
+
+    @Value("${success.message.template}")
+    private String successTemplate;
+
+    @Value("${duplicate.message.template}")
+    private String duplicateTemplate;
+
+    @Value("${update.message.template}")
+    private String updateTemplate;
+
+    @Value("${delete.message.template}")
+    private String deleteTemplate;
+
+    @Value("${fetch.message.template}")
+    private String fetchRecordTemplate;
     @Autowired
     public SenatorialDistrictServiceImpl(StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
         this.stateRepository = stateRepository;
@@ -82,6 +100,14 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
         return new SenatorialDistrictResponse("00", "All Senatorial District retrieved.", senatorialDistricts);
     }
 
+    @Override
+    public SenatorialDistrictResponse filterByName(String name) throws NotFoundException {
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByNameLike(name);
+        if(senatorialDistrict!=null){
+            return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), senatorialDistrict);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
 
     private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
         Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);

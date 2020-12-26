@@ -78,6 +78,15 @@ public class IncidentTypeServiceServiceImpl implements IncidentTypeService {
     }
 
     @Override
+    public IncidentTypeResponse filterByName(String name) throws NotFoundException {
+        IncidentType incidentType = incidentTypeRepository.findByNameLike(name);
+        if(incidentType!=null){
+            return new IncidentTypeResponse("00", String.format(successTemplate,SERVICE_NAME), incidentType);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
+
+    @Override
     public IncidentTypeResponse deleteIncidentTypeById(Long id) throws NotFoundException {
         IncidentType currentIncidentType = getIncidentType(id);
         return new IncidentTypeResponse("00",String.format(deleteTemplate,currentIncidentType.getCode()));

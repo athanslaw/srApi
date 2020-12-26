@@ -11,4 +11,5 @@ public interface IncidentStatusService {
     IncidentStatusResponse editIncidentStatus(Long id, IncidentStatus IncidentStatus) throws NotFoundException;
     IncidentStatusResponse deleteIncidentStatusById(Long id) throws NotFoundException;
     IncidentStatusResponse findAll() ;
+    IncidentStatusResponse filterByName(String name) throws NotFoundException;
 }

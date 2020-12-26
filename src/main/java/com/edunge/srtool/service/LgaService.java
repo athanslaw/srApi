@@ -2,7 +2,6 @@ package com.edunge.srtool.service;
 
 import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.response.LgaResponse;
 
 public interface LgaService {
@@ -12,4 +11,5 @@ public interface LgaService {
     LgaResponse updateLga(Long id, LgaDto lga) throws NotFoundException;
     LgaResponse deleteLgaById(Long id) throws NotFoundException;
     LgaResponse findAll() ;
+    LgaResponse filterByName(String name) throws NotFoundException;
 }

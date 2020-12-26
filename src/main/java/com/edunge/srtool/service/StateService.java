@@ -11,5 +11,5 @@ public interface StateService {
     StateResponse editState(Long id, State state) throws NotFoundException;
     StateResponse deleteStateById(Long id) throws NotFoundException;
     StateResponse findAll() ;
-
+    StateResponse filterByName(String name) throws NotFoundException;
 }

@@ -96,4 +96,13 @@ public class IncidentLevelServiceServiceImpl implements IncidentLevelService {
         }
         return currentState.get();
     }
+
+    @Override
+    public IncidentLevelResponse filterByName(String name) throws NotFoundException {
+        IncidentLevel incidentLevel = incidentLevelRepository.findByNameLike(name);
+        if(incidentLevel!=null){
+            return new IncidentLevelResponse("00", String.format(successTemplate,SERVICE_NAME), incidentLevel);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
 }

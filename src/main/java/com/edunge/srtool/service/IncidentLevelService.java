@@ -11,4 +11,5 @@ public interface IncidentLevelService {
     IncidentLevelResponse editIncidentLevel(Long id, IncidentLevel incidentLevel) throws NotFoundException;
     IncidentLevelResponse deleteIncidentLevelById(Long id) throws NotFoundException;
     IncidentLevelResponse findAll() ;
+    IncidentLevelResponse filterByName(String name) throws NotFoundException;
 }

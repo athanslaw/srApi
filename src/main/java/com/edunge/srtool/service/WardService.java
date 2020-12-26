@@ -11,4 +11,5 @@ public interface WardService {
     WardResponse updateWard(Long id, WardDto ward) throws NotFoundException;
     WardResponse deleteWardById(Long id) throws NotFoundException;
     WardResponse findAll() ;
+    WardResponse filterByName(String name) throws NotFoundException;
 }

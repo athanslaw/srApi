@@ -2,7 +2,6 @@ package com.edunge.srtool.service;
 
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.SenatorialDistrict;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
 
 public interface SenatorialDistrictService {
@@ -12,4 +11,5 @@ public interface SenatorialDistrictService {
     SenatorialDistrictResponse updateSenatorialDistrict(Long id, SenatorialDistrictDto senatorialDistrict) throws NotFoundException;
     SenatorialDistrictResponse deleteSenatorialDistrictById(Long id) throws NotFoundException;
     SenatorialDistrictResponse findAll() ;
+    SenatorialDistrictResponse filterByName(String name) throws NotFoundException;
 }
