@@ -59,4 +59,11 @@ public class IncidentLevelController {
     public ResponseEntity<IncidentLevelResponse> deleteIncidentLevel(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(incidentLevelService.deleteIncidentLevelById(id));
     }
+
+
+    @GetMapping(value = "/incident-level/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter Incident leve by name.")
+    public ResponseEntity<IncidentLevelResponse> filterIncidentLeveleByName(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(incidentLevelService.filterByName(name));
+    }
 }

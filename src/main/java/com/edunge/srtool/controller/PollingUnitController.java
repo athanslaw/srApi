@@ -59,4 +59,10 @@ public class PollingUnitController {
     public ResponseEntity<PollingUnitResponse> deletePollingUnitById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(pollingUnitService.deletePollingUnitById(id));
     }
+
+    @GetMapping(value = "/polling-unit/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter polling unit by name.")
+    public ResponseEntity<PollingUnitResponse> filterPollingUnitByCode(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(pollingUnitService.filterByName(name));
+    }
 }

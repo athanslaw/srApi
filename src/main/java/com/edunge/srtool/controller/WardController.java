@@ -59,4 +59,10 @@ public class WardController {
     public ResponseEntity<WardResponse> deletewardById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(wardService.deleteWardById(id));
     }
+
+    @GetMapping(value = "/ward/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter ward by name.")
+    public ResponseEntity<WardResponse> filterWardByCode(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(wardService.filterByName(name));
+    }
 }

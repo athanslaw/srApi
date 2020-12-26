@@ -59,4 +59,10 @@ public class IncidentTypeController {
     public ResponseEntity<IncidentTypeResponse> deleteIncidentType(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(incidentTypeService.deleteIncidentTypeById(id));
     }
+
+    @GetMapping(value = "/incident-type/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter Incident type by name.")
+    public ResponseEntity<IncidentTypeResponse> filterIncidentTypeByName(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(incidentTypeService.filterByName(name));
+    }
 }

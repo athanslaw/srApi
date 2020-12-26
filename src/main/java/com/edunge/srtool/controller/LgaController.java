@@ -1,11 +1,8 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.LgaDto;
-import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.response.LgaResponse;
-import com.edunge.srtool.response.SenatorialDistrictResponse;
 import com.edunge.srtool.service.LgaService;
-import com.edunge.srtool.service.SenatorialDistrictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +60,11 @@ public class LgaController {
     @ApiOperation(value = "Delete LGA by id.")
     public ResponseEntity<LgaResponse> deleteLgaById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(lgaService.deleteLgaById(id));
+    }
+
+    @GetMapping(value = "/lga/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter LGA by name.")
+    public ResponseEntity<LgaResponse> filterLGAByName(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(lgaService.filterByName(name));
     }
 }

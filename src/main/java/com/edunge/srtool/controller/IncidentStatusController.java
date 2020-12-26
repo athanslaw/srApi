@@ -3,7 +3,6 @@ package com.edunge.srtool.controller;
 import com.edunge.srtool.model.IncidentStatus;
 import com.edunge.srtool.response.IncidentStatusResponse;
 import com.edunge.srtool.service.IncidentStatusService;
-import com.edunge.srtool.service.IncidentStatusService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +58,11 @@ public class IncidentStatusController {
     @ApiOperation(value = "Delete Incident Status by id.")
     public ResponseEntity<IncidentStatusResponse> deleteIncidentStatus(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(incidentStatusService.deleteIncidentStatusById(id));
+    }
+
+    @GetMapping(value = "/incident-status/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter Incident status by name.")
+    public ResponseEntity<IncidentStatusResponse> filterIncidentStatuseByName(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(incidentStatusService.filterByName(name));
     }
 }

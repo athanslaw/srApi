@@ -1,31 +1,15 @@
 package com.edunge.srtool.controller;
 
-import com.edunge.srtool.dto.UserDto;
-import com.edunge.srtool.exceptions.BadRequestException;
-import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.exceptions.NotificationException;
-import com.edunge.srtool.exceptions.UserException;
-import com.edunge.srtool.jwt.JwtTokenUtil;
-import com.edunge.srtool.jwt.JwtUserDetailsService;
-import com.edunge.srtool.model.Login;
 import com.edunge.srtool.model.State;
-import com.edunge.srtool.response.ErrorResponse;
-import com.edunge.srtool.response.LoginResponse;
 import com.edunge.srtool.response.StateResponse;
-import com.edunge.srtool.response.UserResponse;
 import com.edunge.srtool.service.StateService;
-import com.edunge.srtool.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -74,5 +58,11 @@ public class StateController {
     @ApiOperation(value = "Delete state by id.")
     public ResponseEntity<StateResponse> deleteStateById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(stateService.deleteStateById(id));
+    }
+
+    @GetMapping(value = "/state/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter state by name.")
+    public ResponseEntity<StateResponse> filterStateByCode(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(stateService.filterByName(name));
     }
 }

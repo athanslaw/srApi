@@ -1,11 +1,8 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.model.PoliticalParty;
-import com.edunge.srtool.model.State;
 import com.edunge.srtool.response.PoliticalPartyResponse;
-import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.PoliticalPartyService;
-import com.edunge.srtool.service.StateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +58,11 @@ public class PoliticalPartyController {
     @ApiOperation(value = "Delete Political Party by id.")
     public ResponseEntity<PoliticalPartyResponse> deletePoliticalPartyById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(politicalService.deletePoliticalPartyById(id));
+    }
+
+    @GetMapping(value = "/political-party/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter political party by name.")
+    public ResponseEntity<PoliticalPartyResponse> filterPoliticalPartyByName(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(politicalService.filterByName(name));
     }
 }

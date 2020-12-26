@@ -1,18 +1,14 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.SenatorialDistrictDto;
-import com.edunge.srtool.model.State;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
-import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.SenatorialDistrictService;
-import com.edunge.srtool.service.StateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -62,5 +58,11 @@ public class SenatorialDistrictController {
     @ApiOperation(value = "Delete senatorial district by id.")
     public ResponseEntity<SenatorialDistrictResponse> deleteSenatorialDistrictById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.deleteSenatorialDistrictById(id));
+    }
+
+    @GetMapping(value = "/senatorial-district/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter senatorial district by code.")
+    public ResponseEntity<SenatorialDistrictResponse> filterSenatorialDistrictByCode(@RequestParam String name) throws Exception {
+        return ResponseEntity.ok(senatorialDistrictService.filterByName(name));
     }
 }
