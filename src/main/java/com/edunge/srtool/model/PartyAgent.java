@@ -24,4 +24,67 @@ public class PartyAgent extends AbstractBaseModel{
     @JoinColumn(name = "polling_unit_id", nullable = false)
     private PollingUnit pollingUnit;
 
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
+    }
+
+    public Ward getWard() {
+        return ward;
+    }
+
+    public void setWard(Ward ward) {
+        this.ward = ward;
+    }
+
+    public PollingUnit getPollingUnit() {
+        return pollingUnit;
+    }
+
+    public void setPollingUnit(PollingUnit pollingUnit) {
+        this.pollingUnit = pollingUnit;
+    }
 }

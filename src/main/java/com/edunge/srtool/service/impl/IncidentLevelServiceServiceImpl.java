@@ -99,7 +99,7 @@ public class IncidentLevelServiceServiceImpl implements IncidentLevelService {
 
     @Override
     public IncidentLevelResponse filterByName(String name) throws NotFoundException {
-        IncidentLevel incidentLevel = incidentLevelRepository.findByNameLike(name);
+        IncidentLevel incidentLevel = incidentLevelRepository.findByNameStartingWith(name);
         if(incidentLevel!=null){
             return new IncidentLevelResponse("00", String.format(successTemplate,SERVICE_NAME), incidentLevel);
         }

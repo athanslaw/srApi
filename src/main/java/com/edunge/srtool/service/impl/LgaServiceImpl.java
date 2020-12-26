@@ -116,7 +116,7 @@ public class LgaServiceImpl implements LgaService {
 
     @Override
     public LgaResponse filterByName(String name) throws NotFoundException {
-        Lga lga = lgaRepository.findByNameLike(name);
+        Lga lga = lgaRepository.findByNameStartingWith(name);
         if(lga!=null){
             return new LgaResponse("00", String.format(successTemplate,SERVICE_NAME), lga);
         }

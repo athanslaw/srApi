@@ -85,7 +85,7 @@ public class IncidentStatusServiceServiceImpl implements IncidentStatusService {
 
     @Override
     public IncidentStatusResponse filterByName(String name) throws NotFoundException {
-        IncidentStatus incidentStatus = incidentStatusRepository.findByNameLike(name);
+        IncidentStatus incidentStatus = incidentStatusRepository.findByNameStartingWith(name);
         if(incidentStatus!=null){
             return new IncidentStatusResponse("00", String.format(successTemplate,SERVICE_NAME), incidentStatus);
         }

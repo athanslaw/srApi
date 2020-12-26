@@ -21,7 +21,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     private final StateRepository stateRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
-    private static final String SERVICE_NAME = "State";
+    private static final String SERVICE_NAME = "Senatorial District";
 
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
@@ -102,7 +102,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Override
     public SenatorialDistrictResponse filterByName(String name) throws NotFoundException {
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByNameLike(name);
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByNameStartingWith(name);
         if(senatorialDistrict!=null){
             return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), senatorialDistrict);
         }

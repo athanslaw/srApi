@@ -113,7 +113,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
     @Override
     public PollingUnitResponse filterByName(String name) throws NotFoundException {
-        PollingUnit pollingUnit = pollingUnitRepository.findByNameLike(name);
+        PollingUnit pollingUnit = pollingUnitRepository.findByNameStartingWith(name);
         if(pollingUnit!=null){
             return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit);
         }

@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WardRepository extends JpaRepository<Ward, Long> {
     Ward findByCode(String wardCode);
-    Ward findByNameLike(String name);
+    Ward findByNameStartingWith(String name);
 }

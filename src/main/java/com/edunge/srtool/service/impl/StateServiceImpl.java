@@ -83,7 +83,7 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public StateResponse filterByName(String name) throws NotFoundException {
-        State state = stateRepository.findByNameLike(name);
+        State state = stateRepository.findByNameStartingWith(name);
         if(state!=null){
             return new StateResponse("00", String.format(successTemplate,SERVICE_NAME), state);
         }

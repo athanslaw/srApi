@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IncidentLevelRepository extends JpaRepository<IncidentLevel,Long> {
     IncidentLevel findByCode(String code);
-    IncidentLevel findByNameLike(String name);
+    IncidentLevel findByNameStartingWith(String name);
 }

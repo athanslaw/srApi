@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PoliticalPartyRepository extends JpaRepository<PoliticalParty, Long> {
     PoliticalParty findByCode(String code);
-    PoliticalParty findByNameLike (String name);
+    PoliticalParty findByNameStartingWith(String name);
 }
