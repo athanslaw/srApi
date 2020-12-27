@@ -3,10 +3,7 @@ package com.edunge.srtool.service.impl;
 import com.edunge.srtool.dto.WardDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.Lga;
-import com.edunge.srtool.model.SenatorialDistrict;
-import com.edunge.srtool.model.State;
-import com.edunge.srtool.model.Ward;
+import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
@@ -95,18 +92,15 @@ public class WardServiceImpl implements WardService {
         State state = getState(wardDto.getStateId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(wardDto.getSenatorialDistrictId());
         Lga lga = getLga(wardDto.getLgaId());
-        Ward currentWard = wardRepository.findByCode(wardDto.getCode());
-        if(currentWard!=null){
-            currentWard.setId(id);
-            currentWard.setCode(wardDto.getCode());
-            currentWard.setName(wardDto.getName());
-            currentWard.setState(state);
-            currentWard.setSenatorialDistrict(senatorialDistrict);
-            currentWard.setLga(lga);
-            wardRepository.save(currentWard);
-            return new WardResponse("00", String.format(successTemplate, SERVICE_NAME), currentWard);
-        }
-        throw new NotFoundException(String.format(notFoundTemplate, wardDto.getCode()));
+        Ward currentWard = getWard(id);
+        currentWard.setId(id);
+        currentWard.setCode(wardDto.getCode());
+        currentWard.setName(wardDto.getName());
+        currentWard.setState(state);
+        currentWard.setSenatorialDistrict(senatorialDistrict);
+        currentWard.setLga(lga);
+        wardRepository.save(currentWard);
+        return new WardResponse("00", String.format(successTemplate, SERVICE_NAME), currentWard);
     }
 
     @Override

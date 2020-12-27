@@ -21,6 +21,10 @@ public class PartyAgent extends AbstractBaseModel{
     private Ward ward;
 
     @ManyToOne
+    @JoinColumn(name = "political_party_id", nullable = false)
+    private PoliticalParty politicalParty;
+
+    @ManyToOne
     @JoinColumn(name = "polling_unit_id", nullable = false)
     private PollingUnit pollingUnit;
 
@@ -86,5 +90,13 @@ public class PartyAgent extends AbstractBaseModel{
 
     public void setPollingUnit(PollingUnit pollingUnit) {
         this.pollingUnit = pollingUnit;
+    }
+
+    public PoliticalParty getPoliticalParty() {
+        return politicalParty;
+    }
+
+    public void setPoliticalParty(PoliticalParty politicalParty) {
+        this.politicalParty = politicalParty;
     }
 }

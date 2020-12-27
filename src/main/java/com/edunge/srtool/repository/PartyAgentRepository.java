@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PartyAgentRepository extends JpaRepository<PartyAgent, Long> {
+    PartyAgent findByEmail(String email);
+    PartyAgent findByFirstnameOrLastName(String name);
+    PartyAgent findByPhone(String name);
 }

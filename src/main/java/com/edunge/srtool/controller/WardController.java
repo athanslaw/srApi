@@ -30,7 +30,7 @@ public class WardController {
     }
 
     @GetMapping(value = "/ward", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find state by code.")
+    @ApiOperation(value = "Find ward by code.")
     public ResponseEntity<WardResponse> findWardByCode(@RequestParam String code) throws Exception {
         return ResponseEntity.ok(wardService.findWardByCode(code));
     }
