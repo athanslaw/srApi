@@ -9,7 +9,7 @@ public interface PartyAgentService {
     PartyAgentResponse findPartyAgentById(Long id) throws NotFoundException;
     PartyAgentResponse updatePartyAgent(Long id, PartyAgentDto partyAgentDto) throws NotFoundException;
     PartyAgentResponse deletePartyAgentById(Long id) throws NotFoundException;
-    PartyAgentResponse findPartyAgentByName(String name)throws NotFoundException;
+    PartyAgentResponse findPartyAgentByName(String firstName, String lastname)throws NotFoundException;
     PartyAgentResponse findPartyAgentByPhone(String phone)throws NotFoundException;
     PartyAgentResponse findAll() ;
 }

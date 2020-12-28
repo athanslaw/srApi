@@ -1,8 +1,8 @@
 package com.edunge.srtool.dto;
 
-import com.edunge.srtool.model.AbstractBaseModel;
+import com.edunge.srtool.model.BaseModel;
 
-public class PartyAgentDto extends AbstractBaseModel {
+public class PartyAgentDto extends BaseModel {
     private String firstname;
     private String lastname;
     private String phone;

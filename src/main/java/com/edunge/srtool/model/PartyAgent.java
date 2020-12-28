@@ -5,7 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class PartyAgent extends AbstractBaseModel{
+public class PartyAgent extends BaseModel{
     private String firstname;
     private String lastname;
     private String phone;

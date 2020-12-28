@@ -1,5 +1,7 @@
 package com.edunge.srtool.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -7,6 +9,7 @@ import java.util.Set;
 public class SenatorialDistrict extends AbstractBaseModel {
     @ManyToOne
     @JoinColumn(name = "state_id")
+    @JsonIgnore
     private State state;
 
     @OneToMany(mappedBy="senatorialDistrict")

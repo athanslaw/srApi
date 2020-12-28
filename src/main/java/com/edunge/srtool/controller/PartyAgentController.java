@@ -31,7 +31,7 @@ public class PartyAgentController {
 
     @GetMapping(value = "/party-agent", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find party agent by code.")
-    public ResponseEntity<PartyAgentResponse> findPartyAgentByname(@RequestParam String phone) throws Exception {
+    public ResponseEntity<PartyAgentResponse> findPartyAgentByPhone(@RequestParam String phone) throws Exception {
         return ResponseEntity.ok(partyAgentService.findPartyAgentByPhone(phone));
     }
 
@@ -59,9 +59,9 @@ public class PartyAgentController {
         return ResponseEntity.ok(partyAgentService.deletePartyAgentById(id));
     }
 
-    @GetMapping(value = "/party-agent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/party-agent/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find party agent by name.")
-    public ResponseEntity<PartyAgentResponse> filterPartyAgentByCode(@RequestParam String name) throws Exception {
-        return ResponseEntity.ok(partyAgentService.findPartyAgentByName(name));
+    public ResponseEntity<PartyAgentResponse> filterPartyAgentByName(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname) throws Exception {
+        return ResponseEntity.ok(partyAgentService.findPartyAgentByName(firstname, lastname));
     }
 }

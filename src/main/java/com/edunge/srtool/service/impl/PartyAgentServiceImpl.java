@@ -57,7 +57,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
         PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPollingUnitId());
         Lga lga = getLga(partyAgentDto.getLgaId());
-        Ward ward = wardRepository.findByCode(partyAgentDto.getCode());
+        Ward ward = getWard(partyAgentDto.getWardId());
         PartyAgent partyAgent = partyAgentRepository.findByEmail(partyAgentDto.getEmail());
         if(partyAgent==null){
             partyAgent  = new PartyAgent();
@@ -66,8 +66,6 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgent.setAddress(partyAgentDto.getAddress());
             partyAgent.setEmail(partyAgentDto.getEmail());
             partyAgent.setPhone(partyAgentDto.getPhone());
-            partyAgent.setCode(partyAgentDto.getCode());
-            partyAgent.setName(partyAgentDto.getName());
             partyAgent.setPollingUnit(pollingUnit);
             partyAgent.setWard(ward);
             partyAgent.setPoliticalParty(politicalParty);
@@ -75,7 +73,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentRepository.save(partyAgent);
             return new PartyAgentResponse("00", String.format(successTemplate, SERVICE_NAME), partyAgent);
         }
-        throw new DuplicateException(String.format(duplicateTemplate, partyAgent.getCode()));
+        throw new DuplicateException(String.format(duplicateTemplate, partyAgent.getEmail()));
     }
 
     @Override
@@ -85,8 +83,8 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     }
 
     @Override
-    public PartyAgentResponse findPartyAgentByName(String name) throws NotFoundException {
-        PartyAgent partyAgent = partyAgentRepository.findByFirstnameOrLastName(name);
+    public PartyAgentResponse findPartyAgentByName(String firstname, String lastname) throws NotFoundException {
+        List<PartyAgent> partyAgent = partyAgentRepository.findByFirstnameOrLastname(firstname, lastname);
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
@@ -108,15 +106,13 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
         PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPollingUnitId());
         Lga lga = getLga(partyAgentDto.getLgaId());
-        Ward ward = wardRepository.findByCode(partyAgentDto.getCode());
+        Ward ward = getWard(partyAgentDto.getWardId());
         PartyAgent partyAgent = getPartyAgent(id);
         partyAgent.setFirstname(partyAgentDto.getFirstname());
         partyAgent.setLastname(partyAgentDto.getLastname());
         partyAgent.setAddress(partyAgentDto.getAddress());
         partyAgent.setEmail(partyAgentDto.getEmail());
         partyAgent.setPhone(partyAgentDto.getPhone());
-        partyAgent.setCode(partyAgentDto.getCode());
-        partyAgent.setName(partyAgentDto.getName());
         partyAgent.setPollingUnit(pollingUnit);
         partyAgent.setWard(ward);
         partyAgent.setPoliticalParty(politicalParty);
@@ -129,7 +125,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     public PartyAgentResponse deletePartyAgentById(Long id) throws NotFoundException {
         PartyAgent partyAgent = getPartyAgent(id);
         partyAgentRepository.deleteById(id);
-        return new PartyAgentResponse("00",String.format(deleteTemplate,partyAgent.getCode()));
+        return new PartyAgentResponse("00",String.format(deleteTemplate,partyAgent.getEmail()));
     }
 
     @Override
@@ -150,7 +146,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private PartyAgent getPartyAgent(Long id) throws NotFoundException {
         Optional<PartyAgent> partyAgent = partyAgentRepository.findById(id);
         if(!partyAgent.isPresent()){
-            throw new NotFoundException("State not found.");
+            throw new NotFoundException("Party agent not found.");
         }
         return partyAgent.get();
     }
