@@ -1,18 +1,11 @@
-package com.edunge.srtool.model;
+package com.edunge.srtool.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.Date;
-import java.util.Set;
+import com.edunge.srtool.model.AbstractBaseModel;
 
-@Entity
-public class Election extends AbstractBaseModel{
+public class ElectionDto extends AbstractBaseModel {
     private String description;
     private Integer year;
-    private Date dateOfElection;
-
-    @OneToMany(mappedBy = "election")
-    private Set<Result> results;
+    private String dateOfElection;
 
     public String getDescription() {
         return description;
@@ -30,11 +23,11 @@ public class Election extends AbstractBaseModel{
         this.year = year;
     }
 
-    public Date getDateOfElection() {
+    public String getDateOfElection() {
         return dateOfElection;
     }
 
-    public void setDateOfElection(Date dateOfElection) {
+    public void setDateOfElection(String dateOfElection) {
         this.dateOfElection = dateOfElection;
     }
 }
