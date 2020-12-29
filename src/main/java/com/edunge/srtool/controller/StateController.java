@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="Manage States", description="Endpoints to manage Senatorial District")
+@Api(value="Manage States", description="Endpoints to manage States")
 public class StateController {
 
     private final StateService stateService;
