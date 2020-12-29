@@ -33,4 +33,60 @@ public class AbstractElectionDetails extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "voting_level_id",nullable = false)
     private VotingLevel votingLevel;
+
+    public Election getElection() {
+        return election;
+    }
+
+    public void setElection(Election election) {
+        this.election = election;
+    }
+
+    public PartyAgent getPartyAgent() {
+        return partyAgent;
+    }
+
+    public void setPartyAgent(PartyAgent partyAgent) {
+        this.partyAgent = partyAgent;
+    }
+
+    public SenatorialDistrict getSenatorialDistrict() {
+        return senatorialDistrict;
+    }
+
+    public void setSenatorialDistrict(SenatorialDistrict senatorialDistrict) {
+        this.senatorialDistrict = senatorialDistrict;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
+    }
+
+    public Ward getWard() {
+        return ward;
+    }
+
+    public void setWard(Ward ward) {
+        this.ward = ward;
+    }
+
+    public PollingUnit getPollingUnit() {
+        return pollingUnit;
+    }
+
+    public void setPollingUnit(PollingUnit pollingUnit) {
+        this.pollingUnit = pollingUnit;
+    }
+
+    public VotingLevel getVotingLevel() {
+        return votingLevel;
+    }
+
+    public void setVotingLevel(VotingLevel votingLevel) {
+        this.votingLevel = votingLevel;
+    }
 }

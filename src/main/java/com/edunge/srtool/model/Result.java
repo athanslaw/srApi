@@ -12,4 +12,28 @@ public class Result extends AbstractElectionDetails {
 
     private Integer accreditedVotersCount;
     private Integer registeredVotersCount;
+
+    public PartyAgent getPartyAgent() {
+        return partyAgent;
+    }
+
+    public void setPartyAgent(PartyAgent partyAgent) {
+        this.partyAgent = partyAgent;
+    }
+
+    public Integer getAccreditedVotersCount() {
+        return accreditedVotersCount;
+    }
+
+    public void setAccreditedVotersCount(Integer accreditedVotersCount) {
+        this.accreditedVotersCount = accreditedVotersCount;
+    }
+
+    public Integer getRegisteredVotersCount() {
+        return registeredVotersCount;
+    }
+
+    public void setRegisteredVotersCount(Integer registeredVotersCount) {
+        this.registeredVotersCount = registeredVotersCount;
+    }
 }
