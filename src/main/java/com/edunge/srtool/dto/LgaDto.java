@@ -2,8 +2,12 @@ package com.edunge.srtool.dto;
 
 import com.edunge.srtool.model.AbstractBaseModel;
 
+import javax.validation.constraints.NotNull;
+
 public class LgaDto extends AbstractBaseModel {
+    @NotNull
     private Long stateId;
+    @NotNull
     private Long senatorialDistrictId;
 
     public Long getStateId() {

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ResultPerPartyRepository extends JpaRepository<ResultPerParty, Long> {
+    ResultPerParty findByResultAndPoliticalParty(Long resultId, Long politicalPartyId);
 }

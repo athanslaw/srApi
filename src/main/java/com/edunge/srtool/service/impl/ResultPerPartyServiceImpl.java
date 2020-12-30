@@ -1,13 +1,16 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.dto.ResultDto;
+import com.edunge.srtool.dto.ResultPerPartyDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.*;
-import com.edunge.srtool.repository.*;
-import com.edunge.srtool.response.ResultResponse;
+import com.edunge.srtool.model.PoliticalParty;
+import com.edunge.srtool.model.Result;
+import com.edunge.srtool.model.ResultPerParty;
+import com.edunge.srtool.repository.PoliticalPartyRepository;
+import com.edunge.srtool.repository.ResultPerPartyRepository;
+import com.edunge.srtool.repository.ResultRepository;
+import com.edunge.srtool.response.ResultPerPartyResponse;
 import com.edunge.srtool.service.ResultPerPartyService;
-import com.edunge.srtool.service.ResultService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +23,12 @@ import java.util.Optional;
 @Service
 public class ResultPerPartyServiceImpl implements ResultPerPartyService {
     private final ResultRepository resultRepository;
-    private final PartyAgentRepository partyAgentRepository;
-    private final SenatorialDistrictRepository senatorialDistrictRepository;
-    private final WardRepository wardRepository;
-    private final LgaRepository lgaRepository;
-    private final PollingUnitRepository pollingUnitRepository;
+    private final PoliticalPartyRepository politicalPartyRepository;
+    private final ResultPerPartyRepository resultPerPartyRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultPerPartyServiceImpl.class);
 
-    private static final String SERVICE_NAME = "Result";
+    private static final String SERVICE_NAME = "Result Per Party";
 
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
@@ -49,114 +49,73 @@ public class ResultPerPartyServiceImpl implements ResultPerPartyService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultPerPartyServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository) {
+    public ResultPerPartyServiceImpl(ResultRepository resultRepository, PoliticalPartyRepository politicalPartyRepository, ResultPerPartyRepository resultPerPartyRepository) {
         this.resultRepository = resultRepository;
-        this.partyAgentRepository = partyAgentRepository;
-        this.senatorialDistrictRepository = senatorialDistrictRepository;
-        this.wardRepository = wardRepository;
-        this.lgaRepository = lgaRepository;
-        this.pollingUnitRepository = pollingUnitRepository;
+        this.politicalPartyRepository = politicalPartyRepository;
+        this.resultPerPartyRepository = resultPerPartyRepository;
     }
 
     @Override
-    public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
-        Result result = resultRepository.findByElectionAndWardAndPollingUnit(resultDto.getElectionId(), resultDto.getWardId(), resultDto.getPollingUnitId());
-        if(result==null){
-            PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
-            SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
-            Lga lga = getLga(resultDto.getLgaId());
-            PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
-            result = new Result();
-            result.setSenatorialDistrict(senatorialDistrict);
-            result.setLga(lga);
-            result.setPartyAgent(partyAgent);
-            result.setPollingUnit(pollingUnit);
-            result.setLga(lga);
-            resultRepository.save(result);
-            return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
+    public ResultPerPartyResponse saveResultPerParty(ResultPerPartyDto resultPerPartyDto) throws NotFoundException {
+
+        ResultPerParty resultPerParty = resultPerPartyRepository.findByResultAndPoliticalParty(resultPerPartyDto.getResultId(), resultPerPartyDto.getPoliticalPartyId());
+        if(resultPerParty==null){
+            resultPerParty = new ResultPerParty();
+            Result result = getResult(resultPerPartyDto.getResultId());
+            PoliticalParty politicalParty = getPoliticalParty(resultPerPartyDto.getPoliticalPartyId());
+
+            resultPerParty.setPoliticalParty(politicalParty);
+            resultPerParty.setResult(result);
+            resultPerParty.setVoteCount(resultPerPartyDto.getVoteCount());
+            resultPerPartyRepository.save(resultPerParty);
+            return new ResultPerPartyResponse("00", String.format(successTemplate,SERVICE_NAME), resultPerParty);
         }
-        throw new DuplicateException(String.format(duplicateTemplate, resultDto.getCode()));
+        throw new DuplicateException(String.format(duplicateTemplate, resultPerParty.getPoliticalParty().getName()));
     }
 
     @Override
-    public ResultResponse findResultById(Long id) throws NotFoundException {
-        Result result = getResult(id);
-        return new ResultResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), result);
+    public ResultPerPartyResponse findResultPerPartyById(Long id) throws NotFoundException {
+        ResultPerParty result = getResultPerParty(id);
+        return new ResultPerPartyResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), result);
     }
 
 
     @Override
-    public ResultResponse updateResult(Long id, ResultDto resultDto) throws NotFoundException {
-        Result result = getResult(id);
-        PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
-        Lga lga = getLga(resultDto.getLgaId());
-        PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
-        result.setSenatorialDistrict(senatorialDistrict);
-        result.setLga(lga);
-        result.setPartyAgent(partyAgent);
-        result.setPollingUnit(pollingUnit);
-        result.setLga(lga);
-        resultRepository.save(result);
-        return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
+    public ResultPerPartyResponse updateResultPerParty(Long id, ResultPerPartyDto resultPerPartyDto) throws NotFoundException {
+        ResultPerParty resultPerParty = getResultPerParty(id);
+        Result result = getResult(resultPerPartyDto.getResultId());
+        PoliticalParty politicalParty = getPoliticalParty(resultPerPartyDto.getPoliticalPartyId());
+
+        resultPerParty.setPoliticalParty(politicalParty);
+        resultPerParty.setResult(result);
+        resultPerParty.setVoteCount(resultPerPartyDto.getVoteCount());
+        resultPerPartyRepository.save(resultPerParty);
+        return new ResultPerPartyResponse("00", String.format(successTemplate,SERVICE_NAME), resultPerParty);
     }
 
     @Override
-    public ResultResponse deleteResultById(Long id) throws NotFoundException {
-        Result result = getElection(id);
+    public ResultPerPartyResponse deleteResultPerPartyById(Long id) throws NotFoundException {
+        ResultPerParty resultPerParty = getResultPerParty(id);
         resultRepository.deleteById(id);
-        return new ResultResponse("00",String.format(deleteTemplate,SERVICE_NAME));
+        return new ResultPerPartyResponse("00",String.format(deleteTemplate,SERVICE_NAME));
     }
 
     @Override
-    public ResultResponse findAll() {
-        List<Result> elections = resultRepository.findAll();
-        return new ResultResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    public ResultPerPartyResponse findAll() {
+        List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
+        return new ResultPerPartyResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), resultPerParties);
     }
 
-
-    private Result getElection(Long id) throws NotFoundException {
-        Optional<Result> result = resultRepository.findById(id);
-        if(!result.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
-        }
-        return result.get();
-    }
-
-    private Lga getLga(Long id) throws NotFoundException {
-        Optional<Lga> lga = lgaRepository.findById(id);
-        if(!lga.isPresent()){
-            throw new NotFoundException("State not found.");
-        }
-        return lga.get();
-    }
-
-    private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
-        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
-        if(!senatorialDistrict.isPresent()){
-            throw new NotFoundException("Senatorial District not found.");
-        }
-        return senatorialDistrict.get();
-    }
-
-    private Ward getWard(Long id) throws NotFoundException {
-        Optional<Ward> currentWard = wardRepository.findById(id);
-        if(!currentWard.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
-        }
-        return currentWard.get();
-    }
-
-    private PartyAgent getPartyAgent(Long id) throws NotFoundException {
-        Optional<PartyAgent> partyAgent = partyAgentRepository.findById(id);
+    private ResultPerParty getResultPerParty(Long id) throws NotFoundException {
+        Optional<ResultPerParty> partyAgent = resultPerPartyRepository.findById(id);
         if(!partyAgent.isPresent()){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return partyAgent.get();
     }
 
-    private PollingUnit getPollingUnit(Long id) throws NotFoundException {
-        Optional<PollingUnit> currentPollingUnit = pollingUnitRepository.findById(id);
+    private PoliticalParty getPoliticalParty(Long id) throws NotFoundException {
+        Optional<PoliticalParty> currentPollingUnit = politicalPartyRepository.findById(id);
         if(!currentPollingUnit.isPresent()){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }

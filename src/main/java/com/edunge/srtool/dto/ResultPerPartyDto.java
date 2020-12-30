@@ -1,9 +1,16 @@
 package com.edunge.srtool.dto;
 
-import com.edunge.srtool.model.AbstractBaseModel;
+import com.edunge.srtool.model.BaseModel;
 
-public class ResultPerPartyDto extends AbstractBaseModel {
-    private Long resultId, politicalPartyId, voteCount;
+import javax.validation.constraints.NotNull;
+
+public class ResultPerPartyDto extends BaseModel {
+    @NotNull
+    private Long resultId;
+    @NotNull
+    private Long politicalPartyId;
+    @NotNull
+    private Integer voteCount;
 
     public Long getResultId() {
         return resultId;
@@ -21,11 +28,11 @@ public class ResultPerPartyDto extends AbstractBaseModel {
         this.politicalPartyId = politicalPartyId;
     }
 
-    public Long getVoteCount() {
+    public Integer getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteCount(Long voteCount) {
+    public void setVoteCount(Integer voteCount) {
         this.voteCount = voteCount;
     }
 }
