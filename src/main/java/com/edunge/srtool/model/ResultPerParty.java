@@ -16,4 +16,27 @@ public class ResultPerParty extends BaseModel{
 
     private Integer voteCount;
 
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
+
+    public PoliticalParty getPoliticalParty() {
+        return politicalParty;
+    }
+
+    public void setPoliticalParty(PoliticalParty politicalParty) {
+        this.politicalParty = politicalParty;
+    }
+
+    public Integer getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
+    }
 }

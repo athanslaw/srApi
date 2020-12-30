@@ -23,7 +23,6 @@ public class Ward extends AbstractBaseModel {
 
     @ManyToOne
     @JoinColumn(name = "lga_id")
-    @JsonIgnore
     private Lga lga;
 
     @OneToMany(mappedBy = "ward")

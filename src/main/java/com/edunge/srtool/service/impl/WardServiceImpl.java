@@ -117,7 +117,7 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse filterByName(String name) throws NotFoundException {
-        Ward ward = wardRepository.findByNameStartingWith(name);
+        List<Ward> ward = wardRepository.findByNameStartingWith(name);
         if(ward!=null){
             return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
         }
