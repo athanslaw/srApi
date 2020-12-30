@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Ward", description="Endpoints to manage Ward")
+@CrossOrigin(maxAge = 3600)
 public class WardController {
 
     private final WardService wardService;

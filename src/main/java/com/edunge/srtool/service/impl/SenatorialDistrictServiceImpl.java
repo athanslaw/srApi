@@ -102,7 +102,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Override
     public SenatorialDistrictResponse filterByName(String name) throws NotFoundException {
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByNameStartingWith(name);
+        List<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findByNameStartingWith(name);
         if(senatorialDistrict!=null){
             return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), senatorialDistrict);
         }

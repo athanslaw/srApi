@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Incident Type", description="Endpoints to manage Incident Type")
+@CrossOrigin(maxAge = 3600)
 public class IncidentTypeController {
 
     private final IncidentTypeService incidentTypeService;

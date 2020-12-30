@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Party Agent", description="Endpoints to manage Party Agent")
+@CrossOrigin(maxAge = 3600)
 public class PartyAgentController {
 
     private final PartyAgentService partyAgentService;

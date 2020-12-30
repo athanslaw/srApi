@@ -2,9 +2,27 @@ package com.edunge.srtool.dto;
 
 import com.edunge.srtool.model.AbstractBaseModel;
 
+import javax.validation.constraints.NotNull;
+
 public class ResultDto extends AbstractBaseModel {
-    private Long electionId, votingLevelId, partyAgentId, senatorialDistrictId, lgaId, wardId, PollingUnitId;
-    private Integer registeredVotersCount, accreditedCotersCount;
+    @NotNull
+    private Long electionId;
+    @NotNull
+    private Long votingLevelId;
+    @NotNull
+    private Long partyAgentId;
+    @NotNull
+    private Long  senatorialDistrictId;
+    @NotNull
+    private Long  lgaId;
+    @NotNull
+    private Long  wardId;
+    @NotNull
+    private Long  PollingUnitId;
+    @NotNull
+    private Integer registeredVotersCount;
+    @NotNull
+    private Integer  accreditedVotersCount;
 
     public Long getElectionId() {
         return electionId;
@@ -70,11 +88,11 @@ public class ResultDto extends AbstractBaseModel {
         this.registeredVotersCount = registeredVotersCount;
     }
 
-    public Integer getAccreditedCotersCount() {
-        return accreditedCotersCount;
+    public Integer getAccreditedVotersCount() {
+        return accreditedVotersCount;
     }
 
-    public void setAccreditedCotersCount(Integer accreditedCotersCount) {
-        this.accreditedCotersCount = accreditedCotersCount;
+    public void setAccreditedVotersCount(Integer accreditedVotersCount) {
+        this.accreditedVotersCount = accreditedVotersCount;
     }
 }

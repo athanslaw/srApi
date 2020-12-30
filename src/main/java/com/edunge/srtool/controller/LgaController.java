@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Lga", description="Endpoints to manage LGA")
+@CrossOrigin(maxAge = 3600)
 public class LgaController {
 
     private final LgaService lgaService;

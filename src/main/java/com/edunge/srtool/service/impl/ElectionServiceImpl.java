@@ -55,7 +55,7 @@ public class ElectionServiceImpl implements ElectionService {
 
         try {
             Election election = new Election();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm/dd/yyyy");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/mm/yyyy");
             Date dateOfElection = simpleDateFormat.parse(electionDto.getDateOfElection());
             election.setCode(electionDto.getCode());
             election.setName(electionDto.getName());
@@ -88,7 +88,7 @@ public class ElectionServiceImpl implements ElectionService {
     @Override
     public ElectionResponse updateElection(Long id, ElectionDto electionDto) throws NotFoundException {
         Election election = getElection(id);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm/dd/yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/mm/yyyy");
         try {
             Date dateOfElection = simpleDateFormat.parse(electionDto.getDateOfElection());
             election.setId(id);
@@ -120,7 +120,7 @@ public class ElectionServiceImpl implements ElectionService {
 
     @Override
     public ElectionResponse filterByName(String name) throws NotFoundException {
-        Election election = electionRepository.findByNameStartingWith(name);
+        List<Election> election = electionRepository.findByNameStartingWith(name);
         if(election!=null){
             return new ElectionResponse("00", String.format(successTemplate,SERVICE_NAME), election);
         }

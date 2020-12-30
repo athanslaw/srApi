@@ -80,7 +80,7 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
 
     @Override
     public PoliticalPartyResponse filterByName(String name) throws NotFoundException {
-        PoliticalParty politicalParty = politicalPartyRepository.findByNameStartingWith(name);
+        List<PoliticalParty> politicalParty = politicalPartyRepository.findByNameStartingWith(name);
         if(politicalParty!=null){
             return new PoliticalPartyResponse("00", String.format(successTemplate,SERVICE_NAME), politicalParty);
         }
