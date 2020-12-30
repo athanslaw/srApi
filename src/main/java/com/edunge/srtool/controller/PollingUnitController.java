@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Polling Unit", description="Endpoints to manage Polling Unit")
+@CrossOrigin(maxAge = 3600)
 public class PollingUnitController {
 
     private final PollingUnitService pollingUnitService;

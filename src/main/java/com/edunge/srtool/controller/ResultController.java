@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Result", description="Endpoints to manage Result")
+@CrossOrigin(maxAge = 3600)
 public class ResultController {
 
     private final ResultService resultService;

@@ -57,20 +57,19 @@ public class ResultPerPartyServiceImpl implements ResultPerPartyService {
 
     @Override
     public ResultPerPartyResponse saveResultPerParty(ResultPerPartyDto resultPerPartyDto) throws NotFoundException {
+        Result result = getResult(resultPerPartyDto.getResultId());
+        PoliticalParty politicalParty = getPoliticalParty(resultPerPartyDto.getPoliticalPartyId());
 
-        ResultPerParty resultPerParty = resultPerPartyRepository.findByResultAndPoliticalParty(resultPerPartyDto.getResultId(), resultPerPartyDto.getPoliticalPartyId());
+        ResultPerParty resultPerParty = resultPerPartyRepository.findByResultAndPoliticalParty(result, politicalParty);
         if(resultPerParty==null){
             resultPerParty = new ResultPerParty();
-            Result result = getResult(resultPerPartyDto.getResultId());
-            PoliticalParty politicalParty = getPoliticalParty(resultPerPartyDto.getPoliticalPartyId());
-
             resultPerParty.setPoliticalParty(politicalParty);
             resultPerParty.setResult(result);
             resultPerParty.setVoteCount(resultPerPartyDto.getVoteCount());
             resultPerPartyRepository.save(resultPerParty);
             return new ResultPerPartyResponse("00", String.format(successTemplate,SERVICE_NAME), resultPerParty);
         }
-        throw new DuplicateException(String.format(duplicateTemplate, resultPerParty.getPoliticalParty().getName()));
+        throw new DuplicateException(String.format("Results for %s already exists", resultPerParty.getPoliticalParty().getName()));
     }
 
     @Override
@@ -117,7 +116,7 @@ public class ResultPerPartyServiceImpl implements ResultPerPartyService {
     private PoliticalParty getPoliticalParty(Long id) throws NotFoundException {
         Optional<PoliticalParty> currentPollingUnit = politicalPartyRepository.findById(id);
         if(!currentPollingUnit.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+            throw new NotFoundException(String.format(notFoundTemplate,"Political Party"));
         }
         return currentPollingUnit.get();
     }
@@ -125,7 +124,7 @@ public class ResultPerPartyServiceImpl implements ResultPerPartyService {
     private Result getResult(Long id) throws NotFoundException {
         Optional<Result> result = resultRepository.findById(id);
         if(!result.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+            throw new NotFoundException(String.format(notFoundTemplate,"Result"));
         }
         return result.get();
     }

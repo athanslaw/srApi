@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Result Per Party", description="Endpoints to manage Result Per Party")
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class ResultPerPartyController {
 
     private final ResultPerPartyService resultPerPartyService;
@@ -23,7 +24,7 @@ public class ResultPerPartyController {
         this.resultPerPartyService = resultPerPartyService;
     }
 
-    @GetMapping(value = "/result-per-party-per-party/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/result-per-party/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all result per party.")
     public ResponseEntity<ResultPerPartyResponse> findAllResultPerParty(){
         return new ResponseEntity<>(resultPerPartyService.findAll(), HttpStatus.OK);

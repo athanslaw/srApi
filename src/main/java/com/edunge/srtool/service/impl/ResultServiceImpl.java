@@ -20,10 +20,12 @@ import java.util.Optional;
 public class ResultServiceImpl implements ResultService {
     private final ResultRepository resultRepository;
     private final PartyAgentRepository partyAgentRepository;
+    private final ElectionRepository electionRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private final WardRepository wardRepository;
     private final LgaRepository lgaRepository;
     private final PollingUnitRepository pollingUnitRepository;
+    private final VotingLevelRepository votingLevelRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
 
@@ -48,33 +50,45 @@ public class ResultServiceImpl implements ResultService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository) {
+    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository) {
         this.resultRepository = resultRepository;
         this.partyAgentRepository = partyAgentRepository;
+        this.electionRepository = electionRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
         this.lgaRepository = lgaRepository;
         this.pollingUnitRepository = pollingUnitRepository;
+        this.votingLevelRepository = votingLevelRepository;
     }
 
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
-        Result result = resultRepository.findByElectionAndWardAndPollingUnit(resultDto.getElectionId(), resultDto.getWardId(), resultDto.getPollingUnitId());
+        PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
+        Lga lga = getLga(resultDto.getLgaId());
+        PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
+        Election election = getElection(resultDto.getElectionId());
+        VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
+        Ward ward = getWard(resultDto.getWardId());
+        Result result = resultRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
+        //, resultDto.getWardId(), resultDto.getPollingUnitId());
         if(result==null){
-            PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
-            SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
-            Lga lga = getLga(resultDto.getLgaId());
-            PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
+
             result = new Result();
             result.setSenatorialDistrict(senatorialDistrict);
             result.setLga(lga);
+            result.setWard(ward);
             result.setPartyAgent(partyAgent);
             result.setPollingUnit(pollingUnit);
+            result.setElection(election);
+            result.setVotingLevel(votingLevel);
             result.setLga(lga);
+            result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
+            result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
             resultRepository.save(result);
             return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
         }
-        throw new DuplicateException(String.format(duplicateTemplate, resultDto.getCode()));
+        throw new DuplicateException(String.format("Result for %s in %s already exists.", ward.getName(), election.getDescription()));
     }
 
     @Override
@@ -91,18 +105,26 @@ public class ResultServiceImpl implements ResultService {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
         Lga lga = getLga(resultDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
+        Election election = getElection(resultDto.getElectionId());
+        VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
+        Ward ward = getWard(resultDto.getWardId());
         result.setSenatorialDistrict(senatorialDistrict);
         result.setLga(lga);
+        result.setWard(ward);
         result.setPartyAgent(partyAgent);
         result.setPollingUnit(pollingUnit);
+        result.setElection(election);
+        result.setVotingLevel(votingLevel);
         result.setLga(lga);
+        result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
+        result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
         resultRepository.save(result);
         return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
     }
 
     @Override
     public ResultResponse deleteResultById(Long id) throws NotFoundException {
-        Result result = getElection(id);
+        Result result = getResult(id);
         resultRepository.deleteById(id);
         return new ResultResponse("00",String.format(deleteTemplate,SERVICE_NAME));
     }
@@ -114,12 +136,20 @@ public class ResultServiceImpl implements ResultService {
     }
 
 
-    private Result getElection(Long id) throws NotFoundException {
-        Optional<Result> result = resultRepository.findById(id);
-        if(!result.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+    private Election getElection(Long id) throws NotFoundException {
+        Optional<Election> election = electionRepository.findById(id);
+        if(!election.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate,"Election"));
         }
-        return result.get();
+        return election.get();
+    }
+
+    private VotingLevel getVotingLevel(Long id) throws NotFoundException {
+        Optional<VotingLevel> votingLevel = votingLevelRepository.findById(id);
+        if(!votingLevel.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate,"Voting Level"));
+        }
+        return votingLevel.get();
     }
 
     private Lga getLga(Long id) throws NotFoundException {
@@ -141,7 +171,7 @@ public class ResultServiceImpl implements ResultService {
     private Ward getWard(Long id) throws NotFoundException {
         Optional<Ward> currentWard = wardRepository.findById(id);
         if(!currentWard.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+            throw new NotFoundException(String.format(notFoundTemplate,"Ward"));
         }
         return currentWard.get();
     }
@@ -149,7 +179,7 @@ public class ResultServiceImpl implements ResultService {
     private PartyAgent getPartyAgent(Long id) throws NotFoundException {
         Optional<PartyAgent> partyAgent = partyAgentRepository.findById(id);
         if(!partyAgent.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+            throw new NotFoundException(String.format(notFoundTemplate,"Party Agent"));
         }
         return partyAgent.get();
     }
@@ -157,7 +187,7 @@ public class ResultServiceImpl implements ResultService {
     private PollingUnit getPollingUnit(Long id) throws NotFoundException {
         Optional<PollingUnit> currentPollingUnit = pollingUnitRepository.findById(id);
         if(!currentPollingUnit.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+            throw new NotFoundException(String.format(notFoundTemplate,"Polling Unit"));
         }
         return currentPollingUnit.get();
     }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Senatorial District", description="Endpoints to manage Senatorial District")
+@CrossOrigin(maxAge = 3600)
 public class SenatorialDistrictController {
 
     private final SenatorialDistrictService senatorialDistrictService;

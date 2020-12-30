@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage States", description="Endpoints to manage States")
+@CrossOrigin(maxAge = 3600)
 public class StateController {
 
     private final StateService stateService;
