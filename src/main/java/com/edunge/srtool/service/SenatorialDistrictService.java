@@ -12,4 +12,5 @@ public interface SenatorialDistrictService {
     SenatorialDistrictResponse deleteSenatorialDistrictById(Long id) throws NotFoundException;
     SenatorialDistrictResponse findAll() ;
     SenatorialDistrictResponse filterByName(String name) throws NotFoundException;
+    SenatorialDistrictResponse findSenatorialDistrictByStateCode(Long stateCode) throws NotFoundException;
 }

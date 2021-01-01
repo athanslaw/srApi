@@ -90,6 +90,7 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     @Override
     public PoliticalPartyResponse deletePoliticalPartyById(Long id) throws NotFoundException {
         PoliticalParty currentPoliticalParty = getPoliticalParty(id);
+        politicalPartyRepository.deleteById(id);
         return new PoliticalPartyResponse("00",String.format(deleteTemplate,currentPoliticalParty.getCode()));
     }
 

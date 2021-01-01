@@ -66,4 +66,10 @@ public class SenatorialDistrictController {
     public ResponseEntity<SenatorialDistrictResponse> filterSenatorialDistrictByCode(@RequestParam String name) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.filterByName(name));
     }
+
+    @GetMapping(value = "/senatorial-district/state/{stateCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find senatorial district by stateCode.")
+    public ResponseEntity<SenatorialDistrictResponse> filterLGAByStateCode(@PathVariable Long stateCode) throws Exception {
+        return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictByStateCode(stateCode));
+    }
 }
