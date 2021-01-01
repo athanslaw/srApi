@@ -9,7 +9,11 @@ import java.util.List;
 public class PollingUnitResponse extends BaseResponse{
     PollingUnit pollingUnit;
     List<PollingUnit> pollingUnits;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public PollingUnitResponse(String code, String message, PollingUnit pollingUnit) {
         super(code, message);
         this.pollingUnit = pollingUnit;
@@ -26,6 +30,7 @@ public class PollingUnitResponse extends BaseResponse{
     public PollingUnitResponse(String code, String message, List<PollingUnit> pollingUnits) {
         super(code, message);
         this.pollingUnits = pollingUnits;
+        this.count = pollingUnits.size();
     }
 
     public PollingUnit getPollingUnit() {

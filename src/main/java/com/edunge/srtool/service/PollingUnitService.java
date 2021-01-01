@@ -12,4 +12,5 @@ public interface PollingUnitService {
     PollingUnitResponse deletePollingUnitById(Long id) throws NotFoundException;
     PollingUnitResponse findAll() ;
     PollingUnitResponse filterByName(String name) throws NotFoundException;
+    PollingUnitResponse findByWardCode(Long wardCode) throws NotFoundException;
 }

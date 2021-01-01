@@ -66,4 +66,10 @@ public class WardController {
     public ResponseEntity<WardResponse> filterWardByCode(@RequestParam String name) throws Exception {
         return ResponseEntity.ok(wardService.filterByName(name));
     }
+
+    @GetMapping(value = "/ward/lga/{lgaCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find ward by lga code.")
+    public ResponseEntity<WardResponse> filterWardByLgaCode(@PathVariable Long lgaCode) throws Exception {
+        return ResponseEntity.ok(wardService.findByLga(lgaCode));
+    }
 }

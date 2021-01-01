@@ -12,4 +12,5 @@ public interface WardService {
     WardResponse deleteWardById(Long id) throws NotFoundException;
     WardResponse findAll() ;
     WardResponse filterByName(String name) throws NotFoundException;
+    WardResponse findByLga(Long lgaCode) throws NotFoundException;
 }

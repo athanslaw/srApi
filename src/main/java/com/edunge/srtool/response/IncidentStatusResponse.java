@@ -9,7 +9,11 @@ import java.util.List;
 public class IncidentStatusResponse extends BaseResponse {
     IncidentStatus incidentStatus;
     List<IncidentStatus> incidentStatuses;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public IncidentStatusResponse(String code, String message, IncidentStatus politicalParty) {
         super(code, message);
         this.incidentStatus = politicalParty;
@@ -26,6 +30,7 @@ public class IncidentStatusResponse extends BaseResponse {
     public IncidentStatusResponse(String code, String message, List<IncidentStatus> objects) {
         super(code, message);
         this.incidentStatuses = objects;
+        this.count = objects.size();
     }
 
     public IncidentStatus getIncidentStatus() {

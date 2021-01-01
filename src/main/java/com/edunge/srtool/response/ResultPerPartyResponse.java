@@ -9,6 +9,11 @@ import java.util.List;
 public class ResultPerPartyResponse extends BaseResponse{
     ResultPerParty resultPerParty;
     List<ResultPerParty> resultPerParties;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public ResultPerPartyResponse(String code, String message, ResultPerParty resultPerParty) {
         super(code, message);
@@ -26,6 +31,7 @@ public class ResultPerPartyResponse extends BaseResponse{
     public ResultPerPartyResponse(String code, String message, List<ResultPerParty> resultPerParties) {
         super(code, message);
         this.resultPerParties = resultPerParties;
+        this.count = resultPerParties.size();
     }
 
     public ResultPerParty getResultPerParty() {

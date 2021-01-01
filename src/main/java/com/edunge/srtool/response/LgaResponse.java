@@ -9,6 +9,11 @@ import java.util.List;
 public class LgaResponse extends BaseResponse{
     Lga lga;
     List<Lga> lgas;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public LgaResponse(String code, String message, Lga lga) {
         super(code, message);
@@ -26,6 +31,7 @@ public class LgaResponse extends BaseResponse{
     public LgaResponse(String code, String message, List<Lga> lgas) {
         super(code, message);
         this.lgas = lgas;
+        this.count = lgas.size();
     }
 
     public Lga getLga() {

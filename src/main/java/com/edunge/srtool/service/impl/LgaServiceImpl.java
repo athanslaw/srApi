@@ -123,6 +123,12 @@ public class LgaServiceImpl implements LgaService {
         throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
     }
 
+    @Override
+    public LgaResponse findLgaByStateCode(Long stateCode) throws NotFoundException {
+        State state = getState(stateCode);
+        List<Lga> lgaByState = lgaRepository.findByState(state);
+        return new LgaResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
+    }
 
     private Lga getLga(Long id) throws NotFoundException {
         Optional<Lga> currentLga = lgaRepository.findById(id);

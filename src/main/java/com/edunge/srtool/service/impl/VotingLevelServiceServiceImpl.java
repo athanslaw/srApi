@@ -80,6 +80,7 @@ public class VotingLevelServiceServiceImpl implements VotingLevelService {
     @Override
     public VotingLevelResponse deleteVotingLevelById(Long id) throws NotFoundException {
         VotingLevel currentVotingLevel = getVotingLevel(id);
+        votingLevelRepository.deleteById(id);
         return new VotingLevelResponse("00",String.format(deleteTemplate,currentVotingLevel.getCode()));
     }
 

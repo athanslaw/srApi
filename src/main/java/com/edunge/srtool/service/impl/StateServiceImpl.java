@@ -78,6 +78,7 @@ public class StateServiceImpl implements StateService {
     @Override
     public StateResponse deleteStateById(Long id) throws NotFoundException {
         State currentState = getState(id);
+        stateRepository.deleteById(id);
         return new StateResponse("00",String.format("%s deleted successfully.",currentState.getCode()));
     }
 

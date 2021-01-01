@@ -80,6 +80,7 @@ public class IncidentLevelServiceServiceImpl implements IncidentLevelService {
     @Override
     public IncidentLevelResponse deleteIncidentLevelById(Long id) throws NotFoundException {
         IncidentLevel currentIncidentLevel = getIncidentLevel(id);
+        incidentLevelRepository.deleteById(id);
         return new IncidentLevelResponse("00",String.format(deleteTemplate,currentIncidentLevel.getCode()));
     }
 

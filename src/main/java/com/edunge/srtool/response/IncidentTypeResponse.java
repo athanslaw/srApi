@@ -9,7 +9,11 @@ import java.util.List;
 public class IncidentTypeResponse extends BaseResponse {
     IncidentType incidentType;
     List<IncidentType> incidentTypes;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public IncidentTypeResponse(String code, String message, IncidentType politicalParty) {
         super(code, message);
         this.incidentType = politicalParty;
@@ -26,6 +30,7 @@ public class IncidentTypeResponse extends BaseResponse {
     public IncidentTypeResponse(String code, String message, List<IncidentType> objects) {
         super(code, message);
         this.incidentTypes = objects;
+        this.count = objects.size();
     }
 
     public IncidentType getIncidentType() {

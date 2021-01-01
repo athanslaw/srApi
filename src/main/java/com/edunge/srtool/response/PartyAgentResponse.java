@@ -9,7 +9,11 @@ import java.util.List;
 public class PartyAgentResponse extends BaseResponse{
     PartyAgent partyAgent;
     List<PartyAgent> partyAgents;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public PartyAgentResponse(String code, String message, PartyAgent partyAgent) {
         super(code, message);
         this.partyAgent = partyAgent;
@@ -26,6 +30,7 @@ public class PartyAgentResponse extends BaseResponse{
     public PartyAgentResponse(String code, String message, List<PartyAgent> partyAgents) {
         super(code, message);
         this.partyAgents = partyAgents;
+        this.count = partyAgents.size();
     }
 
     public PartyAgent getPartyAgent() {

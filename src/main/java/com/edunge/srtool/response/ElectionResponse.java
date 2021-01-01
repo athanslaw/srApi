@@ -9,7 +9,11 @@ import java.util.List;
 public class ElectionResponse extends BaseResponse{
     Election election;
     List<Election> elections;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public ElectionResponse(String code, String message, Election election) {
         super(code, message);
         this.election = election;
@@ -25,6 +29,7 @@ public class ElectionResponse extends BaseResponse{
 
     public ElectionResponse(String code, String message, List<Election> elections) {
         super(code, message);
+        this.count  = elections.size();
         this.elections = elections;
     }
 
