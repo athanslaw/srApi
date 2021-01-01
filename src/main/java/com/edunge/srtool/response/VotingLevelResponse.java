@@ -9,6 +9,11 @@ import java.util.List;
 public class VotingLevelResponse extends BaseResponse {
     VotingLevel votingLevel;
     List<VotingLevel> votingLevels;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public VotingLevelResponse(String code, String message, VotingLevel politicalParty) {
         super(code, message);
@@ -26,6 +31,7 @@ public class VotingLevelResponse extends BaseResponse {
     public VotingLevelResponse(String code, String message, List<VotingLevel> objects) {
         super(code, message);
         this.votingLevels = objects;
+        this.count = objects.size();
     }
 
     public VotingLevel getVotingLevel() {

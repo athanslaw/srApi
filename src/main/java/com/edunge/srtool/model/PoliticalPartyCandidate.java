@@ -14,8 +14,47 @@ public class PoliticalPartyCandidate extends BaseModel {
     @JoinColumn(name = "political_party_id",nullable = false)
     private PoliticalParty politicalParty;
 
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String imageUrl;
 
+    public Election getElection() {
+        return election;
+    }
+
+    public void setElection(Election election) {
+        this.election = election;
+    }
+
+    public PoliticalParty getPoliticalParty() {
+        return politicalParty;
+    }
+
+    public void setPoliticalParty(PoliticalParty politicalParty) {
+        this.politicalParty = politicalParty;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

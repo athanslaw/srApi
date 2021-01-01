@@ -89,6 +89,7 @@ public class IncidentTypeServiceServiceImpl implements IncidentTypeService {
     @Override
     public IncidentTypeResponse deleteIncidentTypeById(Long id) throws NotFoundException {
         IncidentType currentIncidentType = getIncidentType(id);
+        incidentTypeRepository.deleteById(id);
         return new IncidentTypeResponse("00",String.format(deleteTemplate,currentIncidentType.getCode()));
     }
 

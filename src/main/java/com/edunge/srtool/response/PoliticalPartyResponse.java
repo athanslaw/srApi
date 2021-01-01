@@ -9,7 +9,11 @@ import java.util.List;
 public class PoliticalPartyResponse extends BaseResponse{
     PoliticalParty politicalParty;
     List<PoliticalParty> politicalParties;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public PoliticalPartyResponse(String code, String message, PoliticalParty politicalParty) {
         super(code, message);
         this.politicalParty = politicalParty;
@@ -26,6 +30,7 @@ public class PoliticalPartyResponse extends BaseResponse{
     public PoliticalPartyResponse(String code, String message, List<PoliticalParty> objects) {
         super(code, message);
         this.politicalParties = objects;
+        this.count = objects.size();
     }
 
     public PoliticalParty getPoliticalParty() {

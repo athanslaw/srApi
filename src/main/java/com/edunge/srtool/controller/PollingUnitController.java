@@ -66,4 +66,10 @@ public class PollingUnitController {
     public ResponseEntity<PollingUnitResponse> filterPollingUnitByCode(@RequestParam String name) throws Exception {
         return ResponseEntity.ok(pollingUnitService.filterByName(name));
     }
+
+    @GetMapping(value = "/polling-unit/ward/{wardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find polling unit by ward id.")
+    public ResponseEntity<PollingUnitResponse> filterPollingUnitByCode(@PathVariable Long wardId) throws Exception {
+        return ResponseEntity.ok(pollingUnitService.findByWardCode(wardId));
+    }
 }

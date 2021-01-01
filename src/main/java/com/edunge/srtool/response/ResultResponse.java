@@ -9,7 +9,11 @@ import java.util.List;
 public class ResultResponse extends BaseResponse{
     Result result;
     List<Result> results;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public ResultResponse(String code, String message, Result result) {
         super(code, message);
         this.result = result;
@@ -26,6 +30,7 @@ public class ResultResponse extends BaseResponse{
     public ResultResponse(String code, String message, List<Result> results) {
         super(code, message);
         this.results = results;
+        this.count = results.size();
     }
 
     public Result getResult() {

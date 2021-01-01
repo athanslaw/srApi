@@ -106,6 +106,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardResponse deleteWardById(Long id) throws NotFoundException {
         Ward currentWard = getWard(id);
+        wardRepository.deleteById(id);
         return new WardResponse("00",String.format(deleteTemplate,currentWard.getCode()));
     }
 
@@ -118,6 +119,16 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardResponse filterByName(String name) throws NotFoundException {
         List<Ward> ward = wardRepository.findByNameStartingWith(name);
+        if(ward!=null){
+            return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
+        }
+        throw new NotFoundException("Ward not found.");
+    }
+
+    @Override
+    public WardResponse findByLga(Long lgaCode) throws NotFoundException {
+        Lga lga = getLga(lgaCode);
+        List<Ward> ward = wardRepository.findByLga(lga);
         if(ward!=null){
             return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
         }

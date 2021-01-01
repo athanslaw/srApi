@@ -90,8 +90,9 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Override
     public SenatorialDistrictResponse deleteSenatorialDistrictById(Long id) throws NotFoundException {
-        SenatorialDistrict currentLga = getSenatorialDistrict(id);
-        return new SenatorialDistrictResponse("00",String.format("%s deleted successfully.",currentLga.getCode()));
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
+        senatorialDistrictRepository.deleteById(id);
+        return new SenatorialDistrictResponse("00",String.format("%s deleted successfully.",senatorialDistrict.getCode()));
     }
 
     @Override

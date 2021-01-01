@@ -8,6 +8,11 @@ import java.util.List;
 public class StateResponse extends BaseResponse{
     State state;
     List<State> states;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public StateResponse(String code, String message, State state) {
         super(code, message);
@@ -25,6 +30,7 @@ public class StateResponse extends BaseResponse{
     public StateResponse(String code, String message, List<State> states) {
         super(code, message);
         this.states = states;
+        this.count = states.size();
     }
 
     public State getState() {

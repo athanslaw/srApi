@@ -9,7 +9,11 @@ import java.util.List;
 public class IncidentLevelResponse extends BaseResponse {
     IncidentLevel incidentLevel;
     List<IncidentLevel> incidentLevels;
+    Integer count;
 
+    public Integer getCount() {
+        return count;
+    }
     public IncidentLevelResponse(String code, String message, IncidentLevel politicalParty) {
         super(code, message);
         this.incidentLevel = politicalParty;
@@ -26,6 +30,7 @@ public class IncidentLevelResponse extends BaseResponse {
     public IncidentLevelResponse(String code, String message, List<IncidentLevel> objects) {
         super(code, message);
         this.incidentLevels = objects;
+        this.count = objects.size();
     }
 
     public IncidentLevel getIncidentLevel() {

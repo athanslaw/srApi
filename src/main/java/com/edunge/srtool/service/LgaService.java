@@ -12,4 +12,5 @@ public interface LgaService {
     LgaResponse deleteLgaById(Long id) throws NotFoundException;
     LgaResponse findAll() ;
     LgaResponse filterByName(String name) throws NotFoundException;
+    LgaResponse findLgaByStateCode(Long stateCode) throws NotFoundException;
 }

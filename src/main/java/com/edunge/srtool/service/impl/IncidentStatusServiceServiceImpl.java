@@ -80,6 +80,7 @@ public class IncidentStatusServiceServiceImpl implements IncidentStatusService {
     @Override
     public IncidentStatusResponse deleteIncidentStatusById(Long id) throws NotFoundException {
         IncidentStatus currentIncidentStatus = getIncidentStatus(id);
+        incidentStatusRepository.deleteById(id);
         return new IncidentStatusResponse("00",String.format(deleteTemplate,currentIncidentStatus.getCode()));
     }
 

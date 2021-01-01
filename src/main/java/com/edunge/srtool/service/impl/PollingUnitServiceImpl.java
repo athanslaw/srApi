@@ -121,9 +121,20 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     }
 
     @Override
+    public PollingUnitResponse findByWardCode(Long wardCode) throws NotFoundException {
+        Ward ward = getWard(wardCode);
+        List<PollingUnit> pollingUnit = pollingUnitRepository.findByWard(ward);
+        if(pollingUnit!=null){
+            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
+
+    @Override
     public PollingUnitResponse deletePollingUnitById(Long id) throws NotFoundException {
-        Ward currentWard = getWard(id);
-        return new PollingUnitResponse("00",String.format(deleteTemplate,currentWard.getCode()));
+        PollingUnit currentPollingUnit = getPollingUnit(id);
+        pollingUnitRepository.deleteById(id);
+        return new PollingUnitResponse("00",String.format(deleteTemplate,currentPollingUnit.getCode()));
     }
 
     @Override

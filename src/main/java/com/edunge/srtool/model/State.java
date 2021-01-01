@@ -17,4 +17,13 @@ public class State extends AbstractBaseModel {
 
     @OneToMany(mappedBy="state")
     Set<SenatorialDistrict> senatorialDistricts;
+    private String svgUrl;
+
+    public String getSvgUrl() {
+        return svgUrl;
+    }
+
+    public void setSvgUrl(String svgUrl) {
+        this.svgUrl = svgUrl;
+    }
 }

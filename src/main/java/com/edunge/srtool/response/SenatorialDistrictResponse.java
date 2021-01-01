@@ -8,6 +8,11 @@ import java.util.List;
 public class SenatorialDistrictResponse extends BaseResponse {
     SenatorialDistrict senatorialDistrict;
     List<SenatorialDistrict> senatorialDistricts;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public SenatorialDistrictResponse(String code, String message, SenatorialDistrict senatorialDistrict) {
         super(code, message);
@@ -25,6 +30,7 @@ public class SenatorialDistrictResponse extends BaseResponse {
     public SenatorialDistrictResponse(String code, String message, List<SenatorialDistrict> senatorialDistricts) {
         super(code, message);
         this.senatorialDistricts = senatorialDistricts;
+        this.count = senatorialDistricts.size();
     }
 
     public SenatorialDistrict getSenatorialDistrict() {

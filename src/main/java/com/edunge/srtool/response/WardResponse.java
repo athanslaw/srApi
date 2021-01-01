@@ -9,6 +9,11 @@ import java.util.List;
 public class WardResponse extends BaseResponse{
     Ward ward;
     List<Ward> wards;
+    Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
 
     public WardResponse(String code, String message, Ward ward) {
         super(code, message);
@@ -26,6 +31,7 @@ public class WardResponse extends BaseResponse{
     public WardResponse(String code, String message, List<Ward> wards) {
         super(code, message);
         this.wards = wards;
+        this.count = wards.size();
     }
 
     public Ward getWard() {
