@@ -18,7 +18,7 @@ public class IncidentDto extends AbstractBaseModel {
     @NotNull
     private Long  wardId;
     @NotNull
-    private Long  PollingUnitId;
+    private Long pollingUnitId;
     @NotNull
     private String description;
     @NotNull
@@ -99,10 +99,10 @@ public class IncidentDto extends AbstractBaseModel {
     }
 
     public Long getPollingUnitId() {
-        return PollingUnitId;
+        return pollingUnitId;
     }
 
     public void setPollingUnitId(Long pollingUnitId) {
-        PollingUnitId = pollingUnitId;
+        this.pollingUnitId = pollingUnitId;
     }
 }

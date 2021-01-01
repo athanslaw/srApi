@@ -1,15 +1,25 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.StateService;
+import com.edunge.srtool.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +27,9 @@ import java.util.Optional;
 public class StateServiceImpl implements StateService {
     private final StateRepository stateRepository;
     private static final String SERVICE_NAME = "State";
+    private static final Logger logger = LoggerFactory.getLogger(PoliticalPartyCandidateServiceServiceImpl.class);
+
+    private final Path fileStorageLocation;
 
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
@@ -36,18 +49,32 @@ public class StateServiceImpl implements StateService {
     @Value("${fetch.message.template}")
     private String fetchRecordTemplate;
     @Autowired
-    public StateServiceImpl(StateRepository stateRepository) {
+    public StateServiceImpl(StateRepository stateRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.stateRepository = stateRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
-    public StateResponse saveState(State state) throws NotFoundException {
-        State existingState = stateRepository.findByCode(state.getCode());
+    public StateResponse saveState(String code, String name, MultipartFile file) throws NotFoundException {
+        State existingState = stateRepository.findByCode(code);
         if(existingState==null){
-            stateRepository.save(state);
-            return new StateResponse("00", "State updated successfully", state);
+            existingState = new State();
+            existingState.setCode(code);
+            existingState.setName(name);
+            FileUtil.uploadFile(file, fileStorageLocation);
+            String fileUrl = getSvgUrl(file.getOriginalFilename());
+            existingState.setSvgUrl(fileUrl);
+
+            stateRepository.save(existingState);
+            return new StateResponse("00", "State updated successfully", existingState);
         }
-        throw new DuplicateException(String.format("%s already exist.", state.getCode()));
+        throw new DuplicateException(String.format("%s already exist.", existingState.getCode()));
     }
 
     @Override
@@ -66,11 +93,14 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
-    public StateResponse editState(Long id, State state) throws NotFoundException {
+    public StateResponse editState(Long id, String code, String name, MultipartFile file) throws NotFoundException {
         State currentState =  getState(id);
         currentState.setId(id);
-        currentState.setCode(state.getCode());
-        currentState.setName(state.getName());
+        currentState.setCode(code);
+        currentState.setName(name);
+
+        String fileUrl = getSvgUrl(file.getOriginalFilename());
+        currentState.setSvgUrl(fileUrl);
         stateRepository.save(currentState);
         return new StateResponse("00", "State updated successfully", currentState);
     }
@@ -92,6 +122,11 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
+    public Resource loadSvg(String fileName) {
+        return FileUtil.loadResource(fileName, fileStorageLocation);
+    }
+
+    @Override
     public StateResponse findAll() {
         List<State> states = stateRepository.findAll();
         return new StateResponse("00", "All states retrieved.", states);
@@ -103,5 +138,12 @@ public class StateServiceImpl implements StateService {
             throw new NotFoundException("State not found.");
         }
         return currentState.get();
+    }
+
+    private String getSvgUrl(String fileName){
+        StringBuilder sb = new StringBuilder();
+        sb.append("/uploads/svg/");
+        sb.append(fileName);
+        return sb.toString();
     }
 }

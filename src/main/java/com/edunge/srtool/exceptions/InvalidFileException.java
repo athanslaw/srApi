@@ -1,4 +1,4 @@
-package com.progressoft.task.exception;
+package com.edunge.srtool.exceptions;
 
 public class InvalidFileException extends RuntimeException{
     private final String code = "10";

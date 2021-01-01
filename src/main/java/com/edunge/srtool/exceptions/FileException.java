@@ -1,4 +1,4 @@
-package com.progressoft.task.exception;
+package com.edunge.srtool.exceptions;
 
 public class FileException extends RuntimeException{
     private final String code = "06";
