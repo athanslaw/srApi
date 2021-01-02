@@ -4,7 +4,9 @@ import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
+import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.State;
+import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.StateService;
@@ -26,6 +28,7 @@ import java.util.Optional;
 @Service
 public class StateServiceImpl implements StateService {
     private final StateRepository stateRepository;
+    private final LgaRepository lgaRepository;
     private static final String SERVICE_NAME = "State";
     private static final Logger logger = LoggerFactory.getLogger(PoliticalPartyCandidateServiceServiceImpl.class);
 
@@ -49,8 +52,9 @@ public class StateServiceImpl implements StateService {
     @Value("${fetch.message.template}")
     private String fetchRecordTemplate;
     @Autowired
-    public StateServiceImpl(StateRepository stateRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.stateRepository = stateRepository;
+        this.lgaRepository = lgaRepository;
         this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
                 .toAbsolutePath().normalize();
         try {
@@ -138,6 +142,11 @@ public class StateServiceImpl implements StateService {
             throw new NotFoundException("State not found.");
         }
         return currentState.get();
+    }
+
+    private List<Lga> getLga(State state) throws NotFoundException {
+        List<Lga> lga = lgaRepository.findByState(state);
+        return lga;
     }
 
     private String getSvgUrl(String fileName){

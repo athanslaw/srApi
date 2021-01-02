@@ -1,7 +1,5 @@
 package com.edunge.srtool.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,12 +11,10 @@ public class Ward extends AbstractBaseModel {
 
     @ManyToOne
     @JoinColumn(name = "state_id")
-    @JsonIgnore
     private State state;
 
     @ManyToOne
     @JoinColumn(name = "senatorial_district_id")
-    @JsonIgnore
     private SenatorialDistrict senatorialDistrict;
 
     @ManyToOne
