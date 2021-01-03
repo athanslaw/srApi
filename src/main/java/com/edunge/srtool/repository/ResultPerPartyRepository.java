@@ -6,7 +6,10 @@ import com.edunge.srtool.model.ResultPerParty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ResultPerPartyRepository extends JpaRepository<ResultPerParty, Long> {
     ResultPerParty findByResultAndPoliticalParty(Result result, PoliticalParty politicalParty);
+    List<ResultPerParty> findByResult(Result result);
 }
