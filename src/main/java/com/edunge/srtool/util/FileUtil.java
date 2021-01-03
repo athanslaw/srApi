@@ -20,6 +20,7 @@ public class FileUtil {
         if(Objects.requireNonNull(file.getOriginalFilename()).endsWith(".jpg")
                 || file.getOriginalFilename().endsWith(".png")
                 || file.getOriginalFilename().endsWith(".jpeg")
+                || file.getOriginalFilename().endsWith(".svg")
         ){
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             try {
