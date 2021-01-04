@@ -120,7 +120,7 @@ public class WardServiceImpl implements WardService {
     public WardResponse filterByName(String name) throws NotFoundException {
         List<Ward> ward = wardRepository.findByNameStartingWith(name);
         if(ward!=null){
-            return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
+            return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), ward);
         }
         throw new NotFoundException("Ward not found.");
     }

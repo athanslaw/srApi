@@ -55,7 +55,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse savePartyAgent(PartyAgentDto partyAgentDto) throws NotFoundException {
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPollingUnitId());
+        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPoliticalPartyId());
         Lga lga = getLga(partyAgentDto.getLgaId());
         Ward ward = getWard(partyAgentDto.getWardId());
         PartyAgent partyAgent = partyAgentRepository.findByEmail(partyAgentDto.getEmail());
@@ -104,7 +104,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     public PartyAgentResponse updatePartyAgent(Long id, PartyAgentDto partyAgentDto) throws NotFoundException {
 
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPollingUnitId());
+        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPoliticalPartyId());
         Lga lga = getLga(partyAgentDto.getLgaId());
         Ward ward = getWard(partyAgentDto.getWardId());
         PartyAgent partyAgent = getPartyAgent(id);

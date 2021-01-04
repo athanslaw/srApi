@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -98,8 +99,8 @@ public class DashboardServiceImpl implements DashboardService {
         Long totalStates = getTotalStates();
         Long totalLgas = lgaByState(state);
         Long totalSenatorialDistricts = senatorialDistrictByState(state);
-        Integer totalRegisteredVotes = getRegisteredVotersPerSenatorialDistrict(state);
-        Integer totalAccreditedVotes =  getAccreditedVotesPerSenatorialDistrict(state);
+        Integer totalRegisteredVotes = getRegisteredVotersPerState(state);
+        Integer totalAccreditedVotes =  getAccreditedVotesPerState(state);
         Long totalWards  = Long.valueOf(getWardsByLocalGovernment(state));
         Long totalPollingUnits = Long.valueOf(getPollingUnitsByWard(state));
         Integer totalVoteCounts = getVoteCountsByState(state);
@@ -113,11 +114,26 @@ public class DashboardServiceImpl implements DashboardService {
         List<PartyResult> partyResults = new ArrayList<>();
         politicalParties
                 .forEach(politicalParty -> {
+
+                    List<Result> results = resultRepository.findAll();
+                    AtomicReference<Integer> voteCount = new AtomicReference<>(0);
+                    results.stream()
+                            .filter(result -> result.getLga().getState().getId().equals(state.getId()))
+                            .map(Result::getResultPerParties).forEach(resultPerParties -> {
+                        for (ResultPerParty resultPerparty: resultPerParties) {
+                            if(resultPerparty.getPoliticalParty().getId().equals(politicalParty.getId())){
+                                voteCount.updateAndGet(v -> v + resultPerparty.getVoteCount());
+                            }
+                        }
+                    });
                     PartyResult partyResult = new PartyResult();
                     partyResult.setPoliticalParty(politicalParty);
+                    partyResult.setTotalVoteCount(voteCount.get());
+                    Double percent = (voteCount.get() * 100.0) / totalVoteCounts;
+                    partyResult.setPercent(percent);
                     partyResults.add(partyResult);
                 });
-        return new DashboardResponse("00", "Dashboard loaded", totalStates,
+        return new DashboardResponse("00", "Dashboard loaded.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
@@ -134,12 +150,17 @@ public class DashboardServiceImpl implements DashboardService {
         return (long) lga.size();
     }
 
+    private Long lgaBySenatorialDisctrict(SenatorialDistrict senatorialDistrict){
+        List<Lga> lga = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
+        return (long) lga.size();
+    }
+
     private Long senatorialDistrictByState(State state){
         List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
         return (long) senatorialDistricts.size();
     }
 
-    private Integer getRegisteredVotersPerSenatorialDistrict(State state){
+    private Integer getRegisteredVotersPerState(State state){
         List<Result> results = resultRepository.findAll();
         List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
         int totalResult = 0;
@@ -154,7 +175,18 @@ public class DashboardServiceImpl implements DashboardService {
         return totalResult;
     }
 
-    private Integer getAccreditedVotesPerSenatorialDistrict(State state){
+    private Integer getRegisteredVotersPerSenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        List<Result> results = resultRepository.findAll();
+//        List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
+        int totalResult = 0;
+        totalResult += results.stream()
+            .filter(result -> result.getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
+            .map(Result::getRegisteredVotersCount).mapToInt(Integer::intValue).sum();
+        return totalResult;
+    }
+
+
+    private Integer getAccreditedVotesPerState(State state){
         List<Result> results = resultRepository.findAll();
         List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
         int totalResult = 0;
@@ -169,10 +201,33 @@ public class DashboardServiceImpl implements DashboardService {
         return totalResult;
     }
 
+    private Integer getAccreditedVotesPerSenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        List<Result> results = resultRepository.findAll();
+        int totalResult = 0;
+            totalResult += results.stream()
+                    .filter(result -> result.getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
+                    .map(Result::getAccreditedVotersCount).mapToInt(Integer::intValue).sum();
+        return totalResult;
+    }
+
 
     public Integer getWardsByLocalGovernment(State state){
         List<Ward> wards = wardRepository.findAll();
         List<Lga> lgas = lgaRepository.findByState(state);
+        int totalResult = 0;
+
+        if(lgas.size()>0){
+            for (Lga lga:lgas) {
+                totalResult += wards.stream()
+                        .filter(ward ->  ward.getLga().getId().equals(lga.getId())).count();
+            }
+        }
+        return totalResult;
+    }
+
+    public Integer getWardsBySenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        List<Ward> wards = wardRepository.findAll();
+        List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
         int totalResult = 0;
 
         if(lgas.size()>0){
@@ -203,10 +258,37 @@ public class DashboardServiceImpl implements DashboardService {
         return totalResult;
     }
 
+    public Integer getPollingUnitsByWardBySenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        List<PollingUnit> pollingUnits = pollingUnitRepository.findAll();
+        List<Ward> wards = wardRepository.findAll();
+        List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
+        int totalResult = 0;
+
+        if(lgas.size()>0){
+            for (Lga lga:lgas) {
+                for (Ward ward : wards) {
+                    if (ward.getLga().getId().equals(lga.getId())) {
+                        totalResult += pollingUnits.stream()
+                                .filter(pollingUnit -> pollingUnit.getWard().getId().equals(ward.getId())).count();
+                    }
+                }
+            }
+        }
+        return totalResult;
+    }
+
     public Integer getVoteCountsByState(State state){
         List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
         return resultPerParties.stream()
                 .filter(resultPerParty -> resultPerParty.getResult().getLga().getState().getId().equals(state.getId()))
+                .map(ResultPerParty::getVoteCount)
+                .mapToInt(Integer::intValue).sum();
+    }
+
+    public Integer getVoteCountsBySenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
+        return resultPerParties.stream()
+                .filter(resultPerParty -> resultPerParty.getResult().getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
                 .map(ResultPerParty::getVoteCount)
                 .mapToInt(Integer::intValue).sum();
     }
@@ -220,11 +302,29 @@ public class DashboardServiceImpl implements DashboardService {
         return (long) pollingUnits.size();
     }
 
+    public Long getSenatorialDistrictPollingUnitsWithResult(SenatorialDistrict senatorialDistrict){
+        List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
+        HashSet<String> pollingUnits = new HashSet<>();
+        resultPerParties.stream()
+                .filter(resultPerParty -> resultPerParty.getResult().getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
+                .forEach(resultPerParty -> pollingUnits.add(resultPerParty.getResult().getPollingUnit().getCode()));
+        return (long) pollingUnits.size();
+    }
+
     public Long getStateWardsWithResult(State state){
         List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
         HashSet<String> wards = new HashSet<>();
         resultPerParties.stream()
                 .filter(resultPerParty -> resultPerParty.getResult().getLga().getState().getId().equals(state.getId()))
+                .forEach(resultPerParty -> wards.add(resultPerParty.getResult().getWard().getCode()));
+        return (long) wards.size();
+    }
+
+    public Long getSenatorialDistrictWardsWithResult(SenatorialDistrict senatorialDistrict){
+        List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
+        HashSet<String> wards = new HashSet<>();
+        resultPerParties.stream()
+                .filter(resultPerParty -> resultPerParty.getResult().getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
                 .forEach(resultPerParty -> wards.add(resultPerParty.getResult().getWard().getCode()));
         return (long) wards.size();
     }
@@ -238,6 +338,15 @@ public class DashboardServiceImpl implements DashboardService {
         return (long) lga.size();
     }
 
+    public Long getSenatorialDistrcitLgasWithResult(SenatorialDistrict senatorialDistrict){
+        List<ResultPerParty> resultPerParties = resultPerPartyRepository.findAll();
+        HashSet<String> lga = new HashSet<>();
+        resultPerParties.stream()
+                .filter(resultPerParty -> resultPerParty.getResult().getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
+                .forEach(resultPerParty -> lga.add(resultPerParty.getResult().getLga().getCode()));
+        return (long) lga.size();
+    }
+
     private State getState(Long id) throws NotFoundException {
         Optional<State> state = stateRepository.findById(id);
         if(!state.isPresent()){
@@ -245,4 +354,68 @@ public class DashboardServiceImpl implements DashboardService {
         }
         return state.get();
     }
+
+    private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
+        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
+        if(!senatorialDistrict.isPresent()){
+            throw new NotFoundException("State not found.");
+        }
+        return senatorialDistrict.get();
+    }
+
+    @Override
+    public DashboardResponse getDashboardBySenatorialDistrict(Long senatorialDistrictId) throws NotFoundException {
+
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(senatorialDistrictId);
+
+        Long totalStates = getTotalStates();
+        Long totalLgas = lgaBySenatorialDisctrict(senatorialDistrict);
+        Long totalSenatorialDistricts = 1L;
+        Integer totalRegisteredVotes = getRegisteredVotersPerSenatorialDistrict(senatorialDistrict);
+        Integer totalAccreditedVotes =  getAccreditedVotesPerSenatorialDistrict(senatorialDistrict);
+        Long totalWards  = Long.valueOf(getWardsBySenatorialDistrict(senatorialDistrict));
+        Long totalPollingUnits = Long.valueOf(getPollingUnitsByWardBySenatorialDistrict(senatorialDistrict));
+        Integer totalVoteCounts = getVoteCountsBySenatorialDistrict(senatorialDistrict);
+        Long lgaWithResults = getSenatorialDistrcitLgasWithResult(senatorialDistrict);
+        Long wardsWithResults = getSenatorialDistrictWardsWithResult(senatorialDistrict);
+        Long pollingUnitsWithResults = getSenatorialDistrictPollingUnitsWithResult(senatorialDistrict);
+
+        Double resultsReceived = (totalVoteCounts *100.0) / totalAccreditedVotes;
+
+        List<PoliticalParty> politicalParties = politicalPartyRepository.findAll();
+        List<PartyResult> partyResults = new ArrayList<>();
+        politicalParties
+                .forEach(politicalParty -> {
+
+                    List<Result> results = resultRepository.findAll();
+                    AtomicReference<Integer> voteCount = new AtomicReference<>(0);
+                    results.stream()
+                            .filter(result -> result.getSenatorialDistrict().getId().equals(senatorialDistrict.getId()))
+                            .map(Result::getResultPerParties).forEach(resultPerParties -> {
+                        for (ResultPerParty resultPerparty: resultPerParties) {
+                            if(resultPerparty.getPoliticalParty().getId().equals(politicalParty.getId())){
+                                voteCount.updateAndGet(v -> v + resultPerparty.getVoteCount());
+                            }
+                        }
+                    });
+                    PartyResult partyResult = new PartyResult();
+                    partyResult.setPoliticalParty(politicalParty);
+                    partyResult.setTotalVoteCount(voteCount.get());
+                    Double percent = (voteCount.get() * 100.0) / totalVoteCounts;
+                    partyResult.setPercent(percent);
+                    partyResults.add(partyResult);
+                });
+        return new DashboardResponse("00", "Dashboard loaded.", totalStates,
+                totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
+                totalVoteCounts, totalWards, totalPollingUnits,
+                lgaWithResults,
+                wardsWithResults,
+                pollingUnitsWithResults,
+                resultsReceived,
+                partyResults
+        );
+    }
+
+
+
 }

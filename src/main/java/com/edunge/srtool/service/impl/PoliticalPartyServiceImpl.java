@@ -51,7 +51,7 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     public PoliticalPartyResponse savePoliticalParty(PoliticalPartyDto politicalParty) throws NotFoundException {
         PoliticalParty existingPoliticalParty = politicalPartyRepository.findByCode(politicalParty.getCode());
         if(existingPoliticalParty==null){
-            State state = getState(politicalParty.getStateId());
+//            State state = getState(politicalParty.getStateId());
             existingPoliticalParty = new PoliticalParty();
 //            existingPoliticalParty.setState(state);
             existingPoliticalParty.setCode(politicalParty.getCode());
