@@ -1,6 +1,6 @@
 package com.edunge.srtool.controller;
 
-import com.edunge.srtool.model.PoliticalParty;
+import com.edunge.srtool.dto.PoliticalPartyDto;
 import com.edunge.srtool.response.PoliticalPartyResponse;
 import com.edunge.srtool.service.PoliticalPartyService;
 import io.swagger.annotations.Api;
@@ -45,13 +45,13 @@ public class PoliticalPartyController {
 
     @RequestMapping(value = "/political-party", method = RequestMethod.POST)
     @ApiOperation(value = "Save Political Party to the DB")
-    public ResponseEntity<PoliticalPartyResponse> storePoliticalParty(@RequestBody PoliticalParty politicalParty) throws Exception {
+    public ResponseEntity<PoliticalPartyResponse> storePoliticalParty(@RequestBody PoliticalPartyDto politicalParty) throws Exception {
         return ResponseEntity.ok(politicalService.savePoliticalParty(politicalParty));
     }
 
     @RequestMapping(value = "/political-party/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "Update Political Party to the DB")
-    public ResponseEntity<PoliticalPartyResponse> updatePoliticalParty(@PathVariable Long id, @RequestBody PoliticalParty politicalParty) throws Exception {
+    public ResponseEntity<PoliticalPartyResponse> updatePoliticalParty(@PathVariable Long id, @RequestBody PoliticalPartyDto politicalParty) throws Exception {
         return ResponseEntity.ok(politicalService.editPoliticalParty(id, politicalParty));
     }
 

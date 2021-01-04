@@ -4,10 +4,12 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.DashboardResponse;
+import com.edunge.srtool.response.PartyResult;
 import com.edunge.srtool.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -107,13 +109,22 @@ public class DashboardServiceImpl implements DashboardService {
 
         Double resultsReceived = (totalVoteCounts *100.0) / totalAccreditedVotes;
 
+        List<PoliticalParty> politicalParties = politicalPartyRepository.findAll();
+        List<PartyResult> partyResults = new ArrayList<>();
+        politicalParties
+                .forEach(politicalParty -> {
+                    PartyResult partyResult = new PartyResult();
+                    partyResult.setPoliticalParty(politicalParty);
+                    partyResults.add(partyResult);
+                });
         return new DashboardResponse("00", "Dashboard loaded", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
                 wardsWithResults,
                 pollingUnitsWithResults,
-                resultsReceived
+                resultsReceived,
+                partyResults
         );
     }
 
