@@ -10,4 +10,5 @@ import java.util.List;
 public interface PoliticalPartyRepository extends JpaRepository<PoliticalParty, Long> {
     PoliticalParty findByCode(String code);
     List<PoliticalParty> findByNameStartingWith(String name);
+//    List<PoliticalParty> findByState(State state);
 }

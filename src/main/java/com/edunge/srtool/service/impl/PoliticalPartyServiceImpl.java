@@ -1,9 +1,12 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.dto.PoliticalPartyDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.PoliticalParty;
+import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.PoliticalPartyRepository;
+import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.PoliticalPartyResponse;
 import com.edunge.srtool.service.PoliticalPartyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import java.util.Optional;
 @Service
 public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     private final PoliticalPartyRepository politicalPartyRepository;
+    private final StateRepository stateRepository;
 
     private static final String SERVICE_NAME = "Political Party";
 
@@ -38,15 +42,21 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PoliticalPartyServiceImpl(PoliticalPartyRepository politicalPartyRepository) {
+    public PoliticalPartyServiceImpl(PoliticalPartyRepository politicalPartyRepository, StateRepository stateRepository) {
         this.politicalPartyRepository = politicalPartyRepository;
+        this.stateRepository = stateRepository;
     }
 
     @Override
-    public PoliticalPartyResponse savePoliticalParty(PoliticalParty politicalParty) throws NotFoundException {
+    public PoliticalPartyResponse savePoliticalParty(PoliticalPartyDto politicalParty) throws NotFoundException {
         PoliticalParty existingPoliticalParty = politicalPartyRepository.findByCode(politicalParty.getCode());
         if(existingPoliticalParty==null){
-            politicalPartyRepository.save(politicalParty);
+//            State state = getState(politicalParty.getStateId());
+            existingPoliticalParty = new PoliticalParty();
+//            existingPoliticalParty.setState(state);
+            existingPoliticalParty.setCode(politicalParty.getCode());
+            existingPoliticalParty.setName(politicalParty.getName());
+            politicalPartyRepository.save(existingPoliticalParty);
             return new PoliticalPartyResponse("00", String.format(successTemplate,SERVICE_NAME), existingPoliticalParty);
         }
         throw new DuplicateException(String.format(duplicateTemplate, politicalParty.getCode()));
@@ -68,11 +78,13 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     }
 
     @Override
-    public PoliticalPartyResponse editPoliticalParty(Long id, PoliticalParty politicalParty) throws NotFoundException {
+    public PoliticalPartyResponse editPoliticalParty(Long id, PoliticalPartyDto politicalParty) throws NotFoundException {
         PoliticalParty currentPoliticalParty =  getPoliticalParty(id);
+        State state = getState(politicalParty.getStateId());
         currentPoliticalParty.setId(id);
         currentPoliticalParty.setCode(politicalParty.getCode());
         currentPoliticalParty.setName(politicalParty.getName());
+//        currentPoliticalParty.setState(state);
         politicalPartyRepository.save(currentPoliticalParty);
         return new PoliticalPartyResponse("00", String.format(updateTemplate, SERVICE_NAME), currentPoliticalParty);
     }
@@ -104,6 +116,14 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
         Optional<PoliticalParty> currentState = politicalPartyRepository.findById(id);
         if(!currentState.isPresent()){
             throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+        }
+        return currentState.get();
+    }
+
+    private State getState(Long id) throws NotFoundException {
+        Optional<State> currentState = stateRepository.findById(id);
+        if(!currentState.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate, "State"));
         }
         return currentState.get();
     }

@@ -96,19 +96,16 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(pollingUnitDto.getSenatorialDistrictId());
         Lga lga = getLga(pollingUnitDto.getLgaId());
         Ward ward = getWard(pollingUnitDto.getLgaId());
-        PollingUnit currentPollingUnit = pollingUnitRepository.findByCode(pollingUnitDto.getCode());
-        if(currentPollingUnit!=null){
-            currentPollingUnit.setId(id);
-            currentPollingUnit.setCode(pollingUnitDto.getCode());
-            currentPollingUnit.setName(pollingUnitDto.getName());
-            currentPollingUnit.setState(state);
-            currentPollingUnit.setSenatorialDistrict(senatorialDistrict);
-            currentPollingUnit.setLga(lga);
-            currentPollingUnit.setWard(ward);
-            pollingUnitRepository.save(currentPollingUnit);
-            return new PollingUnitResponse("00", String.format(successTemplate, SERVICE_NAME), currentPollingUnit);
-        }
-        throw new NotFoundException(String.format(notFoundTemplate, pollingUnitDto.getCode()));
+        PollingUnit currentPollingUnit = getPollingUnit(id);
+        currentPollingUnit.setId(id);
+        currentPollingUnit.setCode(pollingUnitDto.getCode());
+        currentPollingUnit.setName(pollingUnitDto.getName());
+        currentPollingUnit.setState(state);
+        currentPollingUnit.setSenatorialDistrict(senatorialDistrict);
+        currentPollingUnit.setLga(lga);
+        currentPollingUnit.setWard(ward);
+        pollingUnitRepository.save(currentPollingUnit);
+        return new PollingUnitResponse("00", String.format(successTemplate, SERVICE_NAME), currentPollingUnit);
     }
 
     @Override

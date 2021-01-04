@@ -2,6 +2,8 @@ package com.edunge.srtool.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DashboardResponse extends BaseResponse{
     Long totalStates;
@@ -17,7 +19,7 @@ public class DashboardResponse extends BaseResponse{
     Long lgaWithResults;
     Long wardsWithResults;
     Long pollingUnitsWithResults;
-    PartyResult partyResult;
+    List<PartyResult> partyResult;
 
     public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits) {
         super(code, message);
@@ -47,7 +49,7 @@ public class DashboardResponse extends BaseResponse{
     public DashboardResponse() {
     }
 
-    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived) {
+    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived, List<PartyResult> partyResult) {
         super(code, message);
         this.totalStates = totalStates;
         this.totalLgas = totalLgas;
@@ -61,6 +63,7 @@ public class DashboardResponse extends BaseResponse{
         this.lgaWithResults = lgaWithResults;
         this.wardsWithResults = wardsWithResults;
         this.pollingUnitsWithResults = pollingUnitsWithResults;
+        this.partyResult = partyResult;
     }
 
     public Long getTotalStates() {
@@ -143,11 +146,11 @@ public class DashboardResponse extends BaseResponse{
         this.resultReceived = resultReceived;
     }
 
-    public PartyResult getPartyResult() {
+    public List<PartyResult> getPartyResult() {
         return partyResult;
     }
 
-    public void setPartyResult(PartyResult partyResult) {
+    public void setPartyResult(List<PartyResult> partyResult) {
         this.partyResult = partyResult;
     }
 

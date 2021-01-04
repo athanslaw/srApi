@@ -58,7 +58,7 @@ public class StateController {
 
     @PutMapping(value = "/state/{id}")
     @ApiOperation(value = "Update state to the DB")
-    public ResponseEntity<StateResponse> updateState(@PathVariable Long id, @RequestParam String code, @RequestParam String name, @RequestParam MultipartFile file) throws Exception {
+    public ResponseEntity<StateResponse> updateState(@PathVariable Long id, @RequestParam String code, @RequestParam String name, @RequestParam(required = false) MultipartFile file) throws Exception {
         return ResponseEntity.ok(stateService.editState(id, code, name, file));
     }
 

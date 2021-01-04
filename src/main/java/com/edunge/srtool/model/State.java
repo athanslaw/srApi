@@ -35,4 +35,12 @@ public class State extends AbstractBaseModel {
     public void setDefaultParty(boolean defaultParty) {
         this.defaultParty = defaultParty;
     }
+
+    public Set<SenatorialDistrict> getSenatorialDistricts() {
+        return senatorialDistricts;
+    }
+
+    public void setSenatorialDistricts(Set<SenatorialDistrict> senatorialDistricts) {
+        this.senatorialDistricts = senatorialDistricts;
+    }
 }

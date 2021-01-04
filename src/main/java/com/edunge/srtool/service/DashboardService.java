@@ -4,6 +4,7 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.DashboardResponse;
 
 public interface DashboardService {
-    public DashboardResponse getDefaultDashboard();
-    public DashboardResponse getDashboardByState(Long stateId) throws NotFoundException;
+    DashboardResponse getDefaultDashboard();
+    DashboardResponse getDashboardByState(Long stateId) throws NotFoundException;
+    DashboardResponse getDashboardBySenatorialDistrict(Long senatorialDistrictId) throws NotFoundException;
 }

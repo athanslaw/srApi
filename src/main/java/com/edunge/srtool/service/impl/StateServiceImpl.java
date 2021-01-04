@@ -102,9 +102,11 @@ public class StateServiceImpl implements StateService {
         currentState.setId(id);
         currentState.setCode(code);
         currentState.setName(name);
-
-        String fileUrl = getSvgUrl(file.getOriginalFilename());
-        currentState.setSvgUrl(fileUrl);
+        if(file!=null){
+            FileUtil.uploadFile(file, fileStorageLocation);
+            String fileUrl = getSvgUrl(file.getOriginalFilename());
+            currentState.setSvgUrl(fileUrl);
+        }
         stateRepository.save(currentState);
         return new StateResponse("00", "State updated successfully", currentState);
     }

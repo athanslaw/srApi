@@ -7,7 +7,7 @@ public class PartyResult {
     private PoliticalParty politicalParty;
     private ResultPerParty resultPerParty;
     private Integer totalVoteCount;
-    private Integer percent;
+    private Double percent;
 
     public PoliticalParty getPoliticalParty() {
         return politicalParty;
@@ -33,11 +33,11 @@ public class PartyResult {
         this.totalVoteCount = totalVoteCount;
     }
 
-    public Integer getPercent() {
+    public Double getPercent() {
         return percent;
     }
 
-    public void setPercent(Integer percent) {
+    public void setPercent(Double percent) {
         this.percent = percent;
     }
 }
