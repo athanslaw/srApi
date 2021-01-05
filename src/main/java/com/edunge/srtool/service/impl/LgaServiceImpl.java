@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LgaServiceImpl implements LgaService {
@@ -88,17 +90,14 @@ public class LgaServiceImpl implements LgaService {
         State state = getState(lgaDto.getStateId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(lgaDto.getSenatorialDistrictId());
 
-        Lga currentLga = lgaRepository.findByCode(lgaDto.getCode());
-        if(currentLga!=null){
-            currentLga.setId(id);
-            currentLga.setCode(lgaDto.getCode());
-            currentLga.setName(lgaDto.getName());
-            currentLga.setState(state);
-            currentLga.setSenatorialDistrict(senatorialDistrict);
-            lgaRepository.save(currentLga);
-            return new LgaResponse("00", String.format(updateTemplate, lgaDto.getCode()), currentLga);
-        }
-        throw new NotFoundException(String.format(notFoundTemplate, lgaDto.getCode()));
+        Lga currentLga = getLga(id);
+        currentLga.setId(id);
+        currentLga.setCode(lgaDto.getCode());
+        currentLga.setName(lgaDto.getName());
+        currentLga.setState(state);
+        currentLga.setSenatorialDistrict(senatorialDistrict);
+        lgaRepository.save(currentLga);
+        return new LgaResponse("00", String.format(updateTemplate, lgaDto.getCode()), currentLga);
     }
 
     @Override
@@ -113,6 +112,27 @@ public class LgaServiceImpl implements LgaService {
         return new LgaResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), lgas);
     }
 
+    public LgaResponse findLgaFilter(Long stateId, Long senatorialDistrictId) throws NotFoundException {
+        List<Lga> lgas = lgaRepository.findAll();
+
+        List<Lga> filter = new ArrayList<>();
+        if(stateId>0 && senatorialDistrictId>0 ){
+            filter = lgas.stream()
+                    .filter(lga -> lga.getState().getId().equals(stateId))
+                    .filter(lga -> lga.getSenatorialDistrict().getId().equals(senatorialDistrictId))
+                    .collect(Collectors.toList());
+        }else if(stateId>0){
+            filter = lgas.stream()
+                    .filter(lga -> lga.getState().getId().equals(stateId))
+                    .collect(Collectors.toList());
+        }else if(senatorialDistrictId>0){
+            filter = lgas.stream()
+                    .filter(lga -> lga.getSenatorialDistrict().getId().equals(senatorialDistrictId))
+                    .collect(Collectors.toList());
+        }
+
+        return new LgaResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), filter);
+    }
 
     @Override
     public LgaResponse filterByName(String name) throws NotFoundException {
@@ -127,6 +147,13 @@ public class LgaServiceImpl implements LgaService {
     public LgaResponse findLgaByStateCode(Long stateCode) throws NotFoundException {
         State state = getState(stateCode);
         List<Lga> lgaByState = lgaRepository.findByState(state);
+        return new LgaResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
+    }
+
+    @Override
+    public LgaResponse findLgaBySenatorialDistrictCode(Long senatorialDistrictId) throws NotFoundException {
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(senatorialDistrictId);
+        List<Lga> lgaByState = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
         return new LgaResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
     }
 

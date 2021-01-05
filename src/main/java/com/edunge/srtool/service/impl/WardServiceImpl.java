@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WardServiceImpl implements WardService {
@@ -106,7 +108,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardResponse deleteWardById(Long id) throws NotFoundException {
         Ward currentWard = getWard(id);
-        wardRepository.deleteById(id);
+        wardRepository.delete(currentWard);
         return new WardResponse("00",String.format(deleteTemplate,currentWard.getCode()));
     }
 
@@ -114,6 +116,31 @@ public class WardServiceImpl implements WardService {
     public WardResponse findAll() {
         List<Ward> wards = wardRepository.findAll();
         return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), wards);
+    }
+
+    public WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId) {
+        List<Ward> wards = wardRepository.findAll();
+        List<Ward> filter = new ArrayList<>();
+
+        if(stateId>0 && senatorialDistrictId > 0 && lgaId>0){
+            filter = wards.stream()
+                    .filter(ward -> ward.getState().getId().equals(stateId))
+                    .filter(ward -> ward.getSenatorialDistrict().getId().equals(senatorialDistrictId))
+                    .filter(ward -> ward.getLga().getId().equals(lgaId))
+                    .collect(Collectors.toList());
+        }
+        else if(stateId>0 && senatorialDistrictId >0){
+            filter = wards.stream()
+                    .filter(ward -> ward.getState().getId().equals(stateId))
+                    .filter(ward -> ward.getSenatorialDistrict().getId().equals(senatorialDistrictId))
+                    .collect(Collectors.toList());
+        }
+        else if(stateId>0){
+            filter = wards.stream()
+                    .filter(ward -> ward.getState().getId().equals(stateId))
+                    .collect(Collectors.toList());
+        }
+        return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), filter);
     }
 
     @Override

@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface PartyAgentRepository extends JpaRepository<PartyAgent, Long> {
-    PartyAgent findByEmail(String email);
     List<PartyAgent> findByFirstnameOrLastname(String firstname, String lastname);
     PartyAgent findByPhone(String phone);
 }

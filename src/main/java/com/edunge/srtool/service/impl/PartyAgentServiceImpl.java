@@ -55,20 +55,20 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse savePartyAgent(PartyAgentDto partyAgentDto) throws NotFoundException {
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPoliticalPartyId());
         Lga lga = getLga(partyAgentDto.getLgaId());
         Ward ward = getWard(partyAgentDto.getWardId());
-        PartyAgent partyAgent = partyAgentRepository.findByEmail(partyAgentDto.getEmail());
+        PartyAgent partyAgent = partyAgentRepository.findByPhone(partyAgentDto.getPhone());
         if(partyAgent==null){
             partyAgent  = new PartyAgent();
             partyAgent.setFirstname(partyAgentDto.getFirstname());
             partyAgent.setLastname(partyAgentDto.getLastname());
             partyAgent.setAddress(partyAgentDto.getAddress());
-            partyAgent.setEmail(partyAgentDto.getEmail());
             partyAgent.setPhone(partyAgentDto.getPhone());
             partyAgent.setPollingUnit(pollingUnit);
             partyAgent.setWard(ward);
-            partyAgent.setPoliticalParty(politicalParty);
+            if(!partyAgentDto.getEmail().isEmpty()) partyAgent.setEmail(partyAgentDto.getEmail());
+            Optional<PoliticalParty> politicalParty = politicalPartyRepository.findById(partyAgentDto.getPoliticalPartyId());
+            politicalParty.ifPresent(partyAgent::setPoliticalParty);
             partyAgent.setLga(lga);
             partyAgentRepository.save(partyAgent);
             return new PartyAgentResponse("00", String.format(successTemplate, SERVICE_NAME), partyAgent);
@@ -104,18 +104,18 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     public PartyAgentResponse updatePartyAgent(Long id, PartyAgentDto partyAgentDto) throws NotFoundException {
 
         PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        PoliticalParty politicalParty = getPoliticalParty(partyAgentDto.getPoliticalPartyId());
         Lga lga = getLga(partyAgentDto.getLgaId());
         Ward ward = getWard(partyAgentDto.getWardId());
         PartyAgent partyAgent = getPartyAgent(id);
         partyAgent.setFirstname(partyAgentDto.getFirstname());
         partyAgent.setLastname(partyAgentDto.getLastname());
         partyAgent.setAddress(partyAgentDto.getAddress());
-        partyAgent.setEmail(partyAgentDto.getEmail());
         partyAgent.setPhone(partyAgentDto.getPhone());
         partyAgent.setPollingUnit(pollingUnit);
         partyAgent.setWard(ward);
-        partyAgent.setPoliticalParty(politicalParty);
+        if(!partyAgentDto.getEmail().isEmpty()) partyAgent.setEmail(partyAgentDto.getEmail());
+        Optional<PoliticalParty> politicalParty = politicalPartyRepository.findById(partyAgentDto.getPoliticalPartyId());
+        politicalParty.ifPresent(partyAgent::setPoliticalParty);
         partyAgent.setLga(lga);
         partyAgentRepository.save(partyAgent);
         return new PartyAgentResponse("00", String.format(successTemplate, SERVICE_NAME), partyAgent);

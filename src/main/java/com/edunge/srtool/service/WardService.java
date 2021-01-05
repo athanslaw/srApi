@@ -13,4 +13,5 @@ public interface WardService {
     WardResponse findAll() ;
     WardResponse filterByName(String name) throws NotFoundException;
     WardResponse findByLga(Long lgaCode) throws NotFoundException;
+    WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId);
 }
