@@ -7,4 +7,5 @@ public interface DashboardService {
     DashboardResponse getDefaultDashboard();
     DashboardResponse getDashboardByState(Long stateId) throws NotFoundException;
     DashboardResponse getDashboardBySenatorialDistrict(Long senatorialDistrictId) throws NotFoundException;
+    DashboardResponse getDashboardByLga(Long lgaId) throws NotFoundException;
 }

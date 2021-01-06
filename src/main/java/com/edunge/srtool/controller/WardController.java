@@ -72,4 +72,10 @@ public class WardController {
     public ResponseEntity<WardResponse> filterWardByLgaCode(@PathVariable Long lgaCode) throws Exception {
         return ResponseEntity.ok(wardService.findByLga(lgaCode));
     }
+
+    @GetMapping(value = "/ward/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find ward by senatorial district code.")
+    public ResponseEntity<WardResponse> filterWardByLgaIdStateIdSenatorialDistrictID(@RequestParam(required = false, defaultValue = "0") Long stateId, @RequestParam(required = false, defaultValue = "0") Long senatorialDistrictId, @RequestParam(required = false, defaultValue = "0") Long lgaWardId)  throws Exception {
+        return ResponseEntity.ok(wardService.searchWardByFilter(stateId,senatorialDistrictId, lgaWardId));
+    }
 }

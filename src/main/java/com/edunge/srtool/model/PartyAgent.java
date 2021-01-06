@@ -1,5 +1,6 @@
 package com.edunge.srtool.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -9,6 +10,7 @@ public class PartyAgent extends BaseModel{
     private String firstname;
     private String lastname;
     private String phone;
+    @Column(nullable = true)
     private String email;
     private String address;
 
@@ -21,7 +23,7 @@ public class PartyAgent extends BaseModel{
     private Ward ward;
 
     @ManyToOne
-    @JoinColumn(name = "political_party_id", nullable = false)
+    @JoinColumn(name = "political_party_id", nullable = true)
     private PoliticalParty politicalParty;
 
     @ManyToOne

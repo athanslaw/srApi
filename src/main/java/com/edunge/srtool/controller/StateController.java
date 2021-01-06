@@ -97,4 +97,17 @@ public class StateController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
+    @GetMapping(value = "/state/default", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get default state")
+    public ResponseEntity<StateResponse> getDefaultState() throws Exception {
+        return ResponseEntity.ok(stateService.getDefaultState());
+    }
+
+
+    @GetMapping(value = "/state/set-default/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Set default state")
+    public ResponseEntity<StateResponse> setDefaultState(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(stateService.setDefaultState(id));
+    }
 }

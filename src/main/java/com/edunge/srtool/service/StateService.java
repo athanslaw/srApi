@@ -14,4 +14,6 @@ public interface StateService {
     StateResponse findAll() ;
     StateResponse filterByName(String name) throws NotFoundException;
     Resource loadSvg(String fileName);
+    StateResponse getDefaultState() throws NotFoundException;
+    StateResponse setDefaultState(Long stateId) throws NotFoundException;
 }

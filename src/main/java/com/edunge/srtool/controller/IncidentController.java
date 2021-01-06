@@ -53,4 +53,22 @@ public class IncidentController {
     public ResponseEntity<IncidentResponse> filterIncidentByCode(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(incidentService.findIncidentById(id));
     }
+
+    @GetMapping(value = "/incident/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by Lga.")
+    public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByLga(id));
+    }
+
+    @GetMapping(value = "/incident/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by Ward.")
+    public ResponseEntity<IncidentResponse> filterIncidentByWard(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByWard(id));
+    }
+
+    @GetMapping(value = "/incident/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by Polling Unit.")
+    public ResponseEntity<IncidentResponse> filterIncidentByPollingUnit(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByPollingUnit(id));
+    }
 }

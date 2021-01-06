@@ -1,9 +1,35 @@
 package com.edunge.srtool.model;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
-public class Incident extends AbstractElectionDetails {
+public class Incident extends BaseModel{
+    @ManyToOne
+    @JoinColumn(name = "lga_id",nullable = false)
+    private Lga lga;
+
+    @ManyToOne
+    @JoinColumn(name = "ward_id",nullable = false)
+    private Ward ward;
+
+    @ManyToOne
+    @JoinColumn(name = "polling_unit_id",nullable = false)
+    private PollingUnit pollingUnit;
+
+    @ManyToOne
+    @JoinColumn(name = "incident_level_id",nullable = false)
+    private IncidentLevel incidentLevel;
+
+    @ManyToOne
+    @JoinColumn(name = "incident_status_id",nullable = false)
+    private IncidentStatus incidentStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "incident_type_id",nullable = false)
+    private IncidentType incidentType;
+
     private String description;
     private String reportedLocation;
     private String phoneNumberToContact;
@@ -30,5 +56,53 @@ public class Incident extends AbstractElectionDetails {
 
     public void setPhoneNumberToContact(String phoneNumberToContact) {
         this.phoneNumberToContact = phoneNumberToContact;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
+    }
+
+    public Ward getWard() {
+        return ward;
+    }
+
+    public void setWard(Ward ward) {
+        this.ward = ward;
+    }
+
+    public PollingUnit getPollingUnit() {
+        return pollingUnit;
+    }
+
+    public void setPollingUnit(PollingUnit pollingUnit) {
+        this.pollingUnit = pollingUnit;
+    }
+
+    public IncidentLevel getIncidentLevel() {
+        return incidentLevel;
+    }
+
+    public void setIncidentLevel(IncidentLevel incidentLevel) {
+        this.incidentLevel = incidentLevel;
+    }
+
+    public IncidentStatus getIncidentStatus() {
+        return incidentStatus;
+    }
+
+    public void setIncidentStatus(IncidentStatus incidentStatus) {
+        this.incidentStatus = incidentStatus;
+    }
+
+    public IncidentType getIncidentType() {
+        return incidentType;
+    }
+
+    public void setIncidentType(IncidentType incidentType) {
+        this.incidentType = incidentType;
     }
 }

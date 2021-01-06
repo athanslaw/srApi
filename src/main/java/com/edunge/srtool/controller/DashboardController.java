@@ -40,4 +40,10 @@ public class DashboardController {
     public ResponseEntity<DashboardResponse> getDashboardBySenatorialDistrict(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(dashboardService.getDashboardBySenatorialDistrict(id));
     }
+
+    @GetMapping(value = "/dashboard/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve default by id.")
+    public ResponseEntity<DashboardResponse> getDashboardByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByLga(id));
+    }
 }

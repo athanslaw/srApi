@@ -1,7 +1,6 @@
 package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.dto.IncidentDto;
-import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
@@ -26,6 +25,9 @@ public class IncidentServiceImpl implements IncidentService {
     private final LgaRepository lgaRepository;
     private final PollingUnitRepository pollingUnitRepository;
     private final VotingLevelRepository votingLevelRepository;
+    private final IncidentLevelRepository incidentLevelRepository;
+    private final IncidentStatusRepository incidentStatusRepository;
+    private final IncidentTypeRepository incidentTypeRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IncidentServiceImpl.class);
 
@@ -47,7 +49,7 @@ public class IncidentServiceImpl implements IncidentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository) {
+    public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -56,37 +58,34 @@ public class IncidentServiceImpl implements IncidentService {
         this.lgaRepository = lgaRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.votingLevelRepository = votingLevelRepository;
+        this.incidentLevelRepository = incidentLevelRepository;
+        this.incidentStatusRepository = incidentStatusRepository;
+        this.incidentTypeRepository = incidentTypeRepository;
     }
 
     @Override
     public IncidentResponse saveIncident(IncidentDto incidentDto) throws NotFoundException {
-        PartyAgent partyAgent = getPartyAgent(incidentDto.getPartyAgentId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(incidentDto.getSenatorialDistrictId());
+        IncidentLevel incidentLevel = incidentLevel(incidentDto.getIncidentLevelId());
+        IncidentStatus incidentStatus = getIncidentStatus(incidentDto.getIncidentStatusId());
+        IncidentType incidentType = getIncidentType(incidentDto.getIncidentTypeId());
+
         Lga lga = getLga(incidentDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
-        Election election = getElection(incidentDto.getElectionId());
-        VotingLevel votingLevel = getVotingLevel(incidentDto.getVotingLevelId());
+        Election election = getElection(incidentDto.getIncidentStatusId());
         Ward ward = getWard(incidentDto.getWardId());
-        Incident incident = incidentRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
-
-        if(incident==null){
-
-            incident = new Incident();
-            incident.setSenatorialDistrict(senatorialDistrict);
-            incident.setLga(lga);
-            incident.setWard(ward);
-            incident.setPartyAgent(partyAgent);
-            incident.setPollingUnit(pollingUnit);
-            incident.setElection(election);
-            incident.setVotingLevel(votingLevel);
-            incident.setLga(lga);
-            incident.setDescription(incidentDto.getDescription());
-            incident.setReportedLocation(incidentDto.getReportedLocation());
-            incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
-            incidentRepository.save(incident);
-            return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
-        }
-        throw new DuplicateException(String.format("Incident for %s in %s already exists.", ward.getName(), election.getDescription()));
+        Incident incident = new Incident();
+        incident.setLga(lga);
+        incident.setWard(ward);
+        incident.setPollingUnit(pollingUnit);
+        incident.setIncidentLevel(incidentLevel);
+        incident.setIncidentStatus(incidentStatus);
+        incident.setIncidentType(incidentType);
+        incident.setLga(lga);
+        incident.setDescription(incidentDto.getDescription());
+        incident.setReportedLocation(incidentDto.getReportedLocation());
+        incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
+        incidentRepository.save(incident);
+        return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
     }
 
     @Override
@@ -99,20 +98,20 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentResponse updateIncident(Long id, IncidentDto incidentDto) throws NotFoundException {
         Incident incident = getIncident(id);
-        PartyAgent partyAgent = getPartyAgent(incidentDto.getPartyAgentId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(incidentDto.getSenatorialDistrictId());
+        IncidentLevel incidentLevel = incidentLevel(incidentDto.getIncidentLevelId());
+        IncidentStatus incidentStatus = getIncidentStatus(incidentDto.getIncidentStatusId());
+        IncidentType incidentType = getIncidentType(incidentDto.getIncidentTypeId());
+
         Lga lga = getLga(incidentDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
-        Election election = getElection(incidentDto.getElectionId());
-        VotingLevel votingLevel = getVotingLevel(incidentDto.getVotingLevelId());
+        Election election = getElection(incidentDto.getIncidentStatusId());
         Ward ward = getWard(incidentDto.getWardId());
-        incident.setSenatorialDistrict(senatorialDistrict);
         incident.setLga(lga);
         incident.setWard(ward);
-        incident.setPartyAgent(partyAgent);
         incident.setPollingUnit(pollingUnit);
-        incident.setElection(election);
-        incident.setVotingLevel(votingLevel);
+        incident.setIncidentLevel(incidentLevel);
+        incident.setIncidentStatus(incidentStatus);
+        incident.setIncidentType(incidentType);
         incident.setLga(lga);
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
@@ -143,12 +142,12 @@ public class IncidentServiceImpl implements IncidentService {
         return election.get();
     }
 
-    private VotingLevel getVotingLevel(Long id) throws NotFoundException {
-        Optional<VotingLevel> votingLevel = votingLevelRepository.findById(id);
-        if(!votingLevel.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Voting Level"));
+    private IncidentType getIncidentType(Long id) throws NotFoundException {
+        Optional<IncidentType> incidentType = incidentTypeRepository.findById(id);
+        if(!incidentType.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate,"Incident Type"));
         }
-        return votingLevel.get();
+        return incidentType.get();
     }
 
     private Lga getLga(Long id) throws NotFoundException {
@@ -159,12 +158,12 @@ public class IncidentServiceImpl implements IncidentService {
         return lga.get();
     }
 
-    private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
-        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
-        if(!senatorialDistrict.isPresent()){
-            throw new NotFoundException("Senatorial District not found.");
+    private IncidentStatus getIncidentStatus(Long id) throws NotFoundException {
+        Optional<IncidentStatus> incidentStatus = incidentStatusRepository.findById(id);
+        if(!incidentStatus.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate,"Incident Level"));
         }
-        return senatorialDistrict.get();
+        return incidentStatus.get();
     }
 
     private Ward getWard(Long id) throws NotFoundException {
@@ -175,12 +174,12 @@ public class IncidentServiceImpl implements IncidentService {
         return currentWard.get();
     }
 
-    private PartyAgent getPartyAgent(Long id) throws NotFoundException {
-        Optional<PartyAgent> partyAgent = partyAgentRepository.findById(id);
-        if(!partyAgent.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Party Agent"));
+    private IncidentLevel incidentLevel(Long id) throws NotFoundException {
+        Optional<IncidentLevel> incidentLevel = incidentLevelRepository.findById(id);
+        if(!incidentLevel.isPresent()){
+            throw new NotFoundException(String.format(notFoundTemplate,"Incident Level"));
         }
-        return partyAgent.get();
+        return incidentLevel.get();
     }
 
     private PollingUnit getPollingUnit(Long id) throws NotFoundException {
@@ -197,5 +196,26 @@ public class IncidentServiceImpl implements IncidentService {
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return incident.get();
+    }
+
+    @Override
+    public IncidentResponse findIncidentByLga(Long id) throws NotFoundException {
+        Lga lga = getLga(id);
+        List<Incident> elections = incidentRepository.findByLga(lga);
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    }
+
+    @Override
+    public IncidentResponse findIncidentByWard(Long id) throws NotFoundException {
+        Ward ward = getWard(id);
+        List<Incident> elections = incidentRepository.findByWard(ward);
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    }
+
+    @Override
+    public IncidentResponse findIncidentByPollingUnit(Long id) throws NotFoundException {
+        PollingUnit pollingUnit = getPollingUnit(id);
+        List<Incident> elections = incidentRepository.findByPollingUnit(pollingUnit);
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 }

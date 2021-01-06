@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -57,7 +56,6 @@ public class LgaController {
     }
 
     @RequestMapping(value = "/lga/delete/{id}", method = RequestMethod.DELETE)
-    @PreAuthorize("hasRole=ADMIN")
     @ApiOperation(value = "Delete LGA by id.")
     public ResponseEntity<LgaResponse> deleteLgaById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(lgaService.deleteLgaById(id));
@@ -73,5 +71,17 @@ public class LgaController {
     @ApiOperation(value = "Find LGA by stateCode.")
     public ResponseEntity<LgaResponse> filterLGAByStateCode(@PathVariable Long stateCode) throws Exception {
         return ResponseEntity.ok(lgaService.findLgaByStateCode(stateCode));
+    }
+
+    @GetMapping(value = "/lga/senatorial-district/{senatorialDistrict}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find LGA by stateCode.")
+    public ResponseEntity<LgaResponse> filterLGABySenatorialDistrict(@PathVariable Long senatorialDistrict) throws Exception {
+        return ResponseEntity.ok(lgaService.findLgaBySenatorialDistrictCode(senatorialDistrict));
+    }
+
+    @GetMapping(value = "/lga/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find LGA by stateCode.")
+    public ResponseEntity<LgaResponse> filterLGABySearch(@RequestParam(required = false, defaultValue = "0") Long stateId, @RequestParam(required = false, defaultValue = "0") Long senatorialDistrictId) throws Exception {
+        return ResponseEntity.ok(lgaService.findLgaFilter(stateId, senatorialDistrictId));
     }
 }
