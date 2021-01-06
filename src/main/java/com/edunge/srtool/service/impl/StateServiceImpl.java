@@ -157,4 +157,22 @@ public class StateServiceImpl implements StateService {
         sb.append(fileName);
         return sb.toString();
     }
+
+    public StateResponse getDefaultState() throws NotFoundException {
+        State state = stateRepository.findByDefaultState(true);
+        if(state==null) throw new NotFoundException("State not found.");
+        return new StateResponse("00", "Default state", state);
+    }
+
+    public StateResponse setDefaultState(Long stateId) throws NotFoundException {
+        State state = getState(stateId);
+        List<State> states = stateRepository.findAll();
+        states.stream().filter(currentState-> !currentState.getId().equals(stateId)).forEach(currentState -> {
+            currentState.setDefaultState(false);
+            stateRepository.save(currentState);
+        });
+        state.setDefaultState(true);
+        stateRepository.save(state);
+        return new StateResponse("00", "Default state", state);
+    }
 }

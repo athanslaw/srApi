@@ -9,10 +9,7 @@ import com.edunge.srtool.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -482,6 +479,7 @@ public class DashboardServiceImpl implements DashboardService {
                     partyResult.setPercent(percent);
                     partyResults.add(partyResult);
                 });
+        partyResults.sort(Comparator.comparingInt(PartyResult::getTotalVoteCount));
         return new DashboardResponse("00", "Dashboard loaded for Senatorial District.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
@@ -535,14 +533,15 @@ public class DashboardServiceImpl implements DashboardService {
                     partyResult.setPercent(percent);
                     partyResults.add(partyResult);
                 });
+        partyResults.sort(Comparator.comparingInt(PartyResult::getTotalVoteCount));
         return new DashboardResponse("00", "Dashboard loaded for LGA.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
                 wardsWithResults,
                 pollingUnitsWithResults,
-                resultsReceived,
-                partyResults
+                resultsReceived,partyResults
+
         );
     }
 

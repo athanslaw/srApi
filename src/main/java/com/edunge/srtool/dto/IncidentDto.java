@@ -6,13 +6,11 @@ import javax.validation.constraints.NotNull;
 
 public class IncidentDto extends AbstractBaseModel {
     @NotNull
-    private Long electionId;
+    private Long incidentStatusId;
     @NotNull
-    private Long votingLevelId;
+    private Long incidentLevelId;
     @NotNull
-    private Long partyAgentId;
-    @NotNull
-    private Long  senatorialDistrictId;
+    private Long incidentTypeId;
     @NotNull
     private Long  lgaId;
     @NotNull
@@ -50,37 +48,30 @@ public class IncidentDto extends AbstractBaseModel {
         this.phoneNumberToContact = phoneNumberToContact;
     }
 
-    public Long getElectionId() {
-        return electionId;
+    public Long getIncidentStatusId() {
+        return incidentStatusId;
     }
 
-    public void setElectionId(Long electionId) {
-        this.electionId = electionId;
+    public void setIncidentStatusId(Long incidentStatusId) {
+        this.incidentStatusId = incidentStatusId;
     }
 
-    public Long getVotingLevelId() {
-        return votingLevelId;
+    public Long getIncidentLevelId() {
+        return incidentLevelId;
     }
 
-    public void setVotingLevelId(Long votingLevelId) {
-        this.votingLevelId = votingLevelId;
+    public void setIncidentLevelId(Long incidentLevelId) {
+        this.incidentLevelId = incidentLevelId;
     }
 
-    public Long getPartyAgentId() {
-        return partyAgentId;
+    public Long getIncidentTypeId() {
+        return incidentTypeId;
     }
 
-    public void setPartyAgentId(Long partyAgentId) {
-        this.partyAgentId = partyAgentId;
+    public void setIncidentTypeId(Long incidentTypeId) {
+        this.incidentTypeId = incidentTypeId;
     }
 
-    public Long getSenatorialDistrictId() {
-        return senatorialDistrictId;
-    }
-
-    public void setSenatorialDistrictId(Long senatorialDistrictId) {
-        this.senatorialDistrictId = senatorialDistrictId;
-    }
 
     public Long getLgaId() {
         return lgaId;

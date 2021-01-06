@@ -18,7 +18,7 @@ public class State extends AbstractBaseModel {
     @OneToMany(mappedBy="state")
     Set<SenatorialDistrict> senatorialDistricts;
     private String svgUrl;
-    private boolean defaultParty;
+    private boolean defaultState;
 
     public String getSvgUrl() {
         return svgUrl;
@@ -28,12 +28,12 @@ public class State extends AbstractBaseModel {
         this.svgUrl = svgUrl;
     }
 
-    public boolean isDefaultParty() {
-        return defaultParty;
+    public boolean isDefaultState() {
+        return defaultState;
     }
 
-    public void setDefaultParty(boolean defaultParty) {
-        this.defaultParty = defaultParty;
+    public void setDefaultState(boolean defaultState) {
+        this.defaultState = defaultState;
     }
 
     public Set<SenatorialDistrict> getSenatorialDistricts() {
