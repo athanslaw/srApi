@@ -35,6 +35,14 @@ public class DashboardResponse extends BaseResponse{
         this.totalPollingUnits = totalPollingUnits;
     }
 
+    public List<LgaResult> getLgaResults() {
+        return lgaResults;
+    }
+
+    public void setLgaResults(List<LgaResult> lgaResults) {
+        this.lgaResults = lgaResults;
+    }
+
     public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Double resultsReceived) {
         super(code, message);
         this.totalStates = totalStates;
