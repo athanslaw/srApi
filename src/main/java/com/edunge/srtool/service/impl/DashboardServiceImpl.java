@@ -133,10 +133,13 @@ public class DashboardServiceImpl implements DashboardService {
 
         List<Result> results = resultRepository.findAll();
         List<LgaResult> lgaResults = new ArrayList<>();
+        HashSet<String> lgaSet = new HashSet<>();
         results.stream().filter(result -> result.getLga().getState().getId().equals(stateId))
                 .forEach(result -> {
                     try {
-                        lgaResults.add(getLgaResult(result.getLga().getId()));
+                        if(lgaSet.add(result.getLga().getCode())){
+                            lgaResults.add(getLgaResult(result.getLga().getId()));
+                        }
                     } catch (NotFoundException e) {
                         e.printStackTrace();
                     }
