@@ -130,6 +130,17 @@ public class DashboardServiceImpl implements DashboardService {
                     partyResult.setPercent(percent);
                     partyResults.add(partyResult);
                 });
+
+        List<Result> results = resultRepository.findAll();
+        List<LgaResult> lgaResults = new ArrayList<>();
+        results.stream().filter(result -> result.getLga().getState().getId().equals(stateId))
+                .forEach(result -> {
+                    try {
+                        lgaResults.add(getLgaResult(result.getLga().getId()));
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                    }
+                });
         return new DashboardResponse("00", "Dashboard loaded.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
@@ -137,7 +148,7 @@ public class DashboardServiceImpl implements DashboardService {
                 wardsWithResults,
                 pollingUnitsWithResults,
                 resultsReceived,
-                partyResults
+                partyResults, lgaResults
         );
     }
 
@@ -544,5 +555,39 @@ public class DashboardServiceImpl implements DashboardService {
 
         );
     }
+
+    public LgaResult getLgaResult(Long lgaId) throws NotFoundException {
+
+        Lga lga = getLga(lgaId);
+        Integer totalAccreditedVotes =  getAccreditedVotesPerLga(lga);
+
+        Integer totalVoteCounts = getVoteCountsByLga(lga);
+        List<PoliticalParty> politicalParties = politicalPartyRepository.findAll();
+        List<PartyResult> partyResults = new ArrayList<>();
+        politicalParties
+                .forEach(politicalParty -> {
+
+                    List<Result> results = resultRepository.findAll();
+                    AtomicReference<Integer> voteCount = new AtomicReference<>(0);
+                    results.stream()
+                            .filter(result -> result.getLga().getId().equals(lga.getId()))
+                            .map(Result::getResultPerParties).forEach(resultPerParties -> {
+                        for (ResultPerParty resultPerparty: resultPerParties) {
+                            if(resultPerparty.getPoliticalParty().getId().equals(politicalParty.getId())){
+                                voteCount.updateAndGet(v -> v + resultPerparty.getVoteCount());
+                            }
+                        }
+                    });
+                    PartyResult partyResult = new PartyResult();
+                    partyResult.setPoliticalParty(politicalParty);
+                    partyResult.setTotalVoteCount(voteCount.get());
+                    Double percent = (voteCount.get() * 100.0) / totalVoteCounts;
+                    partyResult.setPercent(percent);
+                    partyResults.add(partyResult);
+                });
+        partyResults.sort(Comparator.comparingInt(PartyResult::getTotalVoteCount));
+        return new LgaResult(lga, partyResults);
+    }
+
 
 }

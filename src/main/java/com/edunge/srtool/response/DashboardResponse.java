@@ -1,5 +1,6 @@
 package com.edunge.srtool.response;
 
+import com.edunge.srtool.model.LgaResult;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class DashboardResponse extends BaseResponse{
     Long lgaWithResults;
     Long wardsWithResults;
     Long pollingUnitsWithResults;
+    List<LgaResult> lgaResults;
     List<PartyResult> partyResult;
 
     public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits) {
@@ -64,6 +66,24 @@ public class DashboardResponse extends BaseResponse{
         this.wardsWithResults = wardsWithResults;
         this.pollingUnitsWithResults = pollingUnitsWithResults;
         this.partyResult = partyResult;
+    }
+
+    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived, List<PartyResult> partyResult, List<LgaResult> lgaResults) {
+        super(code, message);
+        this.totalStates = totalStates;
+        this.totalLgas = totalLgas;
+        this.totalSenatorialDistricts = totalSenatorialDistricts;
+        this.totalRegisteredVotes = totalRegisteredVotes;
+        this.totalAccreditedVotes = totalAccreditedVotes;
+        this.totalVoteCounts = totalVoteCounts;
+        this.totalWards = totalWards;
+        this.totalPollingUnits = totalPollingUnits;
+        this.resultReceived = resultsReceived;
+        this.lgaWithResults = lgaWithResults;
+        this.wardsWithResults = wardsWithResults;
+        this.pollingUnitsWithResults = pollingUnitsWithResults;
+        this.partyResult = partyResult;
+        this.lgaResults = lgaResults;
     }
 
     public Long getTotalStates() {
