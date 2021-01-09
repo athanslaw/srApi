@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -71,5 +72,10 @@ public class PollingUnitController {
     @ApiOperation(value = "Find polling unit by ward id.")
     public ResponseEntity<PollingUnitResponse> filterPollingUnitByCode(@PathVariable Long wardId) throws Exception {
         return ResponseEntity.ok(pollingUnitService.findByWardCode(wardId));
+    }
+
+    @PostMapping("/polling-unit/upload")
+    public ResponseEntity<PollingUnitResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(pollingUnitService.uploadPollingUnit(file), HttpStatus.OK);
     }
 }

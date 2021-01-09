@@ -3,6 +3,7 @@ package com.edunge.srtool.service;
 import com.edunge.srtool.dto.PollingUnitDto;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.PollingUnitResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PollingUnitService {
     PollingUnitResponse savePollingUnit(PollingUnitDto pollingUnitDto) throws NotFoundException;
@@ -13,4 +14,6 @@ public interface PollingUnitService {
     PollingUnitResponse findAll() ;
     PollingUnitResponse filterByName(String name) throws NotFoundException;
     PollingUnitResponse findByWardCode(Long wardCode) throws NotFoundException;
+
+    PollingUnitResponse uploadPollingUnit(MultipartFile file);
 }

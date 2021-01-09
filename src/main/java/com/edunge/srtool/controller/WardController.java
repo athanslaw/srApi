@@ -82,6 +82,6 @@ public class WardController {
 
     @PostMapping("/ward/upload")
     public ResponseEntity<WardResponse> uploadFile(@RequestParam("file") MultipartFile file) {
-        return new ResponseEntity<>(wardService.uploadLga(file), HttpStatus.OK);
+        return new ResponseEntity<>(wardService.uploadWard(file), HttpStatus.OK);
     }
 }

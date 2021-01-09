@@ -38,7 +38,7 @@ public class WardServiceImpl implements WardService {
     private final StateRepository stateRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private final WardRepository wardRepository;
-private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
 
     private final Path fileStorageLocation;
     private static final String SERVICE_NAME = "Ward";
@@ -238,7 +238,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
     }
 
     @Override
-    public WardResponse uploadLga(MultipartFile file){
+    public WardResponse uploadWard(MultipartFile file){
         List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
         return processUpload(csvLines);
     }

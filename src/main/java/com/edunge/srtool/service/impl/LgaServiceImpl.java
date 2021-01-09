@@ -214,7 +214,7 @@ public class LgaServiceImpl implements LgaService {
             }
         }
         catch (Exception ex){
-            LOGGER.info("State could not be saved");
+            LOGGER.info("Lga could not be saved");
         }
     }
 

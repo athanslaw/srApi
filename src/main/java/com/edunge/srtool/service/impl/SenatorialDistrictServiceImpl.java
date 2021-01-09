@@ -163,7 +163,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
             }
         }
         catch (Exception ex){
-            LOGGER.info("State could not be saved");
+            LOGGER.info("Senatorial District could not be saved");
         }
     }
 

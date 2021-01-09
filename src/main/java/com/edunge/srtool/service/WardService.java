@@ -16,5 +16,5 @@ public interface WardService {
     WardResponse findByLga(Long lgaCode) throws NotFoundException;
     WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId);
 
-    WardResponse uploadLga(MultipartFile file);
+    WardResponse uploadWard(MultipartFile file);
 }
