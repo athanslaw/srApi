@@ -1,7 +1,9 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.SenatorialDistrict;
@@ -11,10 +13,17 @@ import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.LgaResponse;
 import com.edunge.srtool.service.LgaService;
+import com.edunge.srtool.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +32,9 @@ import java.util.stream.Collectors;
 @Service
 public class LgaServiceImpl implements LgaService {
     private static final String SERVICE_NAME = "LGA";
+    private static final Logger LOGGER = LoggerFactory.getLogger(LgaService.class);
 
+    private final Path fileStorageLocation;
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
 
@@ -46,10 +57,17 @@ public class LgaServiceImpl implements LgaService {
     private final SenatorialDistrictRepository senatorialDistrictRepository;
 
     @Autowired
-    public LgaServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
+    public LgaServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -179,5 +197,39 @@ public class LgaServiceImpl implements LgaService {
             throw new NotFoundException(String.format(notFoundTemplate, "Senatorial District"));
         }
         return senatorialDistrict.get();
+    }
+
+    private void saveLga(String stateCode,String senatorialDistrictCode, String code, String name)  {
+        State state = stateRepository.findByCode(stateCode);
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
+        Lga lga = lgaRepository.findByCode(code);
+        try{
+            if(lga==null){
+                lga = new Lga();
+                lga.setState(state);
+                lga.setSenatorialDistrict(senatorialDistrict);
+                lga.setCode(code);
+                lga.setName(name);
+                lgaRepository.save(lga);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info("State could not be saved");
+        }
+    }
+
+    @Override
+    public LgaResponse uploadLga(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private LgaResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveLga(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim());
+        }
+        return new LgaResponse("00", "File Uploaded.");
     }
 }

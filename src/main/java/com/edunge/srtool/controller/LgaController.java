@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -83,5 +84,10 @@ public class LgaController {
     @ApiOperation(value = "Find LGA by stateCode.")
     public ResponseEntity<LgaResponse> filterLGABySearch(@RequestParam(required = false, defaultValue = "0") Long stateId, @RequestParam(required = false, defaultValue = "0") Long senatorialDistrictId) throws Exception {
         return ResponseEntity.ok(lgaService.findLgaFilter(stateId, senatorialDistrictId));
+    }
+
+    @PostMapping("/lga/upload")
+    public ResponseEntity<LgaResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(lgaService.uploadLga(file), HttpStatus.OK);
     }
 }

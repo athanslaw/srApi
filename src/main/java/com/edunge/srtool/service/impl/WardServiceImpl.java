@@ -1,19 +1,31 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.WardDto;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.*;
+import com.edunge.srtool.model.Lga;
+import com.edunge.srtool.model.SenatorialDistrict;
+import com.edunge.srtool.model.State;
+import com.edunge.srtool.model.Ward;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.repository.WardRepository;
 import com.edunge.srtool.response.WardResponse;
 import com.edunge.srtool.service.WardService;
+import com.edunge.srtool.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +38,9 @@ public class WardServiceImpl implements WardService {
     private final StateRepository stateRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private final WardRepository wardRepository;
+private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
 
+    private final Path fileStorageLocation;
     private static final String SERVICE_NAME = "Ward";
 
     @Value("${notfound.message.template}")
@@ -48,11 +62,18 @@ public class WardServiceImpl implements WardService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public WardServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository) {
+    public WardServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -193,5 +214,41 @@ public class WardServiceImpl implements WardService {
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return currentWard.get();
+    }
+
+    private void saveWard(String stateCode,String senatorialDistrictCode,String lgaCode, String code, String name)  {
+        State state = stateRepository.findByCode(stateCode);
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
+        Lga lga = lgaRepository.findByCode(lgaCode);
+        Ward ward = wardRepository.findByCode(code);
+        try{
+            if(ward==null){
+                ward = new Ward();
+                ward.setState(state);
+                ward.setLga(lga);
+                ward.setSenatorialDistrict(senatorialDistrict);
+                ward.setCode(code);
+                ward.setName(name);
+                wardRepository.save(ward);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info("State could not be saved");
+        }
+    }
+
+    @Override
+    public WardResponse uploadLga(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private WardResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveWard(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim());
+        }
+        return new WardResponse("00", "File Uploaded.");
     }
 }

@@ -3,6 +3,7 @@ package com.edunge.srtool.service;
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface SenatorialDistrictService {
     SenatorialDistrictResponse saveSenatorialDistrict(SenatorialDistrictDto senatorialDistrictDto) throws NotFoundException;
@@ -13,4 +14,6 @@ public interface SenatorialDistrictService {
     SenatorialDistrictResponse findAll() ;
     SenatorialDistrictResponse filterByName(String name) throws NotFoundException;
     SenatorialDistrictResponse findSenatorialDistrictByStateCode(Long stateCode) throws NotFoundException;
+
+    SenatorialDistrictResponse uploadSenatorialDistrict(MultipartFile file);
 }

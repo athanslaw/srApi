@@ -30,7 +30,7 @@ public class StateServiceImpl implements StateService {
     private final StateRepository stateRepository;
     private final LgaRepository lgaRepository;
     private static final String SERVICE_NAME = "State";
-    private static final Logger logger = LoggerFactory.getLogger(PoliticalPartyCandidateServiceServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateService.class);
 
     private final Path fileStorageLocation;
 
@@ -174,5 +174,37 @@ public class StateServiceImpl implements StateService {
         state.setDefaultState(true);
         stateRepository.save(state);
         return new StateResponse("00", "Default state", state);
+    }
+
+    private void saveState(String code, String name)  {
+        State existingState = stateRepository.findByCode(code);
+        try{
+            if(existingState==null){
+                existingState = new State();
+                existingState.setCode(code);
+                existingState.setName(name);
+                existingState.setSvgUrl("default.svg");
+                existingState.setDefaultState(false);
+                stateRepository.save(existingState);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info("State could not be saved");
+        }
+    }
+
+    @Override
+    public StateResponse uploadState(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private StateResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveState(state[0].trim(), state[1].trim());
+        }
+        return new StateResponse("00", "File Uploaded.");
     }
 }
