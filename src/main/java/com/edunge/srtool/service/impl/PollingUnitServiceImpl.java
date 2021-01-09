@@ -1,16 +1,25 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.PollingUnitDto;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PollingUnitResponse;
 import com.edunge.srtool.service.PollingUnitService;
+import com.edunge.srtool.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +31,9 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private final WardRepository wardRepository;
     private final PollingUnitRepository pollingUnitRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(PollingUnitService.class);
 
+    private final Path fileStorageLocation;
     private static final String SERVICE_NAME = "Polling Unit";
 
     @Value("${notfound.message.template}")
@@ -44,12 +55,19 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PollingUnitServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, PollingUnitRepository pollingUnitRepository) {
+    public PollingUnitServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, PollingUnitRepository pollingUnitRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
         this.pollingUnitRepository = pollingUnitRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -179,5 +197,43 @@ public class PollingUnitServiceImpl implements PollingUnitService {
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return currentPollingUnit.get();
+    }
+
+    private void saveWard(String stateCode,String senatorialDistrictCode,String lgaCode,String wardCode, String code, String name)  {
+        State state = stateRepository.findByCode(stateCode);
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
+        Lga lga = lgaRepository.findByCode(lgaCode);
+        Ward ward = wardRepository.findByCode(code);
+        PollingUnit pollingUnit = pollingUnitRepository.findByCode(code);
+        try{
+            if(pollingUnit==null){
+                pollingUnit = new PollingUnit();
+                pollingUnit.setState(state);
+                pollingUnit.setLga(lga);
+                pollingUnit.setSenatorialDistrict(senatorialDistrict);
+                pollingUnit.setCode(code);
+                pollingUnit.setWard(ward);
+                pollingUnit.setName(name);
+                pollingUnitRepository.save(pollingUnit);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info("Polling unit could not be saved");
+        }
+    }
+
+    @Override
+    public PollingUnitResponse uploadPollingUnit(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private PollingUnitResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveWard(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim());
+        }
+        return new PollingUnitResponse("00", "File Uploaded.");
     }
 }

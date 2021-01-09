@@ -16,4 +16,6 @@ public interface StateService {
     Resource loadSvg(String fileName);
     StateResponse getDefaultState() throws NotFoundException;
     StateResponse setDefaultState(Long stateId) throws NotFoundException;
+
+    StateResponse uploadState(MultipartFile file);
 }

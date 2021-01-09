@@ -110,4 +110,9 @@ public class StateController {
     public ResponseEntity<StateResponse> setDefaultState(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(stateService.setDefaultState(id));
     }
+
+    @PostMapping("/state/upload")
+    public ResponseEntity<StateResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(stateService.uploadState(file), HttpStatus.OK);
+    }
 }

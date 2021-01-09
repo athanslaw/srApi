@@ -3,6 +3,7 @@ package com.edunge.srtool.service;
 import com.edunge.srtool.dto.WardDto;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.WardResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface WardService {
     WardResponse saveWard(WardDto ward) throws NotFoundException;
@@ -14,4 +15,6 @@ public interface WardService {
     WardResponse filterByName(String name) throws NotFoundException;
     WardResponse findByLga(Long lgaCode) throws NotFoundException;
     WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId);
+
+    WardResponse uploadWard(MultipartFile file);
 }

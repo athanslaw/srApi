@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -71,5 +72,10 @@ public class SenatorialDistrictController {
     @ApiOperation(value = "Find senatorial district by stateCode.")
     public ResponseEntity<SenatorialDistrictResponse> filterLGAByStateCode(@PathVariable Long stateCode) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictByStateCode(stateCode));
+    }
+
+    @PostMapping("/senatorial-district/upload")
+    public ResponseEntity<SenatorialDistrictResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(senatorialDistrictService.uploadSenatorialDistrict(file), HttpStatus.OK);
     }
 }
