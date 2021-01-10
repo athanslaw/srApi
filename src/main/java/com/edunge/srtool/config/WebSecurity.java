@@ -55,7 +55,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
          "/swagger-ui.html/**","/swagger-resources/**","/v2/**","/v2/api-docs").permitAll().
         anyRequest().
-                authenticated()
+                permitAll()
                 .and().
 
         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
