@@ -51,9 +51,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
+                .authorizeRequests()
+                .antMatchers("/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
          "/swagger-ui.html/**","/swagger-resources/**","/v2/**","/v2/api-docs").permitAll().
-        anyRequest().permitAll().and().
+        anyRequest().
+                authenticated()
+                .and().
 
         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
