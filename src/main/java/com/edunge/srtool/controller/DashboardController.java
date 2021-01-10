@@ -1,7 +1,9 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.response.DashboardResponse;
+import com.edunge.srtool.response.IncidentDashboardResponse;
 import com.edunge.srtool.service.DashboardService;
+import com.edunge.srtool.service.IncidentDashboardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final IncidentDashboardService incidentDashboardService;
 
     @Autowired
-    public DashboardController(DashboardService dashboardService) {
+    public DashboardController(DashboardService dashboardService, IncidentDashboardService incidentDashboardService) {
         this.dashboardService = dashboardService;
+        this.incidentDashboardService = incidentDashboardService;
     }
 
     @GetMapping(value = "/dashboard/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,14 +40,27 @@ public class DashboardController {
     }
 
     @GetMapping(value = "/dashboard/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve default by id.")
+    @ApiOperation(value = "Senatorial District Dashboard")
     public ResponseEntity<DashboardResponse> getDashboardBySenatorialDistrict(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(dashboardService.getDashboardBySenatorialDistrict(id));
     }
 
     @GetMapping(value = "/dashboard/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve default by id.")
+    @ApiOperation(value = "Dashboard result by LGA")
     public ResponseEntity<DashboardResponse> getDashboardByLga(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(dashboardService.getDashboardByLga(id));
+    }
+
+    @GetMapping(value = "/dashboard/incidents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Incident Dashboard By State")
+    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentDashboardService.getDashboardByState(id));
+    }
+
+
+    @GetMapping(value = "/dashboard/incidents/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Incident Dashboard By Lga")
+    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentDashboardService.getDashboardByLga(id));
     }
 }
