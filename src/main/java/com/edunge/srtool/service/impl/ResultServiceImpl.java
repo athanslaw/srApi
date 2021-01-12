@@ -1,18 +1,25 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.ResultDto;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.ResultResponse;
 import com.edunge.srtool.service.ResultService;
+import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +33,7 @@ public class ResultServiceImpl implements ResultService {
     private final LgaRepository lgaRepository;
     private final PollingUnitRepository pollingUnitRepository;
     private final VotingLevelRepository votingLevelRepository;
-
+    private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
 
     private static final String SERVICE_NAME = "Result";
@@ -50,7 +57,7 @@ public class ResultServiceImpl implements ResultService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository) {
+    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.resultRepository = resultRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -59,6 +66,13 @@ public class ResultServiceImpl implements ResultService {
         this.lgaRepository = lgaRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.votingLevelRepository = votingLevelRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -198,5 +212,57 @@ public class ResultServiceImpl implements ResultService {
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return result.get();
+    }
+
+    private void saveResult(String electionCode,
+                            String votingLevelCode,
+                            String phoneNumber,
+                            String lgaCode,
+                            String wardCode,
+                            String pollingUnitCode,
+                            String senatorialDistrictCode,
+                            String accreditedVotersCount, String registeredVotersCount) {
+        try{
+            Lga lga = lgaRepository.findByCode(lgaCode);
+            PartyAgent partyAgent = partyAgentRepository.findByPhone(phoneNumber);
+            Ward ward = wardRepository.findByCode(wardCode);
+            PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
+            VotingLevel votingLevel = votingLevelRepository.findByCode(votingLevelCode);
+            SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
+            Election election = electionRepository.findByCode(electionCode);
+            Result result = resultRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
+
+            if(result==null){
+                result = new Result();
+                result.setRegisteredVotersCount(Integer.valueOf(registeredVotersCount));
+                result.setAccreditedVotersCount(Integer.valueOf(accreditedVotersCount));
+                result.setElection(election);
+                result.setWard(ward);
+                result.setLga(lga);
+                result.setPollingUnit(pollingUnit);
+                result.setPartyAgent(partyAgent);
+                result.setVotingLevel(votingLevel);
+                result.setSenatorialDistrict(senatorialDistrict);
+                resultRepository.save(result);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info(String.format("%s result could not be saved",lgaCode));
+        }
+    }
+
+    @Override
+    public ResultResponse uploadResult(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private ResultResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveResult(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim());
+        }
+        return new ResultResponse("00", "File Uploaded.");
     }
 }
