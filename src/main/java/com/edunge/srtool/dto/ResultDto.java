@@ -23,6 +23,7 @@ public class ResultDto extends AbstractBaseModel {
     private Integer registeredVotersCount;
     @NotNull
     private Integer  accreditedVotersCount;
+    private Integer apc, pdp, anpp, others;
 
     public Long getElectionId() {
         return electionId;
@@ -94,5 +95,37 @@ public class ResultDto extends AbstractBaseModel {
 
     public void setAccreditedVotersCount(Integer accreditedVotersCount) {
         this.accreditedVotersCount = accreditedVotersCount;
+    }
+
+    public Integer getApc() {
+        return apc;
+    }
+
+    public void setApc(Integer apc) {
+        this.apc = apc;
+    }
+
+    public Integer getPdp() {
+        return pdp;
+    }
+
+    public void setPdp(Integer pdp) {
+        this.pdp = pdp;
+    }
+
+    public Integer getAnpp() {
+        return anpp;
+    }
+
+    public void setAnpp(Integer anpp) {
+        this.anpp = anpp;
+    }
+
+    public Integer getOthers() {
+        return others;
+    }
+
+    public void setOthers(Integer others) {
+        this.others = others;
     }
 }

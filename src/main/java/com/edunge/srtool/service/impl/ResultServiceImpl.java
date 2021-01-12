@@ -33,6 +33,8 @@ public class ResultServiceImpl implements ResultService {
     private final LgaRepository lgaRepository;
     private final PollingUnitRepository pollingUnitRepository;
     private final VotingLevelRepository votingLevelRepository;
+    private final ResultPerPartyRepository resultPerPartyRepository;
+    private final PoliticalPartyRepository politicalPartyRepository;
     private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
 
@@ -57,7 +59,7 @@ public class ResultServiceImpl implements ResultService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.resultRepository = resultRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -66,6 +68,8 @@ public class ResultServiceImpl implements ResultService {
         this.lgaRepository = lgaRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.votingLevelRepository = votingLevelRepository;
+        this.resultPerPartyRepository = resultPerPartyRepository;
+        this.politicalPartyRepository = politicalPartyRepository;
         this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
                 .toAbsolutePath().normalize();
         try {
@@ -100,6 +104,39 @@ public class ResultServiceImpl implements ResultService {
             result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
             result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
             resultRepository.save(result);
+
+            //Save APC votes;
+            PoliticalParty apc = politicalPartyRepository.findByCode("APC");
+            ResultPerParty resultPerParty = new ResultPerParty();
+            resultPerParty.setVoteCount(resultDto.getApc());
+            resultPerParty.setResult(result);
+            resultPerParty.setPoliticalParty(apc);
+            resultPerPartyRepository.save(resultPerParty);
+
+            //Save APC votes;
+            PoliticalParty pdp = politicalPartyRepository.findByCode("PDP");
+            ResultPerParty resultPerPartyPdp = new ResultPerParty();
+            resultPerPartyPdp.setVoteCount(resultDto.getApc());
+            resultPerPartyPdp.setResult(result);
+            resultPerPartyPdp.setPoliticalParty(pdp);
+            resultPerPartyRepository.save(resultPerPartyPdp);
+
+            //Save APC votes;
+            PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
+            ResultPerParty resultPerPartyAnpp = new ResultPerParty();
+            resultPerPartyAnpp.setVoteCount(resultDto.getApc());
+            resultPerPartyAnpp.setResult(result);
+            resultPerPartyAnpp.setPoliticalParty(anpp);
+            resultPerPartyRepository.save(resultPerPartyAnpp);
+
+            //Save APC votes;
+            PoliticalParty others = politicalPartyRepository.findByCode("Others");
+            ResultPerParty resultPerPartyOthers = new ResultPerParty();
+            resultPerPartyOthers.setVoteCount(resultDto.getApc());
+            resultPerPartyOthers.setResult(result);
+            resultPerPartyOthers.setPoliticalParty(others);
+            resultPerPartyRepository.save(resultPerPartyOthers);
+
             return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
         }
         throw new DuplicateException(String.format("Result for %s in %s already exists.", ward.getName(), election.getDescription()));
