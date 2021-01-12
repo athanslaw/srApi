@@ -24,8 +24,11 @@ public class IncidentDashboardResponse extends BaseResponse{
         return incidentCount;
     }
 
-    public IncidentDashboardResponse(String code, String message) {
+    public IncidentDashboardResponse(String code, String message, Integer totalIncidents, List<IncidentReport> incidentReports, List<IncidentReport> lgaIncidentReport) {
         super(code, message);
+        this.incidentReports = incidentReports;
+        this.incidentCount = totalIncidents;
+        this.lgaIncidentReports = lgaIncidentReport;
     }
 
     public IncidentDashboardResponse() {

@@ -1,7 +1,9 @@
 package com.edunge.srtool.response;
 
 import com.edunge.srtool.model.Lga;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IncidentReport {
     private String incidentType;
     private Integer count;
@@ -42,5 +44,13 @@ public class IncidentReport {
 
     public void setPercent(Double percent) {
         this.percent = percent;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
     }
 }

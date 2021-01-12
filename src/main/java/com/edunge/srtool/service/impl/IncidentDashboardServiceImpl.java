@@ -33,20 +33,10 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         getState(stateId);
         List<Incident> incidentList = incidentRepository.findAll();
         Integer totalIncidents = getStateIncidents(stateId);
-        List<IncidentReport> incidentReports = new ArrayList<>();
-        HashMap<String, Integer> incidentTypeMap = new HashMap<>();
-        incidentList.stream()
-                .filter(incident -> incident.getLga().getState().getId().equals(stateId))
-                .forEach(incident -> {
-                    String incidentType = incident.getIncidentType().getName();
-                    incidentTypeMap.put(incidentType, incidentTypeMap.get(incidentType)+1);
-                });
-        incidentTypeMap.forEach((type, count)->{
-            Double percent = (count * 100.0)/totalIncidents;
-            incidentReports.add(new IncidentReport(type, count, percent));
-        });
+        List<IncidentReport> incidentReports = getIncidentReport(stateId);
         List<IncidentReport> lgaIncidentReport = getLgaReports(stateId);
-        return new IncidentDashboardResponse("00","Incident Report loaded.", incidentReports, lgaIncidentReport);
+
+        return new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, incidentReports, lgaIncidentReport);
     }
 
     public Integer getStateIncidents(Long stateId){
@@ -56,20 +46,21 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
 
     @Override
     public IncidentDashboardResponse getDashboardByLga(Long lgaId) throws NotFoundException {
-        getLga(lgaId);
+        Lga lga = getLga(lgaId);
         List<Incident> incidentList = incidentRepository.findAll();
-        Integer totalIncidents = getLgaIncidents(lgaId);
+        Integer totalIncidents = getLgaIncidents(lga.getId());
         List<IncidentReport> incidentReports = new ArrayList<>();
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         incidentList.stream()
-                .filter(incident -> incident.getLga().getId().equals(lgaId))
+                .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                 .forEach(incident -> {
                     String incidentType = incident.getIncidentType().getName();
-                    incidentTypeMap.put(incidentType, incidentTypeMap.get(incidentType)+1);
+                    Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
+                    incidentTypeMap.put(incidentType, currentValue+1);
                 });
         incidentTypeMap.forEach((type, count)->{
             Double percent = (count * 100.0)/totalIncidents;
-            incidentReports.add(new IncidentReport(type, count, percent));
+            incidentReports.add(new IncidentReport(lga,type, count, percent));
         });
         return new IncidentDashboardResponse("00","Incident Report loaded.", incidentReports);
     }
@@ -77,6 +68,25 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     public Integer getLgaIncidents(Long lgaId){
         List<Incident> incidentList = incidentRepository.findAll();
         return (int) incidentList.stream().filter(incident -> incident.getLga().getId().equals(lgaId)).count();
+    }
+
+    private List<IncidentReport> getIncidentReport(Long stateId){
+        List<Incident> incidentList = incidentRepository.findAll();
+        HashMap<String, Integer> incidentTypeMap = new HashMap<>();
+        List<IncidentReport> incidentReports = new ArrayList<>();
+        incidentList.stream()
+                .filter(incident -> incident.getLga().getState().getId().equals(stateId))
+                .forEach(incident -> {
+                    String incidentType = incident.getIncidentType().getName();
+                    Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
+                    incidentTypeMap.put(incidentType, currentValue+1);
+                });
+        Integer totalIncident = getStateIncidents(stateId);
+        incidentTypeMap.forEach((type, count)->{
+            Double percent = (count * 100.0)/totalIncident;
+            incidentReports.add(new IncidentReport(type, count, percent));
+        });
+        return incidentReports;
     }
 
     private List<IncidentReport> getLgaReports(Long stateId){
@@ -93,7 +103,8 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                             .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                             .forEach(incident -> {
                                 String incidentType = incident.getIncidentType().getName();
-                                incidentTypeMap.put(incidentType, incidentTypeMap.get(incidentType)+1);
+                                Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
+                                incidentTypeMap.put(incidentType, currentValue+1);
                             });
                     incidentTypeMap.forEach((type, count)->{
                         Double percent = (count * 100.0)/totalIncidents;
