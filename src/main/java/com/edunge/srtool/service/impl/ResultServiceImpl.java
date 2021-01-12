@@ -258,7 +258,12 @@ public class ResultServiceImpl implements ResultService {
                             String wardCode,
                             String pollingUnitCode,
                             String senatorialDistrictCode,
-                            String accreditedVotersCount, String registeredVotersCount) {
+                            String accreditedVotersCount,
+                            String registeredVotersCount,
+                            String apcVotes,
+                            String pdpVotes,
+                            String anppVotes,
+                            String othersVotes) {
         try{
             Lga lga = lgaRepository.findByCode(lgaCode);
             PartyAgent partyAgent = partyAgentRepository.findByPhone(phoneNumber);
@@ -281,6 +286,37 @@ public class ResultServiceImpl implements ResultService {
                 result.setVotingLevel(votingLevel);
                 result.setSenatorialDistrict(senatorialDistrict);
                 resultRepository.save(result);
+                //Save APC votes;
+                PoliticalParty apc = politicalPartyRepository.findByCode("APC");
+                ResultPerParty resultPerParty = new ResultPerParty();
+                resultPerParty.setVoteCount(Integer.valueOf(apcVotes));
+                resultPerParty.setResult(result);
+                resultPerParty.setPoliticalParty(apc);
+                resultPerPartyRepository.save(resultPerParty);
+
+                //Save PDP votes;
+                PoliticalParty pdp = politicalPartyRepository.findByCode("PDP");
+                ResultPerParty resultPerPartyPdp = new ResultPerParty();
+                resultPerPartyPdp.setVoteCount(Integer.valueOf(pdpVotes));
+                resultPerPartyPdp.setResult(result);
+                resultPerPartyPdp.setPoliticalParty(pdp);
+                resultPerPartyRepository.save(resultPerPartyPdp);
+
+                //Save ANPP votes;
+                PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
+                ResultPerParty resultPerPartyAnpp = new ResultPerParty();
+                resultPerPartyAnpp.setVoteCount(Integer.valueOf(anppVotes));
+                resultPerPartyAnpp.setResult(result);
+                resultPerPartyAnpp.setPoliticalParty(anpp);
+                resultPerPartyRepository.save(resultPerPartyAnpp);
+
+                //Save Others votes;
+                PoliticalParty others = politicalPartyRepository.findByCode("Others");
+                ResultPerParty resultPerPartyOthers = new ResultPerParty();
+                resultPerPartyOthers.setVoteCount(Integer.valueOf(othersVotes));
+                resultPerPartyOthers.setResult(result);
+                resultPerPartyOthers.setPoliticalParty(others);
+                resultPerPartyRepository.save(resultPerPartyOthers);
             }
         }
         catch (Exception ex){
@@ -298,7 +334,7 @@ public class ResultServiceImpl implements ResultService {
     private ResultResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            saveResult(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim());
+            saveResult(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim(), state[9].trim(), state[10].trim(), state[11].trim(), state[12].trim());
         }
         return new ResultResponse("00", "File Uploaded.");
     }
