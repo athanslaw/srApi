@@ -1,17 +1,24 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.IncidentDto;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.IncidentResponse;
 import com.edunge.srtool.service.IncidentService;
+import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +35,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentLevelRepository incidentLevelRepository;
     private final IncidentStatusRepository incidentStatusRepository;
     private final IncidentTypeRepository incidentTypeRepository;
-
+    private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(IncidentServiceImpl.class);
 
     private static final String SERVICE_NAME = "Incident";
@@ -49,7 +56,7 @@ public class IncidentServiceImpl implements IncidentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository) {
+    public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -61,6 +68,13 @@ public class IncidentServiceImpl implements IncidentService {
         this.incidentLevelRepository = incidentLevelRepository;
         this.incidentStatusRepository = incidentStatusRepository;
         this.incidentTypeRepository = incidentTypeRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -217,5 +231,54 @@ public class IncidentServiceImpl implements IncidentService {
         PollingUnit pollingUnit = getPollingUnit(id);
         List<Incident> elections = incidentRepository.findByPollingUnit(pollingUnit);
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    }
+
+    private void saveIncident(
+                              String incidentLevelCode,
+                              String incidentTypeCode,
+                              String incidentStatusCode,
+                              String lgaCode,
+                              String wardCode,
+                              String pollingUnitCode,
+                              String description,
+                              String reportedLocation,
+                              String phoneNumberToContact
+    ) {
+        try{
+            Lga lga = lgaRepository.findByCode(lgaCode);
+            Ward ward = wardRepository.findByCode(wardCode);
+            PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
+            IncidentLevel incidentLevel = incidentLevelRepository.findByCode(incidentLevelCode);
+            IncidentType incidentType = incidentTypeRepository.findByCode(incidentTypeCode);
+            IncidentStatus incidentStatus = incidentStatusRepository.findByCode(incidentStatusCode);
+            Incident incident = new Incident();
+            incident.setIncidentType(incidentType);
+            incident.setWard(ward);
+            incident.setLga(lga);
+            incident.setIncidentStatus(incidentStatus);
+            incident.setPollingUnit(pollingUnit);
+            incident.setDescription(description);
+            incident.setReportedLocation(reportedLocation);
+            incident.setIncidentLevel(incidentLevel);
+            incident.setPhoneNumberToContact(phoneNumberToContact);
+            incidentRepository.save(incident);
+        }
+        catch (Exception ex){
+            LOGGER.info(String.format("%s | %s | %s Incident could not be saved",incidentLevelCode, lgaCode, wardCode));
+        }
+    }
+
+    @Override
+    public IncidentResponse uploadIncident(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+    private IncidentResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            saveIncident(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim());
+        }
+        return new IncidentResponse("00", "File Uploaded.");
     }
 }
