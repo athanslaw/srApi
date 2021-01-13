@@ -202,8 +202,8 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private void saveWard(String stateCode,String senatorialDistrictCode,String lgaCode,String wardCode, String code, String name)  {
         State state = stateRepository.findByCode(stateCode);
         SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
-        Lga lga = lgaRepository.findByCode(lgaCode);
-        Ward ward = wardRepository.findByCode(code);
+        Lga lga = lgaRepository .findByCode(lgaCode);
+        Ward ward = wardRepository.findByCode(wardCode);
         PollingUnit pollingUnit = pollingUnitRepository.findByCode(code);
         try{
             if(pollingUnit==null){
