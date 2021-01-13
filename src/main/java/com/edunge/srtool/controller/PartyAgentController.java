@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -65,4 +66,10 @@ public class PartyAgentController {
     public ResponseEntity<PartyAgentResponse> filterPartyAgentByName(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname) throws Exception {
         return ResponseEntity.ok(partyAgentService.findPartyAgentByName(firstname, lastname));
     }
+
+    @PostMapping("/party-agent/upload")
+    public ResponseEntity<PartyAgentResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(partyAgentService.uploadPartyAgent(file), HttpStatus.OK);
+    }
+
 }

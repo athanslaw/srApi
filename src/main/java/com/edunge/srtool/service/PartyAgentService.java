@@ -3,6 +3,7 @@ package com.edunge.srtool.service;
 import com.edunge.srtool.dto.PartyAgentDto;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.PartyAgentResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PartyAgentService {
     PartyAgentResponse savePartyAgent(PartyAgentDto partyAgentDto) throws NotFoundException;
@@ -12,4 +13,6 @@ public interface PartyAgentService {
     PartyAgentResponse findPartyAgentByName(String firstName, String lastname)throws NotFoundException;
     PartyAgentResponse findPartyAgentByPhone(String phone)throws NotFoundException;
     PartyAgentResponse findAll() ;
+
+    PartyAgentResponse uploadPartyAgent(MultipartFile file);
 }
