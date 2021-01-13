@@ -1,16 +1,25 @@
 package com.edunge.srtool.service.impl;
 
+import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.PartyAgentDto;
 import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PartyAgentResponse;
 import com.edunge.srtool.service.PartyAgentService;
+import com.edunge.srtool.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,8 +31,11 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private final PollingUnitRepository pollingUnitRepository;
     private final WardRepository wardRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
+    private final SenatorialDistrictRepository senatorialDistrictRepository;
 
     private static final String SERVICE_NAME = "Party Agent";
+    private final Path fileStorageLocation;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
 
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
@@ -44,12 +56,20 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository) {
+    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.lgaRepository = lgaRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.wardRepository = wardRepository;
         this.politicalPartyRepository = politicalPartyRepository;
+        this.senatorialDistrictRepository = senatorialDistrictRepository;
+        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
@@ -174,5 +194,54 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
         return currentWard.get();
+    }
+
+    private void savePartyAgent(String surname,
+                                String otherNames,
+                                String phoneNumber,
+                                String stateCode,
+                                String senatorialDistrictCode,
+                                String lgaCode,
+                                String wardCode,
+                                String pollingUnitCode,
+                                String pollingUnitName)  {
+
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
+        Lga lga = lgaRepository .findByCode(lgaCode);
+        Ward ward = wardRepository.findByCode(wardCode);
+        PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
+        PartyAgent partyAgent = partyAgentRepository.findByPhone(phoneNumber);
+
+        try{
+            if(partyAgent==null){
+                partyAgent = new PartyAgent();
+                partyAgent.setFirstname(otherNames);
+                partyAgent.setLastname(surname);
+                partyAgent.setAddress("KANO");
+                partyAgent.setPhone(phoneNumber);
+                partyAgent.setPollingUnit(pollingUnit);
+                partyAgent.setWard(ward);
+                partyAgent.setLga(lga);
+                partyAgentRepository.save(partyAgent);
+            }
+        }
+        catch (Exception ex){
+            LOGGER.info("Party agent could not be saved");
+        }
+    }
+
+    @Override
+    public PartyAgentResponse uploadPartyAgent(MultipartFile file){
+        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        return processUpload(csvLines);
+    }
+
+
+    private PartyAgentResponse processUpload(List<String> lines){
+        for (String line:lines) {
+            String[] state = line.split(",");
+            savePartyAgent(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim(),state[6].trim(),state[7].trim(),state[8].trim());
+        }
+        return new PartyAgentResponse("00", "File Uploaded.");
     }
 }

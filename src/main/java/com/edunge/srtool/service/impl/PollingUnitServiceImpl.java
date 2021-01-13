@@ -199,7 +199,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         return currentPollingUnit.get();
     }
 
-    private void saveWard(String stateCode,String senatorialDistrictCode,String lgaCode,String wardCode, String code, String name)  {
+    private void savePollingUnit(String stateCode, String senatorialDistrictCode, String lgaCode, String wardCode, String code, String name)  {
         State state = stateRepository.findByCode(stateCode);
         SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
         Lga lga = lgaRepository .findByCode(lgaCode);
@@ -232,7 +232,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private PollingUnitResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            saveWard(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim());
+            savePollingUnit(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim());
         }
         return new PollingUnitResponse("00", "File Uploaded.");
     }
