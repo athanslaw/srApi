@@ -105,7 +105,7 @@ public class DashboardServiceImpl implements DashboardService {
         Long wardsWithResults = getStateWardsWithResult(state);
         Long pollingUnitsWithResults = getStatePollingUnitsWithResult(state);
 
-        Double resultsReceived = (totalVoteCounts *100.0) / totalAccreditedVotes;
+        Double resultsReceived = (pollingUnitsWithResults / totalPollingUnits) *100.0;//(totalVoteCounts *100.0) / totalAccreditedVotes;
 
         List<PoliticalParty> politicalParties = politicalPartyRepository.findAll();
         List<PartyResult> partyResults = new ArrayList<>();

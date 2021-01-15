@@ -121,6 +121,7 @@ public class LgaServiceImpl implements LgaService {
     @Override
     public LgaResponse deleteLgaById(Long id) throws NotFoundException {
         Lga currentLga = getLga(id);
+        lgaRepository.delete(currentLga);
         return new LgaResponse("00",String.format(deleteTemplate,currentLga.getCode()));
     }
 

@@ -9,7 +9,7 @@ public class ResultDto extends AbstractBaseModel {
     private Long electionId;
     @NotNull
     private Long votingLevelId;
-    @NotNull
+
     private Long partyAgentId;
     @NotNull
     private Long  senatorialDistrictId;
