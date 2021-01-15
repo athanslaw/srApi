@@ -12,6 +12,7 @@ import com.edunge.srtool.response.IncidentReport;
 import com.edunge.srtool.service.IncidentDashboardService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                     incidentTypeMap.put(incidentType, currentValue+1);
                 });
         incidentTypeMap.forEach((type, count)->{
-            Double percent = (count * 100.0)/totalIncidents;
+            BigDecimal bd = BigDecimal.valueOf((count * 100.0)/totalIncidents);
+            bd = bd.setScale(2,BigDecimal.ROUND_HALF_DOWN);
+            double percent = bd.doubleValue();
             incidentReports.add(new IncidentReport(lga,type, count, percent));
         });
         return new IncidentDashboardResponse("00","Incident Report loaded.", incidentReports);
