@@ -170,6 +170,39 @@ public class ResultServiceImpl implements ResultService {
         result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
         result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
         resultRepository.save(result);
+
+
+        PoliticalParty apc = politicalPartyRepository.findByCode("APC");
+        ResultPerParty resultPerParty = resultPerPartyRepository.findByResultAndPoliticalParty(result,apc);
+        resultPerParty.setVoteCount(resultDto.getApc());
+        resultPerParty.setResult(result);
+        resultPerParty.setPoliticalParty(apc);
+        resultPerPartyRepository.save(resultPerParty);
+
+        //Save APC votes;
+        PoliticalParty pdp = politicalPartyRepository.findByCode("PDP");
+        ResultPerParty resultPerPartyPdp = resultPerPartyRepository.findByResultAndPoliticalParty(result,pdp);
+        resultPerPartyPdp.setVoteCount(resultDto.getApc());
+        resultPerPartyPdp.setResult(result);
+        resultPerPartyPdp.setPoliticalParty(pdp);
+        resultPerPartyRepository.save(resultPerPartyPdp);
+
+        //Save APC votes;
+        PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
+        ResultPerParty resultPerPartyAnpp = resultPerPartyRepository.findByResultAndPoliticalParty(result,anpp);
+        resultPerPartyAnpp.setVoteCount(resultDto.getApc());
+        resultPerPartyAnpp.setResult(result);
+        resultPerPartyAnpp.setPoliticalParty(anpp);
+        resultPerPartyRepository.save(resultPerPartyAnpp);
+
+        //Save APC votes;
+        PoliticalParty others = politicalPartyRepository.findByCode("Others");
+        ResultPerParty resultPerPartyOthers = resultPerPartyRepository.findByResultAndPoliticalParty(result,others);
+        resultPerPartyOthers.setVoteCount(resultDto.getApc());
+        resultPerPartyOthers.setResult(result);
+        resultPerPartyOthers.setPoliticalParty(others);
+        resultPerPartyRepository.save(resultPerPartyOthers);
+
         return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
     }
 
