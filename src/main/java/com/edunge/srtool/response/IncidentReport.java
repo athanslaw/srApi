@@ -9,10 +9,19 @@ public class IncidentReport {
     private Integer count;
     private Double percent;
     private Lga lga;
+    private Integer totalCount;
     public IncidentReport(String type, Integer count, Double percent) {
         this.incidentType = type;
         this.count = count;
         this.percent = percent;
+    }
+
+    public IncidentReport(Lga lga, String type, Integer count, Double percent, Integer totalCount) {
+        this.incidentType = type;
+        this.count = count;
+        this.percent = percent;
+        this.lga = lga;
+        this.totalCount = totalCount;
     }
 
     public IncidentReport(Lga lga, String type, Integer count, Double percent) {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class IncidentDashboardServiceImpl implements IncidentDashboardService {
@@ -99,6 +100,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                 .forEach(lga -> {
                     Integer totalIncidents = getLgaIncidents(lga.getId());
                     HashMap<String, Integer> incidentTypeMap = new HashMap<>();
+                    AtomicInteger totalIncident = new AtomicInteger(0);
                     incidentList.stream()
                             .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                             .forEach(incident -> {
@@ -106,9 +108,13 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                                 Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
                                 incidentTypeMap.put(incidentType, currentValue+1);
                             });
+                    totalIncident.addAndGet((int) incidentList.stream()
+                            .filter(incident -> incident.getLga().getId().equals(lga.getId()))
+                            .filter(incident -> incident.getIncidentStatus().getName().equals("Unresolved"))
+                            .count());
                     incidentTypeMap.forEach((type, count)->{
                         Double percent = (count * 100.0)/totalIncidents;
-                        incidentReports.add(new IncidentReport(lga,type, count, percent));
+                        incidentReports.add(new IncidentReport(lga,type, count, percent, totalIncident.get()));
                     });
                 });
         return incidentReports;
