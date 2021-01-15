@@ -116,7 +116,7 @@ public class ResultServiceImpl implements ResultService {
             //Save APC votes;
             PoliticalParty pdp = politicalPartyRepository.findByCode("PDP");
             ResultPerParty resultPerPartyPdp = new ResultPerParty();
-            resultPerPartyPdp.setVoteCount(resultDto.getApc());
+            resultPerPartyPdp.setVoteCount(resultDto.getPdp());
             resultPerPartyPdp.setResult(result);
             resultPerPartyPdp.setPoliticalParty(pdp);
             resultPerPartyRepository.save(resultPerPartyPdp);
@@ -124,7 +124,7 @@ public class ResultServiceImpl implements ResultService {
             //Save APC votes;
             PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
             ResultPerParty resultPerPartyAnpp = new ResultPerParty();
-            resultPerPartyAnpp.setVoteCount(resultDto.getApc());
+            resultPerPartyAnpp.setVoteCount(resultDto.getAnpp());
             resultPerPartyAnpp.setResult(result);
             resultPerPartyAnpp.setPoliticalParty(anpp);
             resultPerPartyRepository.save(resultPerPartyAnpp);
@@ -132,7 +132,7 @@ public class ResultServiceImpl implements ResultService {
             //Save APC votes;
             PoliticalParty others = politicalPartyRepository.findByCode("Others");
             ResultPerParty resultPerPartyOthers = new ResultPerParty();
-            resultPerPartyOthers.setVoteCount(resultDto.getApc());
+            resultPerPartyOthers.setVoteCount(resultDto.getOthers());
             resultPerPartyOthers.setResult(result);
             resultPerPartyOthers.setPoliticalParty(others);
             resultPerPartyRepository.save(resultPerPartyOthers);
@@ -182,7 +182,7 @@ public class ResultServiceImpl implements ResultService {
         //Save APC votes;
         PoliticalParty pdp = politicalPartyRepository.findByCode("PDP");
         ResultPerParty resultPerPartyPdp = resultPerPartyRepository.findByResultAndPoliticalParty(result,pdp);
-        resultPerPartyPdp.setVoteCount(resultDto.getApc());
+        resultPerPartyPdp.setVoteCount(resultDto.getPdp());
         resultPerPartyPdp.setResult(result);
         resultPerPartyPdp.setPoliticalParty(pdp);
         resultPerPartyRepository.save(resultPerPartyPdp);
@@ -190,7 +190,7 @@ public class ResultServiceImpl implements ResultService {
         //Save APC votes;
         PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
         ResultPerParty resultPerPartyAnpp = resultPerPartyRepository.findByResultAndPoliticalParty(result,anpp);
-        resultPerPartyAnpp.setVoteCount(resultDto.getApc());
+        resultPerPartyAnpp.setVoteCount(resultDto.getAnpp());
         resultPerPartyAnpp.setResult(result);
         resultPerPartyAnpp.setPoliticalParty(anpp);
         resultPerPartyRepository.save(resultPerPartyAnpp);
@@ -198,7 +198,7 @@ public class ResultServiceImpl implements ResultService {
         //Save APC votes;
         PoliticalParty others = politicalPartyRepository.findByCode("Others");
         ResultPerParty resultPerPartyOthers = resultPerPartyRepository.findByResultAndPoliticalParty(result,others);
-        resultPerPartyOthers.setVoteCount(resultDto.getApc());
+        resultPerPartyOthers.setVoteCount(resultDto.getOthers());
         resultPerPartyOthers.setResult(result);
         resultPerPartyOthers.setPoliticalParty(others);
         resultPerPartyRepository.save(resultPerPartyOthers);
