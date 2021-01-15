@@ -32,6 +32,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private final WardRepository wardRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
+    private final StateRepository stateRepository;
 
     private static final String SERVICE_NAME = "Party Agent";
     private final Path fileStorageLocation;
@@ -56,13 +57,14 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, StateRepository stateRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.lgaRepository = lgaRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.wardRepository = wardRepository;
         this.politicalPartyRepository = politicalPartyRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
+        this.stateRepository = stateRepository;
         this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
                 .toAbsolutePath().normalize();
         try {
@@ -105,6 +107,36 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse findPartyAgentByName(String firstname, String lastname) throws NotFoundException {
         List<PartyAgent> partyAgent = partyAgentRepository.findByFirstnameOrLastname(firstname, lastname);
+        if(partyAgent==null){
+            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+        }
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+    }
+
+    @Override
+    public PartyAgentResponse findPartyAgentByLga(Long lgaId) throws NotFoundException {
+        Lga lga = getLga(lgaId);
+        List<PartyAgent> partyAgent = partyAgentRepository.findByLga(lga);
+        if(partyAgent==null){
+            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+        }
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+    }
+
+    @Override
+    public PartyAgentResponse findPartyAgentByWard(Long wardId) throws NotFoundException {
+        Ward ward = getWard(wardId);
+        List<PartyAgent> partyAgent = partyAgentRepository.findByWard(ward);
+        if(partyAgent==null){
+            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+        }
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+    }
+
+    @Override
+    public PartyAgentResponse findPartyAgentByPollingUnit(Long pollingUnitId) throws NotFoundException {
+        PollingUnit pollingUnit = getPollingUnit(pollingUnitId);
+        List<PartyAgent> partyAgent = partyAgentRepository.findByPollingUnit(pollingUnit);
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
@@ -169,6 +201,14 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             throw new NotFoundException("Party agent not found.");
         }
         return partyAgent.get();
+    }
+
+    private State getState(Long id) throws NotFoundException {
+        Optional<State> state = stateRepository.findById(id);
+        if(!state.isPresent()){
+            throw new NotFoundException("State not found.");
+        }
+        return state.get();
     }
 
 

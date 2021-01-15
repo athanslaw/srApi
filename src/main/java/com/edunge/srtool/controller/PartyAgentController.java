@@ -67,6 +67,24 @@ public class PartyAgentController {
         return ResponseEntity.ok(partyAgentService.findPartyAgentByName(firstname, lastname));
     }
 
+    @GetMapping(value = "/party-agent/filter/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<PartyAgentResponse> filterPartyAgentByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(partyAgentService.findPartyAgentByLga(id));
+    }
+
+    @GetMapping(value = "/party-agent/filter/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<PartyAgentResponse> filterPartyAgentByWard(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(partyAgentService.findPartyAgentByWard(id));
+    }
+
+    @GetMapping(value = "/party-agent/filter/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<PartyAgentResponse> filterPartyAgentByPollingUnit(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(partyAgentService.findPartyAgentByPollingUnit(id));
+    }
+
     @PostMapping("/party-agent/upload")
     public ResponseEntity<PartyAgentResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(partyAgentService.uploadPartyAgent(file), HttpStatus.OK);

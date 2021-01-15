@@ -1,5 +1,7 @@
 package com.edunge.srtool.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -16,18 +18,22 @@ public class PartyAgent extends BaseModel{
 
     @ManyToOne
     @JoinColumn(name = "lga_id", nullable = false)
+    @JsonIgnore
     private Lga lga;
 
     @ManyToOne
     @JoinColumn(name = "ward_id", nullable = false)
+    @JsonIgnore
     private Ward ward;
 
     @ManyToOne
     @JoinColumn(name = "political_party_id", nullable = true)
+    @JsonIgnore
     private PoliticalParty politicalParty;
 
     @ManyToOne
     @JoinColumn(name = "polling_unit_id", nullable = false)
+    @JsonIgnore
     private PollingUnit pollingUnit;
 
     public String getFirstname() {

@@ -114,6 +114,7 @@ public class DashboardServiceImpl implements DashboardService {
 
                     List<Result> results = resultRepository.findAll();
                     AtomicReference<Integer> voteCount = new AtomicReference<>(0);
+                    AtomicReference<Integer> partyCount = new AtomicReference<>(0);
                     results.stream()
                             .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                             .map(Result::getResultPerParties).forEach(resultPerParties -> {
@@ -592,6 +593,5 @@ public class DashboardServiceImpl implements DashboardService {
         partyResults.sort(Comparator.comparingInt(PartyResult::getTotalVoteCount));
         return new LgaResult(lga, partyResults);
     }
-
 
 }
