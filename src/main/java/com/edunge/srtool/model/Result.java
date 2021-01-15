@@ -4,7 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Result extends AbstractElectionDetails {
@@ -43,7 +45,7 @@ public class Result extends AbstractElectionDetails {
     }
 
     public Set<ResultPerParty> getResultPerParties() {
-        return resultPerParties;
+        return resultPerParties.stream().sorted((o1, o2) -> o1.getPoliticalParty().getName().compareTo(o2.getPoliticalParty().getName())).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void setResultPerParties(Set<ResultPerParty> resultPerParties) {
