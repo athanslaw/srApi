@@ -1,11 +1,10 @@
 package com.edunge.srtool.repository;
 
-import com.edunge.srtool.model.Election;
-import com.edunge.srtool.model.PollingUnit;
-import com.edunge.srtool.model.Result;
-import com.edunge.srtool.model.Ward;
+import com.edunge.srtool.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ResultRepository extends JpaRepository<Result, Long> {
@@ -14,4 +13,7 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
 //    @Query("select r from Result r where r.election = :elecction")
     Result findByElectionAndWardAndPollingUnit(Election election, Ward ward, PollingUnit pollingUnit);
     //                    @Param("wardId")Long wardId,@Param("pollingUnitId")Long pollingUnitId);
+    List<Result> findByWard(Ward ward);
+    List<Result> findByLga(Lga lga);
+    List<Result> findByPollingUnit(PollingUnit pollingUnit);
 }
