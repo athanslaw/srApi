@@ -12,5 +12,11 @@ public interface ResultService {
     ResultResponse deleteResultById(Long id) throws NotFoundException;
     ResultResponse findAll() ;
 
+    ResultResponse filterByLga(Long lgaId) throws NotFoundException;
+
+    ResultResponse filterByWard(Long wardId) throws NotFoundException;
+
+    ResultResponse filterByPollingUnit(Long pollingUnitId) throws NotFoundException;
+
     ResultResponse uploadResult(MultipartFile file);
 }

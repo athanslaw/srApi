@@ -284,6 +284,27 @@ public class ResultServiceImpl implements ResultService {
         return result.get();
     }
 
+    @Override
+    public ResultResponse filterByLga(Long lgaId) throws NotFoundException {
+        Lga lga = getLga(lgaId);
+        List<Result> results = resultRepository.findByLga(lga);
+        return new ResultResponse("00", "Results fetched",results);
+    }
+
+    @Override
+    public ResultResponse filterByWard(Long wardId) throws NotFoundException {
+        Ward ward = getWard(wardId);
+        List<Result> results = resultRepository.findByWard(ward);
+        return new ResultResponse("00", "Results fetched",results);
+    }
+
+    @Override
+    public ResultResponse filterByPollingUnit(Long pollingUnitId) throws NotFoundException {
+        PollingUnit pollingUnit = getPollingUnit(pollingUnitId);
+        List<Result> results = resultRepository.findByPollingUnit(pollingUnit);
+        return new ResultResponse("00", "Results fetched",results);
+    }
+
     private void saveResult(String electionCode,
                             String votingLevelCode,
                             String phoneNumber,

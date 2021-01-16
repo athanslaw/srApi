@@ -55,6 +55,24 @@ public class ResultController {
         return ResponseEntity.ok(resultService.findResultById(id));
     }
 
+    @GetMapping(value = "/result/filter/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<ResultResponse> filterResultByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(resultService.filterByLga(id));
+    }
+
+    @GetMapping(value = "/result/filter/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<ResultResponse> filterResultByWard(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(resultService.filterByWard(id));
+    }
+
+    @GetMapping(value = "/result/filter/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<ResultResponse> filterResultByPollingUnit(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(resultService.filterByPollingUnit(id));
+    }
+
     @PostMapping("/result/upload")
     public ResponseEntity<ResultResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(resultService.uploadResult(file), HttpStatus.OK);
