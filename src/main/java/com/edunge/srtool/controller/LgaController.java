@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Lga", description="Endpoints to manage LGA")
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
 public class LgaController {
 
     private final LgaService lgaService;

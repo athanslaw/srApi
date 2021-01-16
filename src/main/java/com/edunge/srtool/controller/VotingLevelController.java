@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Voting Level", description="Endpoints to manage Voting Level")
-@CrossOrigin( maxAge = 3600)
+@CrossOrigin( maxAge = 3600, allowedHeaders = "*")
 public class VotingLevelController {
 
     private VotingLevelService votingLevelService;

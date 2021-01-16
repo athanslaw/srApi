@@ -26,7 +26,7 @@ import java.text.ParseException;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="User Registration", description="New user registration endpoint.")
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
 public class UserController {
     private final JwtUserDetailsService userDetailsService;
     private final UserService userService;

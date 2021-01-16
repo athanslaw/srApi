@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Incident", description="Endpoints to manage Incident")
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
 public class IncidentController {
 
     private final IncidentService incidentService;
