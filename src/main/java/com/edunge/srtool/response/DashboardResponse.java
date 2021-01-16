@@ -1,6 +1,7 @@
 package com.edunge.srtool.response;
 
 import com.edunge.srtool.model.LgaResult;
+import com.edunge.srtool.model.PartyLgaResult;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class DashboardResponse extends BaseResponse{
     Long pollingUnitsWithResults;
     List<LgaResult> lgaResults;
     List<PartyResult> partyResult;
+    List<PartyLgaResult> partyLgaResults;
 
     public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits) {
         super(code, message);
@@ -33,6 +35,25 @@ public class DashboardResponse extends BaseResponse{
         this.totalVoteCounts = totalVoteCounts;
         this.totalWards = totalWards;
         this.totalPollingUnits = totalPollingUnits;
+    }
+
+    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived, List<PartyResult> partyResults, List<LgaResult> lgaResults, List<PartyLgaResult> partyLgaResults) {
+        super(code, message);
+        this.totalStates = totalStates;
+        this.totalLgas = totalLgas;
+        this.totalSenatorialDistricts = totalSenatorialDistricts;
+        this.totalRegisteredVotes = totalRegisteredVotes;
+        this.totalAccreditedVotes = totalAccreditedVotes;
+        this.totalVoteCounts = totalVoteCounts;
+        this.totalWards = totalWards;
+        this.totalPollingUnits = totalPollingUnits;
+        this.resultReceived = resultsReceived;
+        this.lgaWithResults = lgaWithResults;
+        this.wardsWithResults = wardsWithResults;
+        this.pollingUnitsWithResults = pollingUnitsWithResults;
+        this.partyResult = partyResults;
+        this.lgaResults = lgaResults;
+        this.partyLgaResults = partyLgaResults;
     }
 
     public List<LgaResult> getLgaResults() {
@@ -192,5 +213,9 @@ public class DashboardResponse extends BaseResponse{
 
     public Long getPollingUnitsWithResults() {
         return pollingUnitsWithResults;
+    }
+
+    public List<PartyLgaResult> getPartyLgaResults() {
+        return partyLgaResults;
     }
 }

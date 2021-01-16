@@ -135,16 +135,26 @@ public class DashboardServiceImpl implements DashboardService {
         List<Result> results = resultRepository.findAll();
         List<LgaResult> lgaResults = new ArrayList<>();
         HashSet<String> lgaSet = new HashSet<>();
+        HashMap<String,Integer> lgasWon = new HashMap<>();
         results.stream().filter(result -> result.getLga().getState().getId().equals(stateId))
                 .forEach(result -> {
                     try {
                         if(lgaSet.add(result.getLga().getCode())){
-                            lgaResults.add(getLgaResult(result.getLga().getId()));
+                            LgaResult lgaResult = getLgaResult(result.getLga().getId());
+                            String winningParty = lgaResult.getPartyResults().get(lgaResult.getPartyResults().size()-1).getPoliticalParty().getCode();
+                            Integer currentValue = lgasWon.getOrDefault(winningParty, 0);
+                            lgasWon.put(winningParty,currentValue+1);
+                            lgaResults.add(lgaResult);
                         }
                     } catch (NotFoundException e) {
                         e.printStackTrace();
                     }
                 });
+        List<PartyLgaResult> partyLgaResults = new ArrayList<>();
+        for (Map.Entry<String, Integer> lgaWon:lgasWon.entrySet()) {
+            PartyLgaResult partyLgaResult = new PartyLgaResult(lgaWon.getKey(), lgaWon.getValue());
+            partyLgaResults.add(partyLgaResult);
+        }
         Double resultsReceived = (pollingUnitsWithResults * 100.0) / totalPollingUnits;//(totalVoteCounts *100.0) / totalAccreditedVotes;
         return new DashboardResponse("00", "Dashboard loaded.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
@@ -153,7 +163,7 @@ public class DashboardServiceImpl implements DashboardService {
                 wardsWithResults,
                 pollingUnitsWithResults,
                 resultsReceived,
-                partyResults, lgaResults
+                partyResults, lgaResults,partyLgaResults
         );
     }
 
@@ -594,4 +604,38 @@ public class DashboardServiceImpl implements DashboardService {
         return new LgaResult(lga, partyResults);
     }
 
+//    public Integer getPartyLgaResults(String party){
+//        HashSet<String> lgasWon = new HashSet<>();
+//        List<TopResult> topResults = topResults();
+//        topResults.forEach(topResult -> {
+//            if(topResult.getPoliticalParty().getName().equals(party)){
+//                lgasWon.add(topResult.getLgaCode());
+//            }
+//        });
+//
+//        return lgasWon.size();
+//    }
+//
+//    public List<TopResult> topResults(){
+//        List<TopResult> topResults = new ArrayList<>();
+//        List<Result> results = resultRepository.findAll();
+//        results.stream().map(Result::getResultPerParties)
+//                    .forEach(resultPerParties -> {
+//                        List<ResultPerParty> rpp = new ArrayList<>(resultPerParties);
+//                        rpp.sort(new SortByVotes());
+//                        PoliticalParty politicalParty1 = rpp.get(0).getPoliticalParty();
+//                        TopResult topResult = new TopResult();
+//                        topResult.setPoliticalParty(rpp.get(0).getPoliticalParty());
+//                        topResult.setLgaCode(rpp.get(0).getResult().getLga().getCode());
+//                    });
+//        return topResults;
+//    }
+
+    private class SortByVotes implements Comparator<ResultPerParty> {
+
+        @Override
+        public int compare(ResultPerParty o1, ResultPerParty o2) {
+            return o2.getVoteCount()-o1.getVoteCount();
+        }
+    }
 }

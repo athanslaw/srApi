@@ -81,7 +81,7 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
-        PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
+        Optional<PartyAgent> partyAgent = partyAgentRepository.findById(resultDto.getPartyAgentId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
         Lga lga = getLga(resultDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
@@ -96,7 +96,7 @@ public class ResultServiceImpl implements ResultService {
             result.setSenatorialDistrict(senatorialDistrict);
             result.setLga(lga);
             result.setWard(ward);
-            result.setPartyAgent(partyAgent);
+            if(partyAgent.isPresent()) result.setPartyAgent(partyAgent.get());
             result.setPollingUnit(pollingUnit);
             result.setElection(election);
             result.setVotingLevel(votingLevel);
@@ -137,7 +137,7 @@ public class ResultServiceImpl implements ResultService {
             resultPerPartyOthers.setPoliticalParty(others);
             resultPerPartyRepository.save(resultPerPartyOthers);
 
-            return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
+            return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME));
         }
         throw new DuplicateException(String.format("Result for %s in %s already exists.", ward.getName(), election.getDescription()));
     }
@@ -152,7 +152,7 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public ResultResponse updateResult(Long id, ResultDto resultDto) throws NotFoundException {
         Result result = getResult(id);
-        PartyAgent partyAgent = getPartyAgent(resultDto.getPartyAgentId());
+        Optional<PartyAgent> partyAgent = partyAgentRepository.findById(resultDto.getPartyAgentId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
         Lga lga = getLga(resultDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
@@ -162,7 +162,7 @@ public class ResultServiceImpl implements ResultService {
         result.setSenatorialDistrict(senatorialDistrict);
         result.setLga(lga);
         result.setWard(ward);
-        result.setPartyAgent(partyAgent);
+        partyAgent.ifPresent(result::setPartyAgent);
         result.setPollingUnit(pollingUnit);
         result.setElection(election);
         result.setVotingLevel(votingLevel);
@@ -203,7 +203,7 @@ public class ResultServiceImpl implements ResultService {
         resultPerPartyOthers.setPoliticalParty(others);
         resultPerPartyRepository.save(resultPerPartyOthers);
 
-        return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME), result);
+        return new ResultResponse("00", String.format(successTemplate,SERVICE_NAME));
     }
 
     @Override
