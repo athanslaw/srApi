@@ -23,7 +23,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Political Party Candidate", description="Endpoints to manage Political Party Candidates")
-@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600)
 public class PoliticalPartyCandidateController {
     private final PoliticalPartyCandidateService politicalPartyCandidateService;
 

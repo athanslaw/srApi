@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Dashboard", description="Endpoints to get dashboards")
-@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600)
 public class DashboardController {
 
     private final DashboardService dashboardService;

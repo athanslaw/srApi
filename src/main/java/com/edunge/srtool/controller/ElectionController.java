@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Election", description="Endpoints to manage Election")
-@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600)
 public class ElectionController {
 
     private final ElectionService electionService;

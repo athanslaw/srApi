@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Incident Level", description="Endpoints to manage Incident Level")
-@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600)
 public class IncidentLevelController {
 
     private final IncidentLevelService incidentLevelService;

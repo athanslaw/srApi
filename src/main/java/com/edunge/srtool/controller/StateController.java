@@ -21,7 +21,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage States", description="Endpoints to manage States")
-@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600)
 public class StateController {
     private static final Logger logger = LoggerFactory.getLogger(StateController.class);
     private final StateService stateService;

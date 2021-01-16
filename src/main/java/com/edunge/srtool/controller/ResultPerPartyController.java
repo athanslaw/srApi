@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Api(value="Manage Result Per Party", description="Endpoints to manage Result Per Party")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowedHeaders = "*")
+@CrossOrigin(maxAge = 3600, allowedHeaders = "*")
 public class ResultPerPartyController {
 
     private final ResultPerPartyService resultPerPartyService;
