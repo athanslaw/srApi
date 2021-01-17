@@ -142,11 +142,14 @@ public class DashboardServiceImpl implements DashboardService {
                 .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                 .filter(result -> result.getVotingLevel().getCode().equals("Ward")).forEach(result -> {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(result.getWard());
-            existingPollingUnitUnderWard.updateAndGet(v-> Math.toIntExact(v + results.stream().filter(result1 -> result1.getWard().getId().equals(result.getWard().getId())).count()));
+            long current = results.stream()
+                    .filter(currentResult -> currentResult.getWard().getId().equals(result.getWard().getId()))
+                    .count();
             wardLevelResult.updateAndGet(v -> v + pollingUnits.size());
-//            wardLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderWard.get());
+            existingPollingUnitUnderWard.set(Math.toIntExact(current));
         });
         pollingUnitsWithResults+=wardLevelResult.get();
+        pollingUnitsWithResults-=existingPollingUnitUnderWard.get();
 
         //Get polling units by wardLevel results
         AtomicReference<Integer> lgaLevelResult = new AtomicReference<>(0);
@@ -155,13 +158,15 @@ public class DashboardServiceImpl implements DashboardService {
                 .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                 .filter(result -> result.getVotingLevel().getCode().equals("LGA")).forEach(result -> {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByLga(result.getLga());
-            existingPollingUnitUnderLga.updateAndGet(v-> Math.toIntExact(v + results.stream()
-                    .filter(result1 -> result1.getLga().getId().equals(result.getLga().getId())).count()));
 
+            long current = results.stream()
+                    .filter(result1 -> result1.getLga().getId().equals(result.getLga().getId()))
+                    .count();
             lgaLevelResult.updateAndGet(v -> v + pollingUnits.size());
-//            lgaLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderLga.get());
+            existingPollingUnitUnderLga.set((int) current);
         });
         pollingUnitsWithResults+=lgaLevelResult.get();
+        pollingUnitsWithResults-= existingPollingUnitUnderLga.get();
 
         List<LgaResult> lgaResults = new ArrayList<>();
         HashSet<String> lgaSet = new HashSet<>();
