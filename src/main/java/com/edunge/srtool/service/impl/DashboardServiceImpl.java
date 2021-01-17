@@ -137,21 +137,29 @@ public class DashboardServiceImpl implements DashboardService {
 
         //Get polling units by wardLevel results
         AtomicReference<Integer> wardLevelResult = new AtomicReference<>(0);
+        AtomicReference<Integer> existingPollingUnitUnderWard = new AtomicReference<>(0);
         results.stream()
                 .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                 .filter(result -> result.getVotingLevel().getCode().equals("Ward")).forEach(result -> {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(result.getWard());
-            wardLevelResult.updateAndGet(v -> v + pollingUnits.size()-1);
+            existingPollingUnitUnderWard.updateAndGet(v-> Math.toIntExact(v + results.stream().filter(result1 -> result1.getWard().getId().equals(result.getWard().getId())).count()));
+            wardLevelResult.updateAndGet(v -> v + pollingUnits.size());
+            wardLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderWard.get());
         });
         pollingUnitsWithResults+=wardLevelResult.get();
 
         //Get polling units by wardLevel results
         AtomicReference<Integer> lgaLevelResult = new AtomicReference<>(0);
+        AtomicReference<Integer> existingPollingUnitUnderLga = new AtomicReference<>(0);
         results.stream()
                 .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                 .filter(result -> result.getVotingLevel().getCode().equals("LGA")).forEach(result -> {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByLga(result.getLga());
-            lgaLevelResult.updateAndGet(v -> v + pollingUnits.size()-1);
+            existingPollingUnitUnderLga.updateAndGet(v-> Math.toIntExact(v + results.stream()
+                    .filter(result1 -> result1.getLga().getId().equals(result.getLga().getId())).count()));
+
+            lgaLevelResult.updateAndGet(v -> v + pollingUnits.size());
+            lgaLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderLga.get());
         });
         pollingUnitsWithResults+=lgaLevelResult.get();
 
