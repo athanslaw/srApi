@@ -109,6 +109,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         List<PoliticalParty> politicalParties = politicalPartyRepository.findAll();
         List<PartyResult> partyResults = new ArrayList<>();
+
         politicalParties
                 .forEach(politicalParty -> {
 
@@ -133,6 +134,17 @@ public class DashboardServiceImpl implements DashboardService {
                 });
 
         List<Result> results = resultRepository.findAll();
+
+        //Get polling units by wardLevel results
+        AtomicReference<Integer> wardLevelResult = new AtomicReference<>(0);
+        results.stream()
+                .filter(result -> result.getLga().getState().getId().equals(state.getId()))
+                .filter(result -> result.getVotingLevel().getCode().equals("Ward")).forEach(result -> {
+            List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(result.getWard());
+            wardLevelResult.updateAndGet(v -> v + pollingUnits.size());
+        });
+        pollingUnitsWithResults+=wardLevelResult.get();
+
         List<LgaResult> lgaResults = new ArrayList<>();
         HashSet<String> lgaSet = new HashSet<>();
         HashMap<String,Integer> lgasWon = new HashMap<>();
