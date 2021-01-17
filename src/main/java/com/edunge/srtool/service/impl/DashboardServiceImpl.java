@@ -144,7 +144,7 @@ public class DashboardServiceImpl implements DashboardService {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(result.getWard());
             existingPollingUnitUnderWard.updateAndGet(v-> Math.toIntExact(v + results.stream().filter(result1 -> result1.getWard().getId().equals(result.getWard().getId())).count()));
             wardLevelResult.updateAndGet(v -> v + pollingUnits.size());
-            wardLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderWard.get());
+//            wardLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderWard.get());
         });
         pollingUnitsWithResults+=wardLevelResult.get();
 
@@ -159,7 +159,7 @@ public class DashboardServiceImpl implements DashboardService {
                     .filter(result1 -> result1.getLga().getId().equals(result.getLga().getId())).count()));
 
             lgaLevelResult.updateAndGet(v -> v + pollingUnits.size());
-            lgaLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderLga.get());
+//            lgaLevelResult.updateAndGet(integer -> integer - existingPollingUnitUnderLga.get());
         });
         pollingUnitsWithResults+=lgaLevelResult.get();
 
