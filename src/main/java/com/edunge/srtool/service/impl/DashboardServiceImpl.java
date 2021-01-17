@@ -141,9 +141,19 @@ public class DashboardServiceImpl implements DashboardService {
                 .filter(result -> result.getLga().getState().getId().equals(state.getId()))
                 .filter(result -> result.getVotingLevel().getCode().equals("Ward")).forEach(result -> {
             List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(result.getWard());
-            wardLevelResult.updateAndGet(v -> v + pollingUnits.size());
+            wardLevelResult.updateAndGet(v -> v + pollingUnits.size()-1);
         });
         pollingUnitsWithResults+=wardLevelResult.get();
+
+        //Get polling units by wardLevel results
+        AtomicReference<Integer> lgaLevelResult = new AtomicReference<>(0);
+        results.stream()
+                .filter(result -> result.getLga().getState().getId().equals(state.getId()))
+                .filter(result -> result.getVotingLevel().getCode().equals("LGA")).forEach(result -> {
+            List<PollingUnit> pollingUnits = pollingUnitRepository.findByLga(result.getLga());
+            lgaLevelResult.updateAndGet(v -> v + pollingUnits.size()-1);
+        });
+        pollingUnitsWithResults+=lgaLevelResult.get();
 
         List<LgaResult> lgaResults = new ArrayList<>();
         HashSet<String> lgaSet = new HashSet<>();
