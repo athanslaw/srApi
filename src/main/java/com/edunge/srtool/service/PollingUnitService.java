@@ -14,6 +14,5 @@ public interface PollingUnitService {
     PollingUnitResponse findAll() ;
     PollingUnitResponse filterByName(String name) throws NotFoundException;
     PollingUnitResponse findByWardCode(Long wardCode) throws NotFoundException;
-
     PollingUnitResponse uploadPollingUnit(MultipartFile file);
 }
