@@ -1,6 +1,7 @@
 package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.model.Result;
+import com.edunge.srtool.model.ResultPerParty;
 import com.edunge.srtool.repository.ElectionRepository;
 import com.edunge.srtool.repository.ResultRepository;
 import com.edunge.srtool.service.DownloadService;
@@ -11,6 +12,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+@Service
 public class DownloadServiceImpl implements DownloadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadService.class);
     private final ElectionRepository electionRepository;
@@ -257,46 +260,58 @@ public class DownloadServiceImpl implements DownloadService {
             ResultDownload resultDownload = new ResultDownload();
             resultDownload.setAccreditedVotersCount(result.getAccreditedVotersCount());
             resultDownload.setRegisteredVotersCount(result.getRegisteredVotersCount());
-            resultDownload.setFirstname(result.getPartyAgent().getFirstname());
-            resultDownload.setLastname(result.getPartyAgent().getLastname());
-            resultDownload.setPhone(result.getPartyAgent().getPhone());
-            resultDownload.setLgaCode(result.getLga().getCode());
-            resultDownload.setLgaName(result.getLga().getName());
-            resultDownload.setWardCode(result.getWard().getCode());
-            resultDownload.setWardName(result.getWard().getName());
-            resultDownload.setPollingUnitCode(result.getPollingUnit().getCode());
-            resultDownload.setPollingUnitName(result.getPollingUnit().getName());
-            resultDownload.setSenatorialDistrictCode(result.getSenatorialDistrict().getName());
-            resultDownload.setSenatorialDistrictName(result.getSenatorialDistrict().getName());
-            final Integer[] count = {1};
-            result.getResultPerParties()
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getPoliticalParty().getName()))
-                    .forEach(resultPerParty -> {
-                        switch (count[0]){
-                            case 1:
-                                resultDownload.setPartyOne(resultPerParty.getPoliticalParty().getName());
-                                resultDownload.setPartyOneVotes(resultPerParty.getVoteCount().toString());
-                                count[0]++;
-                                break;
-                            case 2:
-                                resultDownload.setPartyTwo(resultPerParty.getPoliticalParty().getName());
-                                resultDownload.setPartyTwoVotes(resultPerParty.getVoteCount().toString());
-                                count[0]++;
-                                break;
-                            case 3:
-                                resultDownload.setPartyThree(resultPerParty.getPoliticalParty().getName());
-                                resultDownload.setPartyThreeVotes(resultPerParty.getVoteCount().toString());
-                                count[0]++;
-                                break;
-                            default:
-                                resultDownload.setOthers(resultPerParty.getPoliticalParty().getName());
-                                resultDownload.setOthers(resultPerParty.getVoteCount().toString());
-                                count[0]++;
-                                break;
-                        }
-            });
+            if(result.getPartyAgent()!=null){
+                resultDownload.setFirstname(result.getPartyAgent().getFirstname());
+                resultDownload.setLastname(result.getPartyAgent().getLastname());
+                resultDownload.setPhone(result.getPartyAgent().getPhone());
+            }
 
+            if(result.getLga()!=null){
+                resultDownload.setLgaCode(result.getLga().getCode());
+                resultDownload.setLgaName(result.getLga().getName());
+            }
+            if(result.getWard()!=null){
+                resultDownload.setWardCode(result.getWard().getCode());
+                resultDownload.setWardName(result.getWard().getName());
+            }
+            if(result.getPollingUnit()!=null){
+                resultDownload.setPollingUnitCode(result.getPollingUnit().getCode());
+                resultDownload.setPollingUnitName(result.getPollingUnit().getName());
+            }
+            if(result.getSenatorialDistrict()!=null){
+                resultDownload.setSenatorialDistrictCode(result.getSenatorialDistrict().getName());
+                resultDownload.setSenatorialDistrictName(result.getSenatorialDistrict().getName());
+            }
+
+            if(result.getResultPerParties().size()>0){
+                int count = 0;
+                List<ResultPerParty> resultPerParties = new ArrayList<>(result.getResultPerParties());
+                resultPerParties.sort(Comparator.comparing(o -> o.getPoliticalParty().getName()));
+                for(int i=0;i<resultPerParties.size();i++){
+                    if(i==0){
+                        resultDownload.setPartyOne(resultPerParties.get(i).getPoliticalParty().getCode());
+                        resultDownload.setPartyOneVotes(resultPerParties.get(i).getVoteCount().toString());
+                        count++;
+                    }
+                    else if(i==1){
+                        resultDownload.setPartyTwo(resultPerParties.get(i).getPoliticalParty().getCode());
+                        resultDownload.setPartyTwoVotes(resultPerParties.get(i).getVoteCount().toString());
+                        count++;
+                    }
+                    else if(i==2){
+                        resultDownload.setPartyThree(resultPerParties.get(i).getPoliticalParty().getCode());
+                        resultDownload.setPartyThreeVotes(resultPerParties.get(i).getVoteCount().toString());
+                        count++;
+                    }
+                    else if(i==3){
+                        resultDownload.setOthers(resultPerParties.get(i).getPoliticalParty().getCode());
+                        resultDownload.setOthers(resultPerParties.get(i).getVoteCount().toString());
+                        count++;
+                    }
+                }
+            }
+
+            resultDownloads.add(resultDownload);
         });
         return resultDownloads;
     }
