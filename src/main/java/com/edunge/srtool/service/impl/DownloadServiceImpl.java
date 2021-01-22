@@ -4,12 +4,22 @@ import com.edunge.srtool.model.Result;
 import com.edunge.srtool.repository.ElectionRepository;
 import com.edunge.srtool.repository.ResultRepository;
 import com.edunge.srtool.service.DownloadService;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class DownloadServiceImpl implements DownloadService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadService.class);
     private final ElectionRepository electionRepository;
     private final ResultRepository resultRepository;
     private final ResultPerPartyServiceImpl resultPerPartyService;
@@ -38,7 +48,7 @@ public class DownloadServiceImpl implements DownloadService {
     }
 
 
-    private static class ResultDownload{
+    public static class ResultDownload{
         private Integer accreditedVotersCount;
         private Integer registeredVotersCount;
         private String firstname;
@@ -53,18 +63,81 @@ public class DownloadServiceImpl implements DownloadService {
         private String pollingUnitCode;
         private String pollingUnitName;
         private String votingLevel;
-        private List<ElectionResult> electionResults;
-
-        public List<ElectionResult> getElectionResults() {
-            return electionResults;
-        }
-
-        public void setElectionResults(List<ElectionResult> electionResults) {
-            this.electionResults = electionResults;
-        }
+        private String partyOne;
+        private String partyOneVotes;
+        private String partyTwo;
+        private String partyTwoVotes;
+        private String partyThree;
+        private String partyThreeVotes;
+        private String others;
+        private String othersVote;
 
         public Integer getAccreditedVotersCount() {
             return accreditedVotersCount;
+        }
+
+        public String getPartyOne() {
+            return partyOne;
+        }
+
+        public void setPartyOne(String partyOne) {
+            this.partyOne = partyOne;
+        }
+
+        public String getPartyOneVotes() {
+            return partyOneVotes;
+        }
+
+        public void setPartyOneVotes(String partyOneVotes) {
+            this.partyOneVotes = partyOneVotes;
+        }
+
+        public String getPartyTwo() {
+            return partyTwo;
+        }
+
+        public void setPartyTwo(String partyTwo) {
+            this.partyTwo = partyTwo;
+        }
+
+        public String getPartyTwoVotes() {
+            return partyTwoVotes;
+        }
+
+        public void setPartyTwoVotes(String partyTwoVotes) {
+            this.partyTwoVotes = partyTwoVotes;
+        }
+
+        public String getPartyThree() {
+            return partyThree;
+        }
+
+        public void setPartyThree(String partyThree) {
+            this.partyThree = partyThree;
+        }
+
+        public String getPartyThreeVotes() {
+            return partyThreeVotes;
+        }
+
+        public void setPartyThreeVotes(String partyThreeVotes) {
+            this.partyThreeVotes = partyThreeVotes;
+        }
+
+        public String getOthers() {
+            return others;
+        }
+
+        public void setOthers(String others) {
+            this.others = others;
+        }
+
+        public String getOthersVote() {
+            return othersVote;
+        }
+
+        public void setOthersVote(String othersVote) {
+            this.othersVote = othersVote;
         }
 
         public void setAccreditedVotersCount(Integer accreditedVotersCount) {
@@ -176,7 +249,8 @@ public class DownloadServiceImpl implements DownloadService {
         }
     }
 
-    private List<ResultDownload> getResults(){
+    @Override
+    public List<ResultDownload> getResults(){
         List<Result> results = resultRepository.findAll();
         List<ResultDownload> resultDownloads = new ArrayList<>();
         results.forEach(result -> {
@@ -194,21 +268,79 @@ public class DownloadServiceImpl implements DownloadService {
             resultDownload.setPollingUnitName(result.getPollingUnit().getName());
             resultDownload.setSenatorialDistrictCode(result.getSenatorialDistrict().getName());
             resultDownload.setSenatorialDistrictName(result.getSenatorialDistrict().getName());
-            List<ElectionResult> electionResults = new ArrayList<>();
-            result.getResultPerParties().forEach(resultPerParty -> {
-                electionResults.add(new ElectionResult(resultPerParty.getPoliticalParty().getName(),resultPerParty.getVoteCount().toString()));
+            final Integer[] count = {1};
+            result.getResultPerParties()
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getPoliticalParty().getName()))
+                    .forEach(resultPerParty -> {
+                        switch (count[0]){
+                            case 1:
+                                resultDownload.setPartyOne(resultPerParty.getPoliticalParty().getName());
+                                resultDownload.setPartyOneVotes(resultPerParty.getVoteCount().toString());
+                                count[0]++;
+                                break;
+                            case 2:
+                                resultDownload.setPartyTwo(resultPerParty.getPoliticalParty().getName());
+                                resultDownload.setPartyTwoVotes(resultPerParty.getVoteCount().toString());
+                                count[0]++;
+                                break;
+                            case 3:
+                                resultDownload.setPartyThree(resultPerParty.getPoliticalParty().getName());
+                                resultDownload.setPartyThreeVotes(resultPerParty.getVoteCount().toString());
+                                count[0]++;
+                                break;
+                            default:
+                                resultDownload.setOthers(resultPerParty.getPoliticalParty().getName());
+                                resultDownload.setOthers(resultPerParty.getVoteCount().toString());
+                                count[0]++;
+                                break;
+                        }
             });
-            resultDownload.setElectionResults(electionResults);
+
         });
         return resultDownloads;
     }
 
-    public static void writeResults(PrintWriter writer, List<ElectionResult> results){
-        try{
 
+    public static void writeResults(PrintWriter writer, List<ResultDownload> results){
+        try{
+            ColumnPositionMappingStrategy<ResultDownload> mappingStrategy = new ColumnPositionMappingStrategy<>();
+            mappingStrategy.setType(ResultDownload.class);
+            String[] columns = new String[]{"accreditedVotersCount",
+                    "registeredVotersCount",
+                    "firstname",
+                    "lastname",
+                    "phone",
+                    "senatorialDistrictCode",
+                    "senatorialDistrictName",
+                    "lgaCode",
+                    "lgaName",
+                    "wardCode",
+                    "wardName",
+                    "pollingUnitCode",
+                    "pollingUnitName",
+                    "votingLevel",
+                    "partyOne",
+                    "partyOneVotes",
+                    "partyTwo",
+                    "partyTwoVotes",
+                    "partyThree",
+                    "partyThreeVotes",
+                    "others",
+                    "othersVote"};
+            mappingStrategy.setColumnMapping(columns);
+            mappingStrategy.generateHeader();
+            String headerFromArray = Arrays.toString(columns).substring(1,Arrays.toString(columns).length()-1);
+            writer.println(headerFromArray);
+            StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer)
+                    .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                    .withMappingStrategy(mappingStrategy)
+                    .withSeparator(',')
+                    .build();
+            beanToCsv.write(results);
         }
         catch (CsvException ex){
-
+            LOGGER.error("Error mapping CSV", ex);
         }
     }
 
