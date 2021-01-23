@@ -103,8 +103,21 @@ public class ResultServiceImpl implements ResultService {
             result.setLga(lga);
             result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
             result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
+            //Delete existing result if the voting level is either LGA or Ward level.
+            if(result.getVotingLevel().getCode().equals("Ward")){
+                resultRepository.deleteByWard(ward);
+                LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
+            }else if(result.getVotingLevel().getCode().equals("LGA")){
+                resultRepository.deleteByLga(lga);
+                LOGGER.info("Deleting existing results results with LGA {} ", ward.getCode());
+            }
+
+            LOGGER.info("Saving result at voting level {} ", votingLevel.getCode());
             resultRepository.save(result);
 
+            resultRepository.save(result);
+
+            //@Todo Remove party code manual update. There's an API to save result per party.
             //Save APC votes;
             PoliticalParty apc = politicalPartyRepository.findByCode("APC");
             ResultPerParty resultPerParty = new ResultPerParty();
