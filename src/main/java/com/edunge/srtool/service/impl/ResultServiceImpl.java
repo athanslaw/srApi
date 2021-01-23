@@ -83,7 +83,8 @@ public class ResultServiceImpl implements ResultService {
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
         Optional<PartyAgent> partyAgent = partyAgentRepository.findById(resultDto.getPartyAgentId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
-        Lga lga = getLga(resultDto.getLgaId());
+
+
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
         Election election = getElection(resultDto.getElectionId());
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
@@ -91,26 +92,31 @@ public class ResultServiceImpl implements ResultService {
         Result result = resultRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
         //, resultDto.getWardId(), resultDto.getPollingUnitId());
         if(result==null){
-
             result = new Result();
-            result.setSenatorialDistrict(senatorialDistrict);
-            result.setLga(lga);
-            result.setWard(ward);
-            if(partyAgent.isPresent()) result.setPartyAgent(partyAgent.get());
-            result.setPollingUnit(pollingUnit);
-            result.setElection(election);
-            result.setVotingLevel(votingLevel);
-            result.setLga(lga);
-            result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
-            result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
             //Delete existing result if the voting level is either LGA or Ward level.
-            if(result.getVotingLevel().getCode().equals("Ward")){
+            if(votingLevel.getCode().equals("Ward")){
+
+                result.setWard(ward);
                 resultRepository.deleteByWard(ward);
                 LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
-            }else if(result.getVotingLevel().getCode().equals("LGA")){
-                resultRepository.deleteByLga(lga);
-                LOGGER.info("Deleting existing results results with LGA {} ", ward.getCode());
             }
+            if(votingLevel.getCode().equals("LGA")){
+                Lga lga = getLga(resultDto.getLgaId());
+                result.setLga(lga);
+                resultRepository.deleteByLga(lga);
+                LOGGER.info("Deleting existing results results with LGA {} ", lga.getCode());
+            }
+
+            if(votingLevel.getCode().equals("PU")){
+                result.setPollingUnit(pollingUnit);
+            }
+
+            result.setSenatorialDistrict(senatorialDistrict);
+            if(partyAgent.isPresent()) result.setPartyAgent(partyAgent.get());
+            result.setElection(election);
+            result.setVotingLevel(votingLevel);
+            result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
+            result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
 
             LOGGER.info("Saving result at voting level {} ", votingLevel.getCode());
             resultRepository.save(result);
