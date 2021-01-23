@@ -19,15 +19,15 @@ public class AbstractElectionDetails extends BaseModel {
     private SenatorialDistrict senatorialDistrict;
 
     @ManyToOne
-    @JoinColumn(name = "lga_id",nullable = false)
+    @JoinColumn(name = "lga_id")
     private Lga lga;
 
     @ManyToOne
-    @JoinColumn(name = "ward_id",nullable = false)
+    @JoinColumn(name = "ward_id")
     private Ward ward;
 
     @ManyToOne
-    @JoinColumn(name = "polling_unit_id",nullable = false)
+    @JoinColumn(name = "polling_unit_id")
     private PollingUnit pollingUnit;
 
     @ManyToOne
