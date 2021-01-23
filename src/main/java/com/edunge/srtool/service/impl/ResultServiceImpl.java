@@ -91,6 +91,7 @@ public class ResultServiceImpl implements ResultService {
         Ward ward = getWard(resultDto.getWardId());
         Result result = resultRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
         //, resultDto.getWardId(), resultDto.getPollingUnitId());
+        Lga lga = getLga(resultDto.getLgaId());
         if(result==null){
             result = new Result();
             //Delete existing result if the voting level is either LGA or Ward level.
@@ -101,7 +102,6 @@ public class ResultServiceImpl implements ResultService {
                 LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
             }
             if(votingLevel.getCode().equals("LGA")){
-                Lga lga = getLga(resultDto.getLgaId());
                 result.setLga(lga);
                 resultRepository.deleteByLga(lga);
                 LOGGER.info("Deleting existing results results with LGA {} ", lga.getCode());
@@ -114,6 +114,9 @@ public class ResultServiceImpl implements ResultService {
             result.setSenatorialDistrict(senatorialDistrict);
             if(partyAgent.isPresent()) result.setPartyAgent(partyAgent.get());
             result.setElection(election);
+            result.setWard(ward);
+            result.setLga(lga);
+            result.setPollingUnit(pollingUnit);
             result.setVotingLevel(votingLevel);
             result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
             result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
@@ -349,6 +352,22 @@ public class ResultServiceImpl implements ResultService {
 
             if(result==null){
                 result = new Result();
+                //Delete existing result if the voting level is either LGA or Ward level.
+                if(votingLevel.getCode().equals("Ward")){
+
+                    result.setWard(ward);
+                    resultRepository.deleteByWard(ward);
+                    LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
+                }
+                if(votingLevel.getCode().equals("LGA")){
+                    result.setLga(lga);
+                    resultRepository.deleteByLga(lga);
+                    LOGGER.info("Deleting existing results results with LGA {} ", lga.getCode());
+                }
+
+                if(votingLevel.getCode().equals("PU")){
+                    result.setPollingUnit(pollingUnit);
+                }
                 result.setRegisteredVotersCount(Integer.valueOf(registeredVotersCount));
                 result.setAccreditedVotersCount(Integer.valueOf(accreditedVotersCount));
                 result.setElection(election);
