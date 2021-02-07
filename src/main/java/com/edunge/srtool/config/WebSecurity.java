@@ -1,6 +1,9 @@
 package com.edunge.srtool.config;
 
-import com.edunge.srtool.jwt.*;
+import com.edunge.srtool.jwt.DefaultAuthProvider;
+import com.edunge.srtool.jwt.JwtRequestFilter;
+import com.edunge.srtool.jwt.JwtUserDetailsService;
+import com.edunge.srtool.jwt.MainAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
  * Created by adewale adeleye on 01/10/2019
@@ -52,8 +60,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf()
                 .disable()
-                .cors()
-                .disable()
+                .cors().and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
          "/swagger-ui.html/**","/swagger-resources/**","/v2/**","/v2/api-docs").permitAll().
@@ -69,6 +76,22 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(defaultAuthProvider);
         auth.userDetailsService(jwtUserDetailsService);
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource()
+    {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "content-type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "content-type"));
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
