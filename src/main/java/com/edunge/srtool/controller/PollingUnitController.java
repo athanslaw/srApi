@@ -74,6 +74,24 @@ public class PollingUnitController {
         return ResponseEntity.ok(pollingUnitService.findByWardCode(wardId));
     }
 
+    @GetMapping(value = "/polling-unit/lga/{lgaId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find polling unit by lga id.")
+    public ResponseEntity<PollingUnitResponse> filterPollingUnitByLga(@PathVariable Long lgaId) throws Exception {
+        return ResponseEntity.ok(pollingUnitService.findByLga(lgaId));
+    }
+
+    @GetMapping(value = "/polling-unit/state/{stateCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find polling unit by state id.")
+    public ResponseEntity<PollingUnitResponse> filterPollingUnitByState(@PathVariable Long stateCode) throws Exception {
+        return ResponseEntity.ok(pollingUnitService.findByState(stateCode));
+    }
+
+    @GetMapping(value = "/polling-unit/senatorial-district/{wardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find polling unit by senatorial id.")
+    public ResponseEntity<PollingUnitResponse> filterPollingUnitBySenatorialDistrict(@PathVariable Long senatorialDistrictCode) throws Exception {
+        return ResponseEntity.ok(pollingUnitService.findBySenatorialDistrict(senatorialDistrictCode));
+    }
+
     @PostMapping("/polling-unit/upload")
     public ResponseEntity<PollingUnitResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(pollingUnitService.uploadPollingUnit(file), HttpStatus.OK);

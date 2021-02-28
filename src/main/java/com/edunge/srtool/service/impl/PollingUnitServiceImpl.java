@@ -130,7 +130,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     public PollingUnitResponse filterByName(String name) throws NotFoundException {
         List<PollingUnit> pollingUnit = pollingUnitRepository.findByNameStartingWith(name);
         if(pollingUnit!=null){
-            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit);
+            return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
         }
         throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
     }
@@ -140,7 +140,37 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         Ward ward = getWard(wardCode);
         List<PollingUnit> pollingUnit = pollingUnitRepository.findByWard(ward);
         if(pollingUnit!=null){
-            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit);
+            return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
+
+    @Override
+    public PollingUnitResponse findByLga(Long lgaCode) throws NotFoundException {
+        Lga lga = getLga(lgaCode);
+        List<PollingUnit> pollingUnit = pollingUnitRepository.findByLga(lga);
+        if(pollingUnit!=null){
+            return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
+
+    @Override
+    public PollingUnitResponse findByState(Long stateCode) throws NotFoundException {
+        State state = getState(stateCode);
+        List<PollingUnit> pollingUnit = pollingUnitRepository.findByState(state);
+        if(pollingUnit!=null){
+            return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
+        }
+        throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
+    }
+
+    @Override
+    public PollingUnitResponse findBySenatorialDistrict(Long senatorialDistrictCode) throws NotFoundException {
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(senatorialDistrictCode);
+        List<PollingUnit> pollingUnit = pollingUnitRepository.findBySenatorialDistrict(senatorialDistrict);
+        if(pollingUnit!=null){
+            return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
         }
         throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
     }
