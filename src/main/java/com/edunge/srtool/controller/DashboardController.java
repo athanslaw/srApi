@@ -51,6 +51,12 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getDashboardByLga(id));
     }
 
+    @GetMapping(value = "/dashboard/lga", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Dashboard result by LGA")
+    public ResponseEntity<DashboardResponse> getDashboardByLga() throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByLga(3L));
+    }
+
     @GetMapping(value = "/dashboard/incidents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Incident Dashboard By State")
     public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState(@PathVariable Long id) throws Exception {

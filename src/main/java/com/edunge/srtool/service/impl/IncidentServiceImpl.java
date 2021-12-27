@@ -84,9 +84,14 @@ public class IncidentServiceImpl implements IncidentService {
         IncidentType incidentType = getIncidentType(incidentDto.getIncidentTypeId());
 
         Lga lga = getLga(incidentDto.getLgaId());
-        PollingUnit pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
-        Election election = getElection(incidentDto.getIncidentStatusId());
-        Ward ward = getWard(incidentDto.getWardId());
+        Ward ward = null;
+        PollingUnit pollingUnit = null;
+        try {
+            ward = getWard(incidentDto.getWardId());
+            pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
+        }catch (Exception e){
+        }
+        //Election election = getElection(incidentDto.getIncidentStatusId());
         Incident incident = new Incident();
         incident.setLga(lga);
         incident.setWard(ward);
@@ -167,7 +172,7 @@ public class IncidentServiceImpl implements IncidentService {
     private Lga getLga(Long id) throws NotFoundException {
         Optional<Lga> lga = lgaRepository.findById(id);
         if(!lga.isPresent()){
-            throw new NotFoundException("State not found.");
+            throw new NotFoundException("LGA not found.");
         }
         return lga.get();
     }
@@ -175,7 +180,7 @@ public class IncidentServiceImpl implements IncidentService {
     private IncidentStatus getIncidentStatus(Long id) throws NotFoundException {
         Optional<IncidentStatus> incidentStatus = incidentStatusRepository.findById(id);
         if(!incidentStatus.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Incident Level"));
+            throw new NotFoundException(String.format(notFoundTemplate,"Incident Status"));
         }
         return incidentStatus.get();
     }
