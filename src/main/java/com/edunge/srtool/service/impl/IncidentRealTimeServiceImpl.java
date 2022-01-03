@@ -7,9 +7,8 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.IncidentResponse;
-import com.edunge.srtool.service.IncidentService;
+import com.edunge.srtool.service.IncidentRealTimeService;
 import com.edunge.srtool.util.FileUtil;
-import com.edunge.srtool.util.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class IncidentServiceImpl implements IncidentService {
+public class IncidentRealTimeServiceImpl implements IncidentRealTimeService {
     private final IncidentRepository incidentRepository;
     private final PartyAgentRepository partyAgentRepository;
     private final ElectionRepository electionRepository;
@@ -38,7 +36,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentStatusRepository incidentStatusRepository;
     private final IncidentTypeRepository incidentTypeRepository;
     private final Path fileStorageLocation;
-    private static final Logger LOGGER = LoggerFactory.getLogger(IncidentServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncidentRealTimeServiceImpl.class);
 
     private static final String SERVICE_NAME = "Incident";
 
@@ -58,9 +56,9 @@ public class IncidentServiceImpl implements IncidentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository,
-                               ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository,
-                               WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public IncidentRealTimeServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository,
+                                       ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository,
+                                       WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -82,90 +80,10 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse saveIncident(IncidentDto incidentDto) throws NotFoundException {
-
-        Incident incident = new Incident();
-
-        Lga lga = getLga(incidentDto.getLgaId());
-        Ward ward = getWard(incidentDto.getWardId());
-        // validate incident levels
-        if(incidentDto.getIncidentLevelId() == 2){
-            // get all PUs in ward
-            pollingUnitRepository.findByWard(ward).forEach(pollingUnit -> {
-                incidentDto.setPollingUnitId(pollingUnit.getId());
-                try {
-                    System.out.println("Athans: "+incidentDto.getPollingUnitId());
-                    saveIncidentSingle(incidentDto, lga, ward);
-                }catch (NotFoundException ne){
-                }
-            });
-        }
-        else if(incidentDto.getIncidentLevelId() == 3){
-            // get all wards and PUs under the LGA
-            pollingUnitRepository.findByLga(lga).forEach(pollingUnit -> {
-                incidentDto.setWardId(pollingUnit.getWard().getId());
-                incidentDto.setPollingUnitId(pollingUnit.getId());
-                try {
-                    System.out.println("Athans: "+incidentDto.getPollingUnitId());
-                    saveIncidentSingle(incidentDto, lga, null);
-                }catch (NotFoundException ne){
-                }
-            });
-        }
-        else {
-            incident = saveIncidentSingle(incidentDto, lga, ward);
-        }
-        return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
-    }
-
-    public Incident saveIncidentSingle(IncidentDto incidentDto, Lga lga, Ward ward) throws NotFoundException {
-        // check for conflict and give 15 mins interval
-        String combinedKeys = new StringBuilder().append(incidentDto.getPollingUnitId())
-                .append(incidentDto.getIncidentStatusId())
-                .append(incidentDto.getIncidentTypeId())
-                .append(incidentDto.getLgaId()+incidentDto.getWardId()).toString();
-
-        System.out.println("Athans combinedKeys: "+combinedKeys);
-        List<Incident> incidentChecks = incidentRepository.findByCombinedKeysOrderByTimeStampDesc(combinedKeys);
-        if(incidentChecks != null && Utilities.dateDifference(incidentChecks.get(0).getTimeStamp(), 15)){
-            return null;
-        }
-
-        IncidentLevel incidentLevel = incidentLevel(incidentDto.getIncidentLevelId());
-        IncidentStatus incidentStatus = getIncidentStatus(incidentDto.getIncidentStatusId());
-        IncidentType incidentType = getIncidentType(incidentDto.getIncidentTypeId());
-
-        PollingUnit pollingUnit = null;
-        try {
-            if(ward == null) {
-                ward = getWard(incidentDto.getWardId());
-            }
-            pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
-        }catch (Exception e){
-        }
-        Incident incident = new Incident();
-        incident.setLga(lga);
-        incident.setTimeStamp(LocalDateTime.now());
-        incident.setCombinedKeys(combinedKeys);
-        incident.setWard(ward);
-        incident.setPollingUnit(pollingUnit);
-        incident.setIncidentLevel(incidentLevel);
-        incident.setIncidentStatus(incidentStatus);
-        incident.setIncidentType(incidentType);
-        incident.setLga(lga);
-        incident.setDescription(incidentDto.getDescription());
-        incident.setReportedLocation(incidentDto.getReportedLocation());
-        incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
-        incidentRepository.save(incident);
-        return incident;
-    }
-
-    @Override
     public IncidentResponse findIncidentById(Long id) throws NotFoundException {
         Incident incident = getIncident(id);
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incident);
     }
-
 
     @Override
     public IncidentResponse updateIncident(Long id, IncidentDto incidentDto) throws NotFoundException {

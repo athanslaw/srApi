@@ -3,6 +3,7 @@ package com.edunge.srtool.dto;
 import com.edunge.srtool.model.AbstractBaseModel;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 public class IncidentDto extends AbstractBaseModel {
     @NotNull
@@ -23,6 +24,8 @@ public class IncidentDto extends AbstractBaseModel {
     private String reportedLocation;
     @NotNull
     private String phoneNumberToContact;
+    private String combinedKeys;
+    private LocalDateTime timeStamp;
 
     public String getDescription() {
         return description;
@@ -95,5 +98,21 @@ public class IncidentDto extends AbstractBaseModel {
 
     public void setPollingUnitId(Long pollingUnitId) {
         this.pollingUnitId = pollingUnitId;
+    }
+
+    public String getCombinedKeys() {
+        return combinedKeys;
+    }
+
+    public void setCombinedKeys(String combinedKeys) {
+        this.combinedKeys = combinedKeys;
+    }
+
+    public LocalDateTime getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(LocalDateTime timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

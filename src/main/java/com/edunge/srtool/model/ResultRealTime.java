@@ -1,12 +1,15 @@
 package com.edunge.srtool.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-public class Result extends AbstractElectionDetails {
+public class ResultRealTime extends AbstractElectionDetails {
     @ManyToOne
     @JoinColumn(name = "party_agent_id",nullable = false)
     private PartyAgent partyAgent;

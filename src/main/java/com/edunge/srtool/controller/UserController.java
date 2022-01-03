@@ -50,11 +50,17 @@ public class UserController {
 
     @RequestMapping(value = "/users/all", method = RequestMethod.POST)
     @PreAuthorize("hasRole=ADMIN")
-    @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative priviledge.")
+    @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
     public ResponseEntity<UserResponse> getAllUsers() throws Exception {
         return ResponseEntity.ok(userService.getAllUser());
     }
 
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    //@PreAuthorize("hasRole=ADMIN")
+    @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
+    public ResponseEntity<UserResponse> getUsers() throws Exception {
+        return ResponseEntity.ok(userService.getAllUser());
+    }
 
     @RequestMapping(value = "/user/id/{id}", method = RequestMethod.POST)
     @PreAuthorize("hasRole=ADMIN")

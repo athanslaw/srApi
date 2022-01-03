@@ -9,7 +9,7 @@ import java.util.List;
 public class UserResponse extends BaseResponse {
     private User user;
     private String token;
-    private List<User> users;
+    public List<User> users;
 
     public UserResponse(String code, String message, String token) {
         super(code, message);

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
-    Incident findByWardAndPollingUnit( Ward ward, PollingUnit pollingUnit);
+    List<Incident> findByCombinedKeysOrderByTimeStampDesc( String combinedKeys); // order by timestamp descending
     List<Incident> findByLga(Lga lga);
     List<Incident> findByWard(Ward ward);
     List<Incident> findByPollingUnit(PollingUnit pollingUnit);

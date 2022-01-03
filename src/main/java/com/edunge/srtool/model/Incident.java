@@ -3,12 +3,19 @@ package com.edunge.srtool.model;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import java.time.LocalDateTime;
 
 @Entity
+//@NamedQuery(name = "Incident.findByWardAndPollingUnit",
+//        query = "SELECT * FROM incident WHERE ward_id=?1 AND polling_unit_id=?2 ORDER BY timeStamp DESC LIMIT 1")
 public class Incident extends BaseModel{
     @ManyToOne
     @JoinColumn(name = "lga_id",nullable = false)
     private Lga lga;
+
+    private String combinedKeys;
+    private LocalDateTime timeStamp;
 
     @ManyToOne
     @JoinColumn(name = "ward_id",nullable = false)
@@ -104,5 +111,21 @@ public class Incident extends BaseModel{
 
     public void setIncidentType(IncidentType incidentType) {
         this.incidentType = incidentType;
+    }
+
+    public String getCombinedKeys() {
+        return combinedKeys;
+    }
+
+    public void setCombinedKeys(String combinedKeys) {
+        this.combinedKeys = combinedKeys;
+    }
+
+    public LocalDateTime getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(LocalDateTime timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Service
 public class ResultServiceImpl implements ResultService {
     private final ResultRepository resultRepository;
+    private final ResultRealTimeRepository resultRealTimeRepository;
     private final PartyAgentRepository partyAgentRepository;
     private final ElectionRepository electionRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
@@ -59,8 +61,9 @@ public class ResultServiceImpl implements ResultService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.resultRepository = resultRepository;
+        this.resultRealTimeRepository = resultRealTimeRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
@@ -86,25 +89,28 @@ public class ResultServiceImpl implements ResultService {
 
 
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
-        Election election = getElection(resultDto.getElectionId());
+        Election election = getElection();
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
         Ward ward = getWard(resultDto.getWardId());
         Result result = resultRepository.findByElectionAndWardAndPollingUnit(election,ward,pollingUnit);
         //, resultDto.getWardId(), resultDto.getPollingUnitId());
         Lga lga = getLga(resultDto.getLgaId());
+        int pollingUnitCount = 1;
         if(result==null){
             result = new Result();
             //Delete existing result if the voting level is either LGA or Ward level.
             if(votingLevel.getCode().equals("Ward")){
-
                 result.setWard(ward);
-                resultRepository.deleteByWard(ward);
-                LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
+                resultRealTimeRepository.deleteByWard(ward);
+                System.out.println("Deleting existing results with ward {} "+ ward.getCode());
+
+                pollingUnitCount = pollingUnitRepository.findByWard(ward).size();
             }
             if(votingLevel.getCode().equals("LGA")){
                 result.setLga(lga);
-                resultRepository.deleteByLga(lga);
-                LOGGER.info("Deleting existing results results with LGA {} ", lga.getCode());
+                resultRealTimeRepository.deleteByLga(lga);
+                System.out.println("Deleting existing results with LGA {} "+ lga.getCode());
+                pollingUnitCount = pollingUnitRepository.findByLga(lga).size();
             }
 
             if(votingLevel.getCode().equals("PU")){
@@ -120,11 +126,11 @@ public class ResultServiceImpl implements ResultService {
             result.setVotingLevel(votingLevel);
             result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
             result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
+            result.setPollingUnitCount(pollingUnitCount);
 
             LOGGER.info("Saving result at voting level {} ", votingLevel.getCode());
             resultRepository.save(result);
-
-            resultRepository.save(result);
+            resultRealTimeRepository.save(result);
 
             //@Todo Remove party code manual update. There's an API to save result per party.
             //Save APC votes;
@@ -241,6 +247,14 @@ public class ResultServiceImpl implements ResultService {
         return new ResultResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
+
+    private Election getElection() throws NotFoundException {
+        Election election = electionRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).get(0);
+        if(election == null){
+            throw new NotFoundException(String.format(notFoundTemplate,"Election"));
+        }
+        return election;
+    }
 
     private Election getElection(Long id) throws NotFoundException {
         Optional<Election> election = electionRepository.findById(id);
@@ -395,12 +409,13 @@ public class ResultServiceImpl implements ResultService {
                 resultPerPartyRepository.save(resultPerPartyPdp);
 
                 //Save ANPP votes;
-                PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
-                ResultPerParty resultPerPartyAnpp = new ResultPerParty();
-                resultPerPartyAnpp.setVoteCount(Integer.valueOf(anppVotes));
-                resultPerPartyAnpp.setResult(result);
-                resultPerPartyAnpp.setPoliticalParty(anpp);
-                resultPerPartyRepository.save(resultPerPartyAnpp);
+                PoliticalParty apga = politicalPartyRepository.findByCode("APGA");
+                //PoliticalParty anpp = politicalPartyRepository.findByCode("ANPP");
+                ResultPerParty resultPerPartyApga = new ResultPerParty();
+                resultPerPartyApga.setVoteCount(Integer.valueOf(anppVotes));
+                resultPerPartyApga.setResult(result);
+                resultPerPartyApga.setPoliticalParty(apga);
+                resultPerPartyRepository.save(resultPerPartyApga);
 
                 //Save Others votes;
                 PoliticalParty others = politicalPartyRepository.findByCode("Others");

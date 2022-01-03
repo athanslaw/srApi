@@ -17,6 +17,7 @@ public class User extends BaseModel {
     private String lastname;
     @Column(unique = true)
     private String email;
+    private String role;
     @JsonIgnore
     private String password;
 
@@ -57,6 +58,14 @@ public class User extends BaseModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public List<Authority> getAuthorities() {
@@ -107,4 +116,17 @@ public class User extends BaseModel {
         this.lastname = lastname;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "phone='" + phone + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", authorities=" + authorities +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

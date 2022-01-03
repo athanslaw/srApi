@@ -75,7 +75,7 @@ public class LgaController {
     }
 
     @GetMapping(value = "/lga/senatorial-district/{senatorialDistrict}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find LGA by stateCode.")
+    @ApiOperation(value = "Find LGA by senatorial district code.")
     public ResponseEntity<LgaResponse> filterLGABySenatorialDistrict(@PathVariable Long senatorialDistrict) throws Exception {
         return ResponseEntity.ok(lgaService.findLgaBySenatorialDistrictCode(senatorialDistrict));
     }
