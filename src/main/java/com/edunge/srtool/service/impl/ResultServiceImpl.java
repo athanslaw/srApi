@@ -371,12 +371,12 @@ public class ResultServiceImpl implements ResultService {
 
                     result.setWard(ward);
                     resultRepository.deleteByWard(ward);
-                    LOGGER.info("Deleting existing results results with ward {} ", ward.getCode());
+                    LOGGER.info("Deleting existing results with ward {} ", ward.getCode());
                 }
                 if(votingLevel.getCode().equals("LGA")){
                     result.setLga(lga);
                     resultRepository.deleteByLga(lga);
-                    LOGGER.info("Deleting existing results results with LGA {} ", lga.getCode());
+                    LOGGER.info("Deleting existing results with LGA {} ", lga.getCode());
                 }
 
                 if(votingLevel.getCode().equals("PU")){

@@ -94,7 +94,6 @@ public class IncidentServiceImpl implements IncidentService {
             pollingUnitRepository.findByWard(ward).forEach(pollingUnit -> {
                 incidentDto.setPollingUnitId(pollingUnit.getId());
                 try {
-                    System.out.println("Athans: "+incidentDto.getPollingUnitId());
                     saveIncidentSingle(incidentDto, lga, ward);
                 }catch (NotFoundException ne){
                 }
@@ -106,7 +105,6 @@ public class IncidentServiceImpl implements IncidentService {
                 incidentDto.setWardId(pollingUnit.getWard().getId());
                 incidentDto.setPollingUnitId(pollingUnit.getId());
                 try {
-                    System.out.println("Athans: "+incidentDto.getPollingUnitId());
                     saveIncidentSingle(incidentDto, lga, null);
                 }catch (NotFoundException ne){
                 }
@@ -127,7 +125,7 @@ public class IncidentServiceImpl implements IncidentService {
 
         System.out.println("Athans combinedKeys: "+combinedKeys);
         List<Incident> incidentChecks = incidentRepository.findByCombinedKeysOrderByTimeStampDesc(combinedKeys);
-        if(incidentChecks != null && Utilities.dateDifference(incidentChecks.get(0).getTimeStamp(), 15)){
+        if(incidentChecks.size() > 0 && Utilities.dateDifference(incidentChecks.get(0).getTimeStamp(), 15)){
             return null;
         }
 
