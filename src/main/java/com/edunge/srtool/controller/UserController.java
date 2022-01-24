@@ -39,7 +39,13 @@ public class UserController {
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserDto userDto) throws ParseException, UserException, NotFoundException, IOException, NotificationException, BadRequestException {
+        System.out.println("athans "+userDto.toString());
         return new ResponseEntity<>(userService.saveUser(userDto), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserDto userDto) throws ParseException, UserException, NotFoundException, IOException, NotificationException, BadRequestException {
+        return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -67,5 +73,12 @@ public class UserController {
     @ApiOperation(value = "Fetch the user details by Id. Admin view")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) throws Exception {
         return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @RequestMapping(value = "/user/id/{id}", method = RequestMethod.DELETE)
+//    @PreAuthorize("hasRole=ADMIN")
+    @ApiOperation(value = "Delete user details by Id. Admin view")
+    public ResponseEntity<UserResponse> deleteUserById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.deleteUserById(id));
     }
 }

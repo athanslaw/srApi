@@ -6,6 +6,7 @@ import javax.persistence.*;
 public class Config extends AbstractBaseModel {
     private String activeState;
     private String activeYear;
+    private String electionLevel; // state, senatorial, lga, polling unit
 
     public String getActiveState() {
         return activeState;
@@ -21,5 +22,13 @@ public class Config extends AbstractBaseModel {
 
     public void setActiveYear(String activeYear) {
         this.activeYear = activeYear;
+    }
+
+    public String getElectionLevel() {
+        return electionLevel;
+    }
+
+    public void setElectionLevel(String electionLevel) {
+        this.electionLevel = electionLevel;
     }
 }

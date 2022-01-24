@@ -11,7 +11,9 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
 //    @Query(value = "SELECT * from result WHERE election_id = ?1 and ward_id=?1 and polling_unit_id=?1", nativeQuery = true)
 //    @Query("select r from Result r where r.election = :electionId and r.ward = :wardId and r.pollingUnit = :pollingUnitId")
 //    @Query("select r from Result r where r.election = :elecction")
-    Result findByElectionAndWardAndPollingUnit(Election election, Ward ward, PollingUnit pollingUnit);
+    Result findByElectionAndPollingUnit(Election election, PollingUnit pollingUnit);
+    Result findByElectionAndWard(Election election, Ward ward);
+    Result findByElectionAndLga(Election election, Lga lga);
     //                    @Param("wardId")Long wardId,@Param("pollingUnitId")Long pollingUnitId);
     List<Result> findByWard(Ward ward);
     List<Result> findByLga(Lga lga);

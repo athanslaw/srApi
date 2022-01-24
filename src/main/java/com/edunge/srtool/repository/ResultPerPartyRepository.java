@@ -12,4 +12,5 @@ import java.util.List;
 public interface ResultPerPartyRepository extends JpaRepository<ResultPerParty, Long> {
     ResultPerParty findByResultAndPoliticalParty(Result result, PoliticalParty politicalParty);
     List<ResultPerParty> findByResult(Result result);
+    void deleteByResult(Result result);
 }

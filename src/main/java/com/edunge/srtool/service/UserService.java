@@ -6,7 +6,9 @@ import com.edunge.srtool.response.UserResponse;
 
 public interface UserService {
     UserResponse saveUser(UserDto userDto);
+    UserResponse updateUser(UserDto userDto);
     UserResponse getAllUser() throws NotFoundException;
 
     UserResponse getUserById(Long userId) throws NotFoundException;
+    UserResponse deleteUserById(Long userId) throws NotFoundException;
 }

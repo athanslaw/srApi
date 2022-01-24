@@ -10,4 +10,5 @@ import java.util.List;
 public interface ElectionRepository extends JpaRepository<Election,Long> {
     Election findByCode(String electionCode);
     List<Election> findByNameStartingWith(String name);
+    List<Election> findByStatus(Boolean status);
 }

@@ -52,21 +52,37 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateException(String.format("%s already exists.",userDto.getEmail()));
         }
         User user = new User();
-        user.setFirstname(userDto.getFirstName());
-        user.setLastname(userDto.getLastName());
+        user.setFirstname(userDto.getFirstname());
+        user.setLastname(userDto.getLastname());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhone(userDto.getPhone());
         user.setRole(userDto.getRole());
-
+        userRepository.save(user);
+/*
         //Default User Role
         Authority authority  = authorityRepository.findByName(AuthorityName.ROLE_USER);
         user.setAuthorities(Arrays.asList(authority));
 
-        userRepository.save(user);
         JwtUser userDetails = JwtUserFactory.create(user);
         String token = jwtTokenUtil.generateUserToken(userDetails, user);
-        return new UserResponse("00", "User Registered Successfully.",token, user);
+        */
+        return new UserResponse("00", "User Registered Successfully.",null, user);
+    }
+
+    @Override
+    public UserResponse updateUser(UserDto userDto) {
+        User user = new User();
+        user.setFirstname(userDto.getFirstname());
+        user.setLastname(userDto.getLastname());
+        user.setEmail(userDto.getEmail());
+        user.setId(userDto.getId());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setPhone(userDto.getPhone());
+        user.setRole(userDto.getRole());
+
+        userRepository.save(user);
+        return new UserResponse("00", "User Updated Successfully.",null, user);
     }
 
     @Override
@@ -82,6 +98,12 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Users not found");
         }
         return new UserResponse("00","User retrieved", user.get());
+    }
+
+    @Override
+    public UserResponse deleteUserById(Long userId) throws NotFoundException {
+        userRepository.deleteById(userId);
+        return new UserResponse("00","User information safely deleted", "");
     }
 
     //@Todo Update user profile or change password

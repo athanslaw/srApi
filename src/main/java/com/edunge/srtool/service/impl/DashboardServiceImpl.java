@@ -176,7 +176,7 @@ public class DashboardServiceImpl implements DashboardService {
                     try {
                         if(lgaSet.add(result.getLga().getCode())){
                             LgaResult lgaResult = getLgaResult(result.getLga().getId());
-                            String winningParty = lgaResult.getPartyResults().get(lgaResult.getPartyResults().size()-1).getPoliticalParty().getCode();
+                            String winningParty = lgaResult.getPartyResults().get(lgaResult.getPartyResults().size()-1).getPoliticalParty().getName();
                             Integer currentValue = lgasWon.getOrDefault(winningParty, 0);
                             lgasWon.put(winningParty,currentValue+1);
                             lgaResults.add(lgaResult);

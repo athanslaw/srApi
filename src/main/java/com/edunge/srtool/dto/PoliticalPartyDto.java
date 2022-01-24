@@ -7,7 +7,7 @@ public class PoliticalPartyDto {
     private String code;
     @NotNull
     private String name;
-    private @NotNull Long stateId;
+    private Long stateId;
 
     public String getCode() {
         return code;

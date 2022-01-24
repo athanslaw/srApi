@@ -123,7 +123,6 @@ public class IncidentServiceImpl implements IncidentService {
                 .append(incidentDto.getIncidentTypeId())
                 .append(incidentDto.getLgaId()+incidentDto.getWardId()).toString();
 
-        System.out.println("Athans combinedKeys: "+combinedKeys);
         List<Incident> incidentChecks = incidentRepository.findByCombinedKeysOrderByTimeStampDesc(combinedKeys);
         if(incidentChecks.size() > 0 && Utilities.dateDifference(incidentChecks.get(0).getTimeStamp(), 15)){
             return null;

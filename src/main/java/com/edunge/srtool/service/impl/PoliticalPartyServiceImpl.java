@@ -80,11 +80,8 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     @Override
     public PoliticalPartyResponse editPoliticalParty(Long id, PoliticalPartyDto politicalParty) throws NotFoundException {
         PoliticalParty currentPoliticalParty =  getPoliticalParty(id);
-        State state = getState(politicalParty.getStateId());
         currentPoliticalParty.setId(id);
-        currentPoliticalParty.setCode(politicalParty.getCode());
         currentPoliticalParty.setName(politicalParty.getName());
-//        currentPoliticalParty.setState(state);
         politicalPartyRepository.save(currentPoliticalParty);
         return new PoliticalPartyResponse("00", String.format(updateTemplate, SERVICE_NAME), currentPoliticalParty);
     }

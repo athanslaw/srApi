@@ -10,6 +10,7 @@ public class Election extends AbstractBaseModel{
     private String description;
     private Integer year;
     private Date dateOfElection;
+    private Boolean status;
 
     @OneToMany(mappedBy = "election")
     private Set<Result> results;
@@ -36,5 +37,23 @@ public class Election extends AbstractBaseModel{
 
     public void setDateOfElection(Date dateOfElection) {
         this.dateOfElection = dateOfElection;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Election{" +
+                "description='" + description + '\'' +
+                ", year=" + year +
+                ", dateOfElection=" + dateOfElection +
+                ", results=" + results +
+                '}';
     }
 }
