@@ -1,6 +1,7 @@
 package com.edunge.srtool.repository;
 
 import com.edunge.srtool.model.Lga;
+import com.edunge.srtool.model.State;
 import com.edunge.srtool.model.Ward;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,5 @@ public interface WardRepository extends JpaRepository<Ward, Long> {
     Ward findByCode(String wardCode);
     List<Ward> findByNameStartingWith(String name);
     List<Ward> findByLga(Lga lga);
+    List<Ward> findByState(State state);
 }

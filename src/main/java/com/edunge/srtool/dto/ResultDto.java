@@ -23,7 +23,7 @@ public class ResultDto extends AbstractBaseModel {
     private Integer registeredVotersCount;
     @NotNull
     private Integer  accreditedVotersCount;
-    private Integer apc, pdp, anpp, others;
+    private Integer party_1, party_2, party_3, party_4, result_id;
 
     public Long getElectionId() {
         return electionId;
@@ -97,35 +97,44 @@ public class ResultDto extends AbstractBaseModel {
         this.accreditedVotersCount = accreditedVotersCount;
     }
 
-    public Integer getApc() {
-        return apc;
+    public Integer getParty_1() {
+        return party_1;
     }
 
-    public void setApc(Integer apc) {
-        this.apc = apc;
+    public void setParty_1(Integer party_1) {
+        this.party_1 = party_1;
     }
 
-    public Integer getPdp() {
-        return pdp;
+    public Integer getParty_2() {
+        return party_2;
     }
 
-    public void setPdp(Integer pdp) {
-        this.pdp = pdp;
+    public void setParty_2(Integer party_2) {
+        this.party_2 = party_2;
     }
 
-    public Integer getAnpp() {
-        return anpp;
+    public Integer getParty_3() {
+        return party_3;
     }
 
-    public void setAnpp(Integer anpp) {
-        this.anpp = anpp;
+    public void setParty_3(Integer party_3) {
+        this.party_3 = party_3;
     }
 
-    public Integer getOthers() {
-        return others;
+    public Integer getParty_4() {
+        return party_4;
     }
 
-    public void setOthers(Integer others) {
-        this.others = others;
+    public void setParty_4(Integer party_4) {
+        this.party_4 = party_4;
     }
+
+    public Integer getResult_id() {
+        return result_id;
+    }
+
+    public void setResult_id(Integer result_id) {
+        this.result_id = result_id;
+    }
+
 }
