@@ -55,6 +55,12 @@ public class IncidentController {
         return ResponseEntity.ok(incidentService.findIncidentById(id));
     }
 
+    @GetMapping(value = "/incident/senatorial/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by Senatorial.")
+    public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentBySenatorial(id));
+    }
+
     @GetMapping(value = "/incident/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Lga.")
     public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id) throws Exception {

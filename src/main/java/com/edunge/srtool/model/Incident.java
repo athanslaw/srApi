@@ -16,6 +16,7 @@ public class Incident extends BaseModel{
 
     private String combinedKeys;
     private LocalDateTime timeStamp;
+    private int weight;
 
     @ManyToOne
     @JoinColumn(name = "ward_id",nullable = false)
@@ -127,5 +128,13 @@ public class Incident extends BaseModel{
 
     public void setTimeStamp(LocalDateTime timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

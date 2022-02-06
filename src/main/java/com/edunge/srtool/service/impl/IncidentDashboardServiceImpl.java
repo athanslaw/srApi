@@ -104,6 +104,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                     Integer totalIncidents = getLgaIncidents(lga.getId());
                     HashMap<String, Integer> incidentTypeMap = new HashMap<>();
                     AtomicInteger totalIncident = new AtomicInteger(0);
+                    AtomicInteger totalWeight = new AtomicInteger(0);
                     incidentList.stream()
                             .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                             .forEach(incident -> {
@@ -111,13 +112,17 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                                 Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
                                 incidentTypeMap.put(incidentType, currentValue+1);
                             });
-                    totalIncident.addAndGet((int) incidentList.stream()
+                    incidentList.stream()
                             .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                             .filter(incident -> incident.getIncidentStatus().getName().equals("Unresolved"))
-                            .count());
+                                .forEach(incident -> {
+                                    totalWeight.addAndGet(incident.getWeight());
+                                    totalIncident.addAndGet(1);
+                                });
                     incidentTypeMap.forEach((type, count)->{
                         Double percent = (count * 100.0)/totalIncidents;
-                        incidentReports.add(new IncidentReport(lga,type, count, percent, totalIncident.get()));
+                        int weight = totalWeight.get() / totalIncident.get();
+                        incidentReports.add(new IncidentReport(lga,type, count, percent, totalIncident.get(), weight));
                     });
                 });
         return incidentReports;

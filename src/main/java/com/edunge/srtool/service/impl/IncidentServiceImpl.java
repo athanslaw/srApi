@@ -20,7 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private final WardRepository wardRepository;
     private final LgaRepository lgaRepository;
+    private final StateRepository stateRepository;
     private final PollingUnitRepository pollingUnitRepository;
     private final VotingLevelRepository votingLevelRepository;
     private final IncidentLevelRepository incidentLevelRepository;
@@ -60,13 +64,14 @@ public class IncidentServiceImpl implements IncidentService {
     @Autowired
     public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository,
                                ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository,
-                               WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
+                               WardRepository wardRepository, LgaRepository lgaRepository, StateRepository stateRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
         this.lgaRepository = lgaRepository;
+        this.stateRepository = stateRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.votingLevelRepository = votingLevelRepository;
         this.incidentLevelRepository = incidentLevelRepository;
@@ -87,10 +92,10 @@ public class IncidentServiceImpl implements IncidentService {
         Incident incident = new Incident();
 
         Lga lga = getLga(incidentDto.getLgaId());
-        Ward ward = getWard(incidentDto.getWardId());
         // validate incident levels
         if(incidentDto.getIncidentLevelId() == 2){
             // get all PUs in ward
+            Ward ward = getWard(incidentDto.getWardId());
             pollingUnitRepository.findByWard(ward).forEach(pollingUnit -> {
                 incidentDto.setPollingUnitId(pollingUnit.getId());
                 try {
@@ -99,18 +104,20 @@ public class IncidentServiceImpl implements IncidentService {
                 }
             });
         }
-        else if(incidentDto.getIncidentLevelId() == 3){
+        else if(incidentDto.getIncidentLevelId() == 1){
             // get all wards and PUs under the LGA
             pollingUnitRepository.findByLga(lga).forEach(pollingUnit -> {
                 incidentDto.setWardId(pollingUnit.getWard().getId());
                 incidentDto.setPollingUnitId(pollingUnit.getId());
                 try {
-                    saveIncidentSingle(incidentDto, lga, null);
+                    Ward ward = getWard(incidentDto.getWardId());
+                    saveIncidentSingle(incidentDto, lga, ward);
                 }catch (NotFoundException ne){
                 }
             });
         }
         else {
+            Ward ward = getWard(incidentDto.getWardId());
             incident = saveIncidentSingle(incidentDto, lga, ward);
         }
         return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
@@ -121,7 +128,8 @@ public class IncidentServiceImpl implements IncidentService {
         String combinedKeys = new StringBuilder().append(incidentDto.getPollingUnitId())
                 .append(incidentDto.getIncidentStatusId())
                 .append(incidentDto.getIncidentTypeId())
-                .append(incidentDto.getLgaId()+incidentDto.getWardId()).toString();
+                .append(incidentDto.getLgaId())
+                .append(incidentDto.getWardId()).toString();
 
         List<Incident> incidentChecks = incidentRepository.findByCombinedKeysOrderByTimeStampDesc(combinedKeys);
         if(incidentChecks.size() > 0 && Utilities.dateDifference(incidentChecks.get(0).getTimeStamp(), 15)){
@@ -134,12 +142,11 @@ public class IncidentServiceImpl implements IncidentService {
 
         PollingUnit pollingUnit = null;
         try {
-            if(ward == null) {
-                ward = getWard(incidentDto.getWardId());
-            }
             pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
         }catch (Exception e){
         }
+        float weight = (incidentType.getWeight() + this.processWeight()) /2;
+        System.out.println("Level: "+incidentLevel);
         Incident incident = new Incident();
         incident.setLga(lga);
         incident.setTimeStamp(LocalDateTime.now());
@@ -153,8 +160,22 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
+        incident.setWeight((int) weight);
         incidentRepository.save(incident);
         return incident;
+    }
+
+    private int processWeight(){
+        SimpleDateFormat sd = new SimpleDateFormat("HH");
+        String str = sd.format(new Date());
+        int weight = 1;
+        System.out.println("Weight: "+str);
+        if(str.compareTo("0") >= 0){
+            weight = 5;
+        }else if(str.compareTo("09") >= 0){
+            weight = 3;
+        }
+        return weight;
     }
 
     @Override
@@ -198,7 +219,8 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     public IncidentResponse findAll() {
-        List<Incident> elections = incidentRepository.findAll();
+        State state = getState();
+        List<Incident> elections = incidentRepository.findTop10(state);
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
@@ -225,6 +247,16 @@ public class IncidentServiceImpl implements IncidentService {
             throw new NotFoundException("LGA not found.");
         }
         return lga.get();
+    }
+
+    private State getState() {
+        State state = stateRepository.findByDefaultState(true);
+        return state;
+    }
+
+    private SenatorialDistrict getSenatorialDistrict(long id) {
+        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findById(id).get();
+        return senatorialDistrict;
     }
 
     private IncidentStatus getIncidentStatus(Long id) throws NotFoundException {
@@ -272,6 +304,20 @@ public class IncidentServiceImpl implements IncidentService {
         Lga lga = getLga(id);
         List<Incident> elections = incidentRepository.findByLga(lga);
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    }
+
+    @Override
+    public IncidentResponse findIncidentBySenatorial(Long id){
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
+        List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
+        List<Incident> incidentList = new ArrayList<>();
+        lgas.stream().forEach(lga -> {
+            incidentRepository.findByLga(lga)
+                .forEach(incident -> {
+                    incidentList.add(incident);
+                });
+        });
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 
     @Override

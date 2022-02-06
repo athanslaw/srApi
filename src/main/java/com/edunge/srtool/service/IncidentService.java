@@ -12,6 +12,7 @@ public interface IncidentService {
     IncidentResponse deleteIncidentById(Long id) throws NotFoundException;
     IncidentResponse findAll() ;
     IncidentResponse findIncidentByLga(Long id) throws NotFoundException;
+    IncidentResponse findIncidentBySenatorial(Long id) throws NotFoundException;
     IncidentResponse findIncidentByWard(Long id) throws NotFoundException;
     IncidentResponse findIncidentByPollingUnit(Long id) throws NotFoundException;
 
