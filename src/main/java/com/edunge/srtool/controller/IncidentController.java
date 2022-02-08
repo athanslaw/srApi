@@ -46,8 +46,6 @@ public class IncidentController {
     @RequestMapping(value = "/incident/delete/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete incident by id.")
     public ResponseEntity<IncidentResponse> deleteIncidentById(@PathVariable Long id) throws Exception {
-        // test
-        System.out.println("Athans");
         return ResponseEntity.ok(incidentService.deleteIncidentById(id));
     }
 
