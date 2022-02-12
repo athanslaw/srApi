@@ -62,7 +62,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
+                .antMatchers("*","/api/v1/login","/api/v1/register","/api/v1/reset-password","/api/v1/reset-pin","webjars/**",
          "/swagger-ui.html/**","/swagger-resources/**","/v2/**","/v2/api-docs").permitAll().
         anyRequest().authenticated()
                 .and().
@@ -82,7 +82,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*", "https://1581-41-203-117-93.ngrok.io", "https://1581-41-203-117-93.ngrok.io", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "content-type"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "content-type"));
