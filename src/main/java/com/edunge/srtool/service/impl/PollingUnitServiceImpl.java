@@ -61,9 +61,9 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
         this.pollingUnitRepository = pollingUnitRepository;
+        try {
         this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
                 .toAbsolutePath().normalize();
-        try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
