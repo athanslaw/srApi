@@ -67,9 +67,9 @@ public class WardServiceImpl implements WardService {
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
-        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
         try {
+            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);

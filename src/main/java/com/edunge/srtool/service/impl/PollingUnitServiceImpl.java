@@ -62,7 +62,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         this.wardRepository = wardRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         try {
-        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
                 .toAbsolutePath().normalize();
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {

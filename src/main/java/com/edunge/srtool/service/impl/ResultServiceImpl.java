@@ -83,9 +83,9 @@ public class ResultServiceImpl implements ResultService {
         this.votingLevelRepository = votingLevelRepository;
         this.resultPerPartyRepository = resultPerPartyRepository;
         this.politicalPartyRepository = politicalPartyRepository;
-        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
         try {
+            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
+                .toAbsolutePath().normalize();
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);

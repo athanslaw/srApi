@@ -39,9 +39,9 @@ public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalParty
         this.politicalPartyCandidateRepository = politicalPartyCandidateRepository;
         this.electionRepository = electionRepository;
         this.politicalPartyRepository = politicalPartyRepository;
-        this.fileStorageLocation = Paths.get(fileConfigurationProperties.getUploadDir())
-                .toAbsolutePath().normalize();
         try {
+            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getUploadDir())
+                .toAbsolutePath().normalize();
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
