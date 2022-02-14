@@ -8,6 +8,7 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PartyAgentResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.PartyAgentService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -35,8 +36,10 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private final StateRepository stateRepository;
 
     private static final String SERVICE_NAME = "Party Agent";
-    private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
+
+    @Autowired
+    FileProcessingService fileProcessingService;
 
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
@@ -57,7 +60,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, StateRepository stateRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, StateRepository stateRepository) {
         this.lgaRepository = lgaRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.pollingUnitRepository = pollingUnitRepository;
@@ -65,13 +68,6 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         this.politicalPartyRepository = politicalPartyRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.stateRepository = stateRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -272,7 +268,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
 
     @Override
     public PartyAgentResponse uploadPartyAgent(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

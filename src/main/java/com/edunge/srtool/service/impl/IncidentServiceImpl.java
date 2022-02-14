@@ -1,12 +1,12 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.IncidentDto;
 import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.IncidentResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.IncidentService;
 import com.edunge.srtool.util.FileUtil;
 import com.edunge.srtool.util.Utilities;
@@ -41,7 +41,6 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentLevelRepository incidentLevelRepository;
     private final IncidentStatusRepository incidentStatusRepository;
     private final IncidentTypeRepository incidentTypeRepository;
-    private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(IncidentServiceImpl.class);
 
     private static final String SERVICE_NAME = "Incident";
@@ -62,9 +61,15 @@ public class IncidentServiceImpl implements IncidentService {
     private String fetchRecordTemplate;
 
     @Autowired
+    FileProcessingService fileProcessingService;
+
+    @Autowired
     public IncidentServiceImpl(IncidentRepository incidentRepository, PartyAgentRepository partyAgentRepository,
                                ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository,
-                               WardRepository wardRepository, LgaRepository lgaRepository, StateRepository stateRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository, IncidentTypeRepository incidentTypeRepository, FileConfigurationProperties fileConfigurationProperties) {
+                               WardRepository wardRepository, LgaRepository lgaRepository, StateRepository stateRepository,
+                               PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository,
+                               IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository,
+                               IncidentTypeRepository incidentTypeRepository) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -77,13 +82,6 @@ public class IncidentServiceImpl implements IncidentService {
         this.incidentLevelRepository = incidentLevelRepository;
         this.incidentStatusRepository = incidentStatusRepository;
         this.incidentTypeRepository = incidentTypeRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -371,7 +369,7 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     public IncidentResponse uploadIncident(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

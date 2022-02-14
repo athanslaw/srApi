@@ -14,6 +14,7 @@ import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.repository.WardRepository;
 import com.edunge.srtool.response.WardResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.WardService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ public class WardServiceImpl implements WardService {
     private final WardRepository wardRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
 
-    private final Path fileStorageLocation;
     private static final String SERVICE_NAME = "Ward";
 
     @Value("${notfound.message.template}")
@@ -62,18 +62,13 @@ public class WardServiceImpl implements WardService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public WardServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, FileConfigurationProperties fileConfigurationProperties) {
+    FileProcessingService fileProcessingService;
+    @Autowired
+    public WardServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -239,7 +234,7 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse uploadWard(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

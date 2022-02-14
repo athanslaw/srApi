@@ -1,9 +1,7 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.SenatorialDistrict;
@@ -12,6 +10,7 @@ import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.LgaResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.LgaService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -21,9 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +30,6 @@ public class LgaServiceImpl implements LgaService {
     private static final String SERVICE_NAME = "LGA";
     private static final Logger LOGGER = LoggerFactory.getLogger(LgaService.class);
 
-    private final Path fileStorageLocation;
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
 
@@ -57,17 +52,12 @@ public class LgaServiceImpl implements LgaService {
     private final SenatorialDistrictRepository senatorialDistrictRepository;
 
     @Autowired
-    public LgaServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, FileConfigurationProperties fileConfigurationProperties) {
+    FileProcessingService fileProcessingService;
+    @Autowired
+    public LgaServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -221,7 +211,7 @@ public class LgaServiceImpl implements LgaService {
 
     @Override
     public LgaResponse uploadLga(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

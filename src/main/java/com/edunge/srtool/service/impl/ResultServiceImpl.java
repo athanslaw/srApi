@@ -1,13 +1,12 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.ResultDto;
 import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.ResultResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.ResultService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -18,9 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +34,6 @@ public class ResultServiceImpl implements ResultService {
     private final VotingLevelRepository votingLevelRepository;
     private final ResultPerPartyRepository resultPerPartyRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
-    private final Path fileStorageLocation;
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultServiceImpl.class);
 
     private static final String SERVICE_NAME = "Result";
@@ -71,7 +66,10 @@ public class ResultServiceImpl implements ResultService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository, FileConfigurationProperties fileConfigurationProperties) {
+    FileProcessingService fileProcessingService;
+
+    @Autowired
+    public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository) {
         this.resultRepository = resultRepository;
         this.resultRealTimeRepository = resultRealTimeRepository;
         this.partyAgentRepository = partyAgentRepository;
@@ -83,13 +81,6 @@ public class ResultServiceImpl implements ResultService {
         this.votingLevelRepository = votingLevelRepository;
         this.resultPerPartyRepository = resultPerPartyRepository;
         this.politicalPartyRepository = politicalPartyRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -470,7 +461,7 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public ResultResponse uploadResult(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

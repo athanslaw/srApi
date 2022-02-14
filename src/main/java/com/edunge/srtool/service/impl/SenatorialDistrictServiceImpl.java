@@ -1,15 +1,14 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.SenatorialDistrict;
 import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.SenatorialDistrictService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -19,9 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +28,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
     private final SenatorialDistrictRepository senatorialDistrictRepository;
     private static final String SERVICE_NAME = "Senatorial District";
     private static final Logger LOGGER = LoggerFactory.getLogger(SenatorialDistrict.class);
-    private final Path fileStorageLocation;
+
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
 
@@ -50,17 +46,14 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Value("${fetch.message.template}")
     private String fetchRecordTemplate;
+
     @Autowired
-    public SenatorialDistrictServiceImpl(StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, FileConfigurationProperties fileConfigurationProperties) {
+    FileProcessingService fileProcessingService;
+
+    @Autowired
+    public SenatorialDistrictServiceImpl(StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -169,7 +162,7 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Override
     public SenatorialDistrictResponse uploadSenatorialDistrict(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

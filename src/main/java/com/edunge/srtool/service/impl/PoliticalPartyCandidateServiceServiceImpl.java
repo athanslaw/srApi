@@ -10,6 +10,7 @@ import com.edunge.srtool.repository.ElectionRepository;
 import com.edunge.srtool.repository.PoliticalPartyCandidateRepository;
 import com.edunge.srtool.repository.PoliticalPartyRepository;
 import com.edunge.srtool.response.PoliticalPartyCandidateResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.PoliticalPartyCandidateService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -32,20 +33,14 @@ public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalParty
     private final PoliticalPartyRepository politicalPartyRepository;
     private static final Logger logger = LoggerFactory.getLogger(PoliticalPartyCandidateServiceServiceImpl.class);
 
-    private final Path fileStorageLocation;
+    @Autowired
+    FileProcessingService fileProcessingService;
 
     @Autowired
-    public PoliticalPartyCandidateServiceServiceImpl(PoliticalPartyCandidateRepository politicalPartyCandidateRepository, ElectionRepository electionRepository, PoliticalPartyRepository politicalPartyRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public PoliticalPartyCandidateServiceServiceImpl(PoliticalPartyCandidateRepository politicalPartyCandidateRepository, ElectionRepository electionRepository, PoliticalPartyRepository politicalPartyRepository) {
         this.politicalPartyCandidateRepository = politicalPartyCandidateRepository;
         this.electionRepository = electionRepository;
         this.politicalPartyRepository = politicalPartyRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getUploadDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
     private static final String SERVICE_NAME = "Political party candidate";
     @Value("${notfound.message.template}")
@@ -128,7 +123,7 @@ public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalParty
     }
 
     private String uploadFile(MultipartFile file){
-        return FileUtil.uploadFile(file, this.fileStorageLocation);
+        return FileUtil.uploadFile(file, fileProcessingService.getFileStorageLocation());
     }
 
     private PoliticalParty getPoliticalParty(Long id) throws NotFoundException {
@@ -158,7 +153,7 @@ public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalParty
 
     @Override
     public Resource loadPoliticalPartyImage(String fileName) {
-        return FileUtil.loadResource(fileName, fileStorageLocation);
+        return FileUtil.loadResource(fileName, fileProcessingService.getFileStorageLocation());
     }
 
     @Override

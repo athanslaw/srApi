@@ -8,6 +8,7 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PollingUnitResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.PollingUnitService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +35,6 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private final PollingUnitRepository pollingUnitRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(PollingUnitService.class);
 
-    private final Path fileStorageLocation;
     private static final String SERVICE_NAME = "Polling Unit";
 
     @Value("${notfound.message.template}")
@@ -55,19 +56,15 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PollingUnitServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, PollingUnitRepository pollingUnitRepository, FileConfigurationProperties fileConfigurationProperties) {
+    FileProcessingService fileProcessingService;
+
+    @Autowired
+    public PollingUnitServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, PollingUnitRepository pollingUnitRepository) {
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
         this.wardRepository = wardRepository;
         this.pollingUnitRepository = pollingUnitRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -254,7 +251,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
     @Override
     public PollingUnitResponse uploadPollingUnit(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 

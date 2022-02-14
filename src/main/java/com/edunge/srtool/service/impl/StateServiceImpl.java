@@ -9,6 +9,7 @@ import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.StateService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -32,8 +33,6 @@ public class StateServiceImpl implements StateService {
     private static final String SERVICE_NAME = "State";
     private static final Logger LOGGER = LoggerFactory.getLogger(StateService.class);
 
-    private final Path fileStorageLocation;
-
     @Value("${notfound.message.template}")
     private String notFoundTemplate;
 
@@ -51,17 +50,14 @@ public class StateServiceImpl implements StateService {
 
     @Value("${fetch.message.template}")
     private String fetchRecordTemplate;
+
+    @Autowired
+    FileProcessingService fileProcessingService;
+
     @Autowired
     public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository, FileConfigurationProperties fileConfigurationProperties) {
         this.stateRepository = stateRepository;
         this.lgaRepository = lgaRepository;
-        try {
-            this.fileStorageLocation = Paths.get(fileConfigurationProperties.getSvgDir())
-                .toAbsolutePath().normalize();
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
     }
 
     @Override
@@ -71,7 +67,7 @@ public class StateServiceImpl implements StateService {
             existingState = new State();
             existingState.setCode(code);
             existingState.setName(name);
-            FileUtil.uploadFile(file, fileStorageLocation);
+            FileUtil.uploadFile(file, fileProcessingService.getFileStorageLocation());
             String fileUrl = getSvgUrl(file.getOriginalFilename());
             existingState.setSvgUrl(fileUrl);
 
@@ -103,7 +99,7 @@ public class StateServiceImpl implements StateService {
         currentState.setCode(code);
         currentState.setName(name);
         if(file!=null){
-            FileUtil.uploadFile(file, fileStorageLocation);
+            FileUtil.uploadFile(file, fileProcessingService.getFileStorageLocation());
             String fileUrl = getSvgUrl(file.getOriginalFilename());
             currentState.setSvgUrl(fileUrl);
         }
@@ -129,7 +125,7 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public Resource loadSvg(String fileName) {
-        return FileUtil.loadResource(fileName, fileStorageLocation);
+        return FileUtil.loadResource(fileName, fileProcessingService.getFileStorageLocation());
     }
 
     @Override
@@ -195,7 +191,7 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public StateResponse uploadState(MultipartFile file){
-        List<String> csvLines = FileUtil.getCsvLines(file, this.fileStorageLocation);
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
 
