@@ -24,7 +24,7 @@ public class FileProcessingService {
                     .toAbsolutePath().normalize();
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
-            throw new FileNotFoundException("Could not create the directory where the uploaded files will be stored.", ex);
+            System.out.println("Could not create the directory where the uploaded files will be stored."+ ex);
         }
     }
 
