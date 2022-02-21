@@ -110,6 +110,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setLastname(agents.getLastname());
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDto.setId(agents.getId());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -132,6 +133,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setFirstname(agents.getFirstname());
             partyAgentDto.setLastname(agents.getLastname());
             partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setId(agents.getId());
             partyAgentDto.setPhone(agents.getPhone());
             partyAgentDtoList.add(partyAgentDto);
         });
@@ -156,6 +158,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setLastname(agents.getLastname());
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDto.setId(agents.getId());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -179,6 +182,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setLastname(agents.getLastname());
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDto.setId(agents.getId());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
