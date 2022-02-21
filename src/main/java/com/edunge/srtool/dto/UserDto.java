@@ -9,6 +9,7 @@ public class UserDto {
     private String email;
     private String password;
     private String role;
+    private String lgaId;
 
     public String getPhone() {
         return phone;
@@ -64,6 +65,14 @@ public class UserDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getLgaId() {
+        return lgaId;
+    }
+
+    public void setLgaId(String lgaId) {
+        this.lgaId = lgaId;
     }
 
     @Override

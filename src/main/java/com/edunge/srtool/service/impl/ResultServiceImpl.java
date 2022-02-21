@@ -420,7 +420,6 @@ public class ResultServiceImpl implements ResultService {
                             String lgaCode,
                             String wardCode,
                             String pollingUnitCode,
-                            String senatorialDistrictCode,
                             String accreditedVotersCount,
                             String registeredVotersCount,
                             String party1Votes,
@@ -440,8 +439,7 @@ public class ResultServiceImpl implements ResultService {
             resultDto.setWardId(ward.getId());
             PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
             resultDto.setPollingUnitId(pollingUnit.getId());
-            SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
-            resultDto.setSenatorialDistrictId(senatorialDistrict.getId());
+            resultDto.setSenatorialDistrictId(lga.getSenatorialDistrict().getId());
             resultDto.setAccreditedVotersCount(Integer.valueOf(accreditedVotersCount));
             resultDto.setRegisteredVotersCount(Integer.valueOf(registeredVotersCount));
             resultDto.setParty_1(Integer.valueOf(party1Votes));
@@ -469,7 +467,7 @@ public class ResultServiceImpl implements ResultService {
     private ResultResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            saveResult(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim(), state[9].trim(), state[10].trim(), state[11].trim(), state[12].trim());
+            saveResult(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim(), state[9].trim(), state[10].trim(), state[11].trim());
         }
         return new ResultResponse("00", "File Uploaded.");
     }

@@ -1,5 +1,6 @@
 package com.edunge.srtool.response;
 
+import com.edunge.srtool.dto.PartyAgentDto;
 import com.edunge.srtool.model.PartyAgent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -9,6 +10,7 @@ import java.util.List;
 public class PartyAgentResponse extends BaseResponse{
     PartyAgent partyAgent;
     List<PartyAgent> partyAgents;
+    List<PartyAgentDto> partyAgentDtoList;
     Integer count;
 
     public Integer getCount() {
@@ -19,18 +21,17 @@ public class PartyAgentResponse extends BaseResponse{
         this.partyAgent = partyAgent;
     }
 
+    public PartyAgentResponse(String code, String message, List<PartyAgentDto> partyAgent) {
+        super(code, message);
+        this.partyAgentDtoList = partyAgent;
+    }
+
     public PartyAgentResponse(PartyAgent partyAgent) {
         this.partyAgent = partyAgent;
     }
 
     public PartyAgentResponse(String code, String message) {
         super(code, message);
-    }
-
-    public PartyAgentResponse(String code, String message, List<PartyAgent> partyAgents) {
-        super(code, message);
-        this.partyAgents = partyAgents;
-        this.count = partyAgents.size();
     }
 
     public PartyAgent getPartyAgent() {
@@ -47,5 +48,13 @@ public class PartyAgentResponse extends BaseResponse{
 
     public void setPartyAgents(List<PartyAgent> partyAgents) {
         this.partyAgents = partyAgents;
+    }
+
+    public List<PartyAgentDto> getPartyAgentDtoList() {
+        return partyAgentDtoList;
+    }
+
+    public void setPartyAgentDtoList(List<PartyAgentDto> partyAgentDtoList) {
+        this.partyAgentDtoList = partyAgentDtoList;
     }
 }

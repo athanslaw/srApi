@@ -51,11 +51,10 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     public PoliticalPartyResponse savePoliticalParty(PoliticalPartyDto politicalParty) throws NotFoundException {
         PoliticalParty existingPoliticalParty = politicalPartyRepository.findByCode(politicalParty.getCode());
         if(existingPoliticalParty==null){
-//            State state = getState(politicalParty.getStateId());
             existingPoliticalParty = new PoliticalParty();
-//            existingPoliticalParty.setState(state);
             existingPoliticalParty.setCode(politicalParty.getCode());
             existingPoliticalParty.setName(politicalParty.getName());
+            existingPoliticalParty.setColorCode(politicalParty.getColorCode());
             politicalPartyRepository.save(existingPoliticalParty);
             return new PoliticalPartyResponse("00", String.format(successTemplate,SERVICE_NAME), existingPoliticalParty);
         }
@@ -82,6 +81,7 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
         PoliticalParty currentPoliticalParty =  getPoliticalParty(id);
         currentPoliticalParty.setId(id);
         currentPoliticalParty.setName(politicalParty.getName());
+        currentPoliticalParty.setColorCode(politicalParty.getColorCode());
         politicalPartyRepository.save(currentPoliticalParty);
         return new PoliticalPartyResponse("00", String.format(updateTemplate, SERVICE_NAME), currentPoliticalParty);
     }

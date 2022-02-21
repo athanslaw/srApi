@@ -1,7 +1,5 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Election;
 import com.edunge.srtool.model.PoliticalParty;
@@ -21,11 +19,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalPartyCandidateService {
     private final PoliticalPartyCandidateRepository politicalPartyCandidateRepository;
@@ -149,7 +145,6 @@ public class PoliticalPartyCandidateServiceServiceImpl implements PoliticalParty
         }
         return election.get();
     }
-
 
     @Override
     public Resource loadPoliticalPartyImage(String fileName) {

@@ -8,6 +8,7 @@ public class PoliticalPartyDto {
     @NotNull
     private String name;
     private Long stateId;
+    private String colorCode;
 
     public String getCode() {
         return code;
@@ -31,5 +32,13 @@ public class PoliticalPartyDto {
 
     public void setStateId(@NotNull Long stateId) {
         this.stateId = stateId;
+    }
+
+    public String getColorCode() {
+        return colorCode;
+    }
+
+    public void setColorCode(String colorCode) {
+        this.colorCode = colorCode;
     }
 }

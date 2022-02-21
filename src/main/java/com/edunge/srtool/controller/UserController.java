@@ -8,6 +8,7 @@ import com.edunge.srtool.exceptions.UserException;
 import com.edunge.srtool.jwt.JwtTokenUtil;
 import com.edunge.srtool.jwt.JwtUserDetailsService;
 import com.edunge.srtool.model.Login;
+import com.edunge.srtool.response.LocationResponse;
 import com.edunge.srtool.response.LoginResponse;
 import com.edunge.srtool.response.UserResponse;
 import com.edunge.srtool.service.UserService;
@@ -30,22 +31,33 @@ import java.text.ParseException;
 public class UserController {
     private final JwtUserDetailsService userDetailsService;
     private final UserService userService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public UserController(JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService, UserService userService) {
         this.userDetailsService = userDetailsService;
+        this.jwtTokenUtil = jwtTokenUtil;
         this.userService = userService;
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserDto userDto) throws ParseException, UserException, NotFoundException, IOException, NotificationException, BadRequestException {
-        System.out.println("athans "+userDto.toString());
         return new ResponseEntity<>(userService.saveUser(userDto), HttpStatus.OK);
     }
 
     @PutMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> updateUser(@RequestBody UserDto userDto) throws ParseException, UserException, NotFoundException, IOException, NotificationException, BadRequestException {
         return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/users/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> changePassword(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.changePassword(userDto), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/users/lga", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> updateLga(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.updateLga(userDto), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -66,6 +78,12 @@ public class UserController {
     @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
     public ResponseEntity<UserResponse> getUsers() throws Exception {
         return ResponseEntity.ok(userService.getAllUser());
+    }
+
+    @RequestMapping(value = "/users/location", method = RequestMethod.GET)
+    @ApiOperation(value = "This method fetches registered user's location.")
+    public ResponseEntity<LocationResponse> getUserLocation(@RequestHeader("Authorization") String token) throws Exception {
+        return ResponseEntity.ok(userService.getUserLgaById(jwtTokenUtil.getUsernameFromToken(token.split(" ")[1])));
     }
 
     @RequestMapping(value = "/user/id/{id}", method = RequestMethod.POST)

@@ -13,6 +13,10 @@ public class PartyAgentDto extends BaseModel {
     private Long pollingUnitId;
     private Long politicalPartyId;
 
+    private String lgaName;
+    private String wardName;
+    private String pollingUnitName;
+
     public String getFirstname() {
         return firstname;
     }
@@ -83,5 +87,29 @@ public class PartyAgentDto extends BaseModel {
 
     public void setPoliticalPartyId(Long politicalPartyId) {
         this.politicalPartyId = politicalPartyId;
+    }
+
+    public String getLgaName() {
+        return lgaName;
+    }
+
+    public void setLgaName(String lgaName) {
+        this.lgaName = lgaName;
+    }
+
+    public String getWardName() {
+        return wardName;
+    }
+
+    public void setWardName(String wardName) {
+        this.wardName = wardName;
+    }
+
+    public String getPollingUnitName() {
+        return pollingUnitName;
+    }
+
+    public void setPollingUnitName(String pollingUnitName) {
+        this.pollingUnitName = pollingUnitName;
     }
 }

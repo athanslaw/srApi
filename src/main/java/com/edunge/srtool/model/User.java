@@ -20,6 +20,7 @@ public class User extends BaseModel {
     private String role;
     @JsonIgnore
     private String password;
+    private String lgaId;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(
@@ -114,6 +115,15 @@ public class User extends BaseModel {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getLgaId() {
+        return lgaId;
+    }
+
+    public void setLgaId(String lgaId) {
+        this.lgaId = lgaId;
+        System.out.println("LLGGAA: "+lgaId);
     }
 
     @Override

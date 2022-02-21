@@ -2,7 +2,6 @@ package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.State;
@@ -20,9 +19,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 

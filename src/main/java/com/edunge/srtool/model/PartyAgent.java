@@ -107,4 +107,19 @@ public class PartyAgent extends BaseModel{
     public void setPoliticalParty(PoliticalParty politicalParty) {
         this.politicalParty = politicalParty;
     }
+
+    @Override
+    public String toString() {
+        return "PartyAgent{" +
+                "firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", lga=" + lga +
+                ", ward=" + ward +
+                ", politicalParty=" + politicalParty +
+                ", pollingUnit=" + pollingUnit +
+                '}';
+    }
 }

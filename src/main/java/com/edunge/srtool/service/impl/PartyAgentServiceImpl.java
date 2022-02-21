@@ -1,9 +1,7 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.dto.PartyAgentDto;
 import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.FileNotFoundException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
@@ -18,9 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,40 +99,92 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse findPartyAgentByName(String firstname, String lastname) throws NotFoundException {
         List<PartyAgent> partyAgent = partyAgentRepository.findByFirstnameOrLastname(firstname, lastname);
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        partyAgent.stream().forEach(agents->{
+            PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+            partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setAddress(agents.getAddress());
+            partyAgentDto.setFirstname(agents.getFirstname());
+            partyAgentDto.setLastname(agents.getLastname());
+            partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDtoList.add(partyAgentDto);
+        });
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
     }
 
     @Override
     public PartyAgentResponse findPartyAgentByLga(Long lgaId) throws NotFoundException {
         Lga lga = getLga(lgaId);
         List<PartyAgent> partyAgent = partyAgentRepository.findByLga(lga);
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        partyAgent.stream().forEach(agents->{
+            PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+            partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setAddress(agents.getAddress());
+            partyAgentDto.setFirstname(agents.getFirstname());
+            partyAgentDto.setLastname(agents.getLastname());
+            partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDtoList.add(partyAgentDto);
+        });
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
     }
 
     @Override
     public PartyAgentResponse findPartyAgentByWard(Long wardId) throws NotFoundException {
         Ward ward = getWard(wardId);
         List<PartyAgent> partyAgent = partyAgentRepository.findByWard(ward);
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        partyAgent.stream().forEach(agents->{
+            PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+            partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setAddress(agents.getAddress());
+            partyAgentDto.setFirstname(agents.getFirstname());
+            partyAgentDto.setLastname(agents.getLastname());
+            partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDtoList.add(partyAgentDto);
+        });
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
     }
 
     @Override
     public PartyAgentResponse findPartyAgentByPollingUnit(Long pollingUnitId) throws NotFoundException {
         PollingUnit pollingUnit = getPollingUnit(pollingUnitId);
         List<PartyAgent> partyAgent = partyAgentRepository.findByPollingUnit(pollingUnit);
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        partyAgent.stream().forEach(agents->{
+            PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+            partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setAddress(agents.getAddress());
+            partyAgentDto.setFirstname(agents.getFirstname());
+            partyAgentDto.setLastname(agents.getLastname());
+            partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDtoList.add(partyAgentDto);
+        });
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
     }
 
     @Override
@@ -179,7 +227,23 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse findAll() {
         List<PartyAgent> partyAgents = partyAgentRepository.findAll();
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), partyAgents);
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        partyAgents.stream().forEach(agents->{
+            PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setLgaId(agents.getLga().getId());
+            partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+            partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setWardId(agents.getWard().getId());
+            partyAgentDto.setAddress(agents.getAddress());
+            partyAgentDto.setFirstname(agents.getFirstname());
+            partyAgentDto.setLastname(agents.getLastname());
+            partyAgentDto.setEmail(agents.getEmail());
+            partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDto.setId(agents.getId());
+            partyAgentDtoList.add(partyAgentDto);
+        });
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), partyAgentDtoList);
     }
 
 
