@@ -158,11 +158,9 @@ public class StateServiceImpl implements StateService {
 
     public StateResponse setDefaultState(Long stateId) throws NotFoundException {
         State state = getState(stateId);
-        List<State> states = stateRepository.findAll();
-        states.stream().filter(currentState-> !currentState.getId().equals(stateId)).forEach(currentState -> {
-            currentState.setDefaultState(false);
-            stateRepository.save(currentState);
-        });
+        State currentDefaultState = stateRepository.findByDefaultState(true);
+        currentDefaultState.setDefaultState(false);
+        stateRepository.save(currentDefaultState);
         state.setDefaultState(true);
         stateRepository.save(state);
         return new StateResponse("00", "Default state", state);
