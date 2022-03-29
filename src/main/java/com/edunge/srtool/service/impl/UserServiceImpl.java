@@ -4,22 +4,21 @@ import com.edunge.srtool.dto.UserDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.jwt.JwtTokenUtil;
-import com.edunge.srtool.jwt.JwtUser;
-import com.edunge.srtool.jwt.JwtUserFactory;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.AuthorityRepository;
 import com.edunge.srtool.repository.UserRepository;
 import com.edunge.srtool.response.LocationResponse;
 import com.edunge.srtool.response.UserResponse;
+import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.UserService;
+import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +33,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    FileProcessingService fileProcessingService;
 
     LgaServiceImpl lgaService;
 
@@ -60,12 +62,37 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhone(userDto.getPhone());
-        user.setRole(userDto.getRole());
+        user.setRole(userDto.getRole().toLowerCase());
         user.setLgaId(userDto.getLgaId());
         userRepository.save(user);
         return new UserResponse("00", "User Registered Successfully.",null, user);
     }
 
+    @Override
+    public UserResponse uploadUsers(MultipartFile file){
+        System.out.println("Also got here");
+        List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
+        return processUpload(csvLines);
+    }
+
+    private UserResponse processUpload(List<String> lines){
+        UserDto userDto;
+        for (String line:lines) {
+            String[] user = line.split(",");
+            userDto = new UserDto();
+            userDto.setFirstname(user[0].trim());
+            userDto.setLastname(user[1].trim());
+            userDto.setEmail(user[2].trim());
+            userDto.setPassword(user[3].trim());
+            userDto.setPhone(user[4].trim());
+            userDto.setRole(user[5].trim());
+            userDto.setLgaId(user[6].trim());
+            saveUser(userDto);
+        }
+
+        // format = firstname, lastname, email, password, phone, role, lgaId
+        return new UserResponse("00", "File Uploaded.");
+    }
     @Override
     public UserResponse updateUser(UserDto userDto) {
         User existingUser = userRepository.findByEmail(userDto.getEmail());

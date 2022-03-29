@@ -401,6 +401,13 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
+    public ResultResponse filterBySenatorialDistrict(Long id) throws NotFoundException {
+        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
+        List<Result> results = resultRepository.findBySenatorialDistrict(senatorialDistrict);
+        return new ResultResponse("00", "Results fetched",results);
+    }
+
+    @Override
     public ResultResponse filterByWard(Long wardId) throws NotFoundException {
         Ward ward = getWard(wardId);
         List<Result> results = resultRepository.findByWard(ward);

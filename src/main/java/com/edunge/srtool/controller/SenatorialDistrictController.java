@@ -74,6 +74,12 @@ public class SenatorialDistrictController {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictByStateCode(stateCode));
     }
 
+    @GetMapping(value = "/senatorial-district/state/default", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find senatorial district for default state.")
+    public ResponseEntity<SenatorialDistrictResponse> filterSenatorialDistrictForDefaultState() throws Exception {
+        return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictForDefaultState());
+    }
+
     @PostMapping("/senatorial-district/upload")
     public ResponseEntity<SenatorialDistrictResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(senatorialDistrictService.uploadSenatorialDistrict(file), HttpStatus.OK);

@@ -25,6 +25,7 @@ public class IncidentDto extends AbstractBaseModel {
     @NotNull
     private String phoneNumberToContact;
     private String combinedKeys;
+    private int severity;
     private LocalDateTime timeStamp;
 
     public String getDescription() {
@@ -114,5 +115,13 @@ public class IncidentDto extends AbstractBaseModel {
 
     public void setTimeStamp(LocalDateTime timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public int getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(int severity) {
+        this.severity = severity;
     }
 }

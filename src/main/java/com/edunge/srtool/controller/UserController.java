@@ -8,6 +8,7 @@ import com.edunge.srtool.exceptions.UserException;
 import com.edunge.srtool.jwt.JwtTokenUtil;
 import com.edunge.srtool.jwt.JwtUserDetailsService;
 import com.edunge.srtool.model.Login;
+import com.edunge.srtool.response.IncidentResponse;
 import com.edunge.srtool.response.LocationResponse;
 import com.edunge.srtool.response.LoginResponse;
 import com.edunge.srtool.response.UserResponse;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -43,6 +45,12 @@ public class UserController {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserDto userDto) throws ParseException, UserException, NotFoundException, IOException, NotificationException, BadRequestException {
         return new ResponseEntity<>(userService.saveUser(userDto), HttpStatus.OK);
+    }
+
+    @PostMapping(value="/user/upload")
+    public ResponseEntity<UserResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+        System.out.println("Got here");
+        return new ResponseEntity<>(userService.uploadUsers(file), HttpStatus.OK);
     }
 
     @PutMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)

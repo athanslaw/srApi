@@ -32,6 +32,11 @@ public class UserResponse extends BaseResponse {
         this.user = user;
     }
 
+    public UserResponse(String code, String message) {
+        super(code, message);
+
+    }
+
     public User getUser() {
         return user;
     }

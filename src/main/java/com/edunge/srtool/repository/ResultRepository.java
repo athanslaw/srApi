@@ -17,6 +17,7 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
     // @Param("wardId")Long wardId,@Param("pollingUnitId")Long pollingUnitId);
     List<Result> findByWard(Ward ward);
     List<Result> findByLga(Lga lga);
+    List<Result> findBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
     List<Result> findByPollingUnit(PollingUnit pollingUnit);
     void deleteByWard(Ward ward);
     void deleteByLga(Lga lga);

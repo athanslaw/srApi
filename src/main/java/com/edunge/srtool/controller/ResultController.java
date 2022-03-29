@@ -55,6 +55,12 @@ public class ResultController {
         return ResponseEntity.ok(resultService.findResultById(id));
     }
 
+    @GetMapping(value = "/result/filter/senatorialDistrict/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by senatorial district.")
+    public ResponseEntity<ResultResponse> filterResultBySenatorialDistrict(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(resultService.filterBySenatorialDistrict(id));
+    }
+
     @GetMapping(value = "/result/filter/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by name.")
     public ResponseEntity<ResultResponse> filterResultByLga(@PathVariable Long id) throws Exception {

@@ -76,17 +76,7 @@ public class FileUtil {
                 if (file.isEmpty()) {
                     throw new FileException("Failed to store empty file.");
                 }
-                if(Files.exists(Paths.get(String.format("%s/%s", storagePath, file.getOriginalFilename())))){
-                    throw new FileException("File already exists.");
-                }
-                Path destinationFile = storagePath.resolve(
-                        Paths.get(file.getOriginalFilename()))
-                        .normalize().toAbsolutePath();
-                if (!destinationFile.getParent().equals(storagePath.toAbsolutePath())) {
-                    throw new FileException(
-                            "Cannot store file outside current directory.");
-                }
-
+                System.out.println("File info: "+ file);
 
                 try (InputStream inputStream = file.getInputStream()) {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));

@@ -11,10 +11,10 @@ public interface IncidentService {
     IncidentResponse updateIncident(Long id, IncidentDto incidentDto) throws NotFoundException;
     IncidentResponse deleteIncidentById(Long id) throws NotFoundException;
     IncidentResponse findAll() ;
-    IncidentResponse findIncidentByLga(Long id) throws NotFoundException;
-    IncidentResponse findIncidentBySenatorial(Long id) throws NotFoundException;
-    IncidentResponse findIncidentByWard(Long id) throws NotFoundException;
-    IncidentResponse findIncidentByPollingUnit(Long id) throws NotFoundException;
+    IncidentResponse findIncidentByLga(Long id, String incidentType) throws NotFoundException;
+    IncidentResponse findIncidentBySenatorial(Long id, String incidentType) throws NotFoundException;
+    IncidentResponse findIncidentByWard(Long id, String incidentType) throws NotFoundException;
+    IncidentResponse findIncidentByPollingUnit(Long id, String incidentType) throws NotFoundException;
 
     IncidentResponse uploadIncident(MultipartFile file);
 }

@@ -15,8 +15,8 @@ public class FileProcessingService {
 
     @Autowired
     FileConfigurationProperties fileConfigurationProperties;
-    private Path fileStorageLocation;
-
+    private Path fileStorageLocation=null;
+/*
     @PostConstruct
     void init(){
         try {
@@ -27,7 +27,7 @@ public class FileProcessingService {
             System.out.println("Could not create the directory where the uploaded files will be stored."+ ex);
         }
     }
-
+*/
     public Path getFileStorageLocation(){
         return fileStorageLocation;
     }

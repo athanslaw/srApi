@@ -57,26 +57,26 @@ public class IncidentController {
 
     @GetMapping(value = "/incident/senatorial/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Senatorial.")
-    public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentBySenatorial(id));
+    public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentBySenatorial(id, incidentType));
     }
 
     @GetMapping(value = "/incident/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Lga.")
-    public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByLga(id));
+    public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByLga(id, incidentType));
     }
 
     @GetMapping(value = "/incident/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Ward.")
-    public ResponseEntity<IncidentResponse> filterIncidentByWard(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByWard(id));
+    public ResponseEntity<IncidentResponse> filterIncidentByWard(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByWard(id, incidentType));
     }
 
     @GetMapping(value = "/incident/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Polling Unit.")
-    public ResponseEntity<IncidentResponse> filterIncidentByPollingUnit(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByPollingUnit(id));
+    public ResponseEntity<IncidentResponse> filterIncidentByPollingUnit(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByPollingUnit(id, incidentType));
     }
 
     @PostMapping("/incident/upload")

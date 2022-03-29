@@ -127,6 +127,13 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
         return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
     }
 
+    @Override
+    public SenatorialDistrictResponse findSenatorialDistrictForDefaultState() throws NotFoundException {
+        State state = getState();
+        List<SenatorialDistrict> lgaByState = senatorialDistrictRepository.findByState(state);
+        return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
+    }
+
     private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
         Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
         if(!senatorialDistrict.isPresent()){
@@ -141,6 +148,11 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
             throw new NotFoundException("State not found.");
         }
         return currentState.get();
+    }
+
+    private State getState() throws NotFoundException {
+        State currentState = stateRepository.findByDefaultState(true);
+        return currentState;
     }
 
     private void saveSenatorialDistrict(String stateCode, String code, String name)  {
@@ -165,7 +177,6 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
         List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
-
 
     private SenatorialDistrictResponse processUpload(List<String> lines){
         for (String line:lines) {

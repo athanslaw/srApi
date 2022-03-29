@@ -14,6 +14,8 @@ public interface ResultService {
 
     ResultResponse filterByLga(Long lgaId) throws NotFoundException;
 
+    ResultResponse filterBySenatorialDistrict(Long id) throws NotFoundException;
+
     ResultResponse filterByWard(Long wardId) throws NotFoundException;
 
     ResultResponse filterByPollingUnit(Long pollingUnitId) throws NotFoundException;

@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by adewale adeleye on 01/10/2019
@@ -43,7 +44,11 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username);
         if(user==null){
-            throw new UsernameNotFoundException("The provided username does not exist.");
+            List<User> users = userRepository.findByPhone(username);
+            if(users.size() <1) {
+                throw new UsernameNotFoundException("The provided username does not exist.");
+            }
+            user = users.get(0);
         }
         return JwtUserFactory.create(user);
     }
@@ -75,6 +80,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public LoginResponse login(Login login) throws Exception {
         UserDetails details  = loadUserByUsername(login.getUsername());
+        login.setUsername(details.getUsername());
         final String token = jwtTokenUtil.generateToken(details);
         authenticate(login.getUsername(), login.getPassword());
         User user = userRepository.findByEmail(login.getUsername());

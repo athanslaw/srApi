@@ -14,6 +14,7 @@ public interface SenatorialDistrictService {
     SenatorialDistrictResponse findAll() ;
     SenatorialDistrictResponse filterByName(String name) throws NotFoundException;
     SenatorialDistrictResponse findSenatorialDistrictByStateCode(Long stateCode) throws NotFoundException;
+    SenatorialDistrictResponse findSenatorialDistrictForDefaultState() throws NotFoundException;
 
     SenatorialDistrictResponse uploadSenatorialDistrict(MultipartFile file);
 }

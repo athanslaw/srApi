@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class IncidentServiceImpl implements IncidentService {
@@ -139,7 +140,7 @@ public class IncidentServiceImpl implements IncidentService {
             pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
         }catch (Exception e){
         }
-        float weight = (incidentType.getWeight() + this.processWeight()) /2;
+       // float weight = (incidentType.getWeight() + this.processWeight()) /2;
         System.out.println("Level: "+incidentLevel);
         Incident incident = new Incident();
         incident.setLga(lga);
@@ -154,7 +155,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
-        incident.setWeight((int) weight);
+        incident.setWeight(incidentDto.getSeverity());
         incidentRepository.save(incident);
         return incident;
     }
@@ -188,7 +189,6 @@ public class IncidentServiceImpl implements IncidentService {
 
         Lga lga = getLga(incidentDto.getLgaId());
         PollingUnit pollingUnit = getPollingUnit(incidentDto.getPollingUnitId());
-        Election election = getElection(incidentDto.getIncidentStatusId());
         Ward ward = getWard(incidentDto.getWardId());
         incident.setLga(lga);
         incident.setWard(ward);
@@ -200,6 +200,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
+        incident.setWeight(incidentDto.getSeverity());
         incidentRepository.save(incident);
         return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
     }
@@ -294,14 +295,22 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse findIncidentByLga(Long id) throws NotFoundException {
+    public IncidentResponse findIncidentByLga(Long id, String incidentType) throws NotFoundException {
         Lga lga = getLga(id);
         List<Incident> elections = incidentRepository.findByLga(lga);
+
+        try {
+            Long incidentTypeId = Long.parseLong(incidentType);
+            System.out.println("Here"+incidentTypeId);
+            elections  = elections.stream()
+                    .filter(election -> election.getIncidentType().getId() ==incidentTypeId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
     @Override
-    public IncidentResponse findIncidentBySenatorial(Long id){
+    public IncidentResponse findIncidentBySenatorial(Long id, String incidentType){
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
         List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
         List<Incident> incidentList = new ArrayList<>();
@@ -311,20 +320,37 @@ public class IncidentServiceImpl implements IncidentService {
                     incidentList.add(incident);
                 });
         });
+        try{
+            Long incidentTypeId = Long.parseLong(incidentType);
+            incidentList.stream()
+                    .filter(election -> election.getIncidentType().getId() == incidentTypeId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 
     @Override
-    public IncidentResponse findIncidentByWard(Long id) throws NotFoundException {
+    public IncidentResponse findIncidentByWard(Long id, String incidentType) throws NotFoundException {
         Ward ward = getWard(id);
         List<Incident> elections = incidentRepository.findByWard(ward);
+        try{
+            Long incidentTypeId = Long.parseLong(incidentType);
+            elections.stream()
+                    .filter(election -> election.getIncidentType().getId() == incidentTypeId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
     @Override
-    public IncidentResponse findIncidentByPollingUnit(Long id) throws NotFoundException {
+    public IncidentResponse findIncidentByPollingUnit(Long id, String incidentType) throws NotFoundException {
         PollingUnit pollingUnit = getPollingUnit(id);
         List<Incident> elections = incidentRepository.findByPollingUnit(pollingUnit);
+        try{
+            Long incidentTypeId = Long.parseLong(incidentType);
+            elections.stream()
+                    .filter(election -> election.getIncidentType().getId() == incidentTypeId);
+        }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
@@ -337,7 +363,8 @@ public class IncidentServiceImpl implements IncidentService {
                               String pollingUnitCode,
                               String description,
                               String reportedLocation,
-                              String phoneNumberToContact
+                              String phoneNumberToContact,
+                              String severity
     ) {
         try{
             Lga lga = lgaRepository.findByCode(lgaCode);
@@ -356,6 +383,13 @@ public class IncidentServiceImpl implements IncidentService {
             incident.setReportedLocation(reportedLocation);
             incident.setIncidentLevel(incidentLevel);
             incident.setPhoneNumberToContact(phoneNumberToContact);
+            try{
+                int weight = Integer.parseInt(severity);
+                incident.setWeight(weight);
+            }
+            catch (Exception e){
+                incident.setWeight(1);
+            }
             incidentRepository.save(incident);
         }
         catch (Exception ex){
@@ -372,7 +406,7 @@ public class IncidentServiceImpl implements IncidentService {
     private IncidentResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            saveIncident(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim());
+            saveIncident(state[0].trim(), state[1].trim(), state[2].trim(),state[3].trim(), state[4].trim(), state[5].trim(),state[6].trim(), state[7].trim(), state[8].trim(), state[9].trim());
         }
         return new IncidentResponse("00", "File Uploaded.");
     }

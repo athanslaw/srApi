@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class IncidentDashboardServiceImpl implements IncidentDashboardService {
@@ -32,34 +33,48 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
 
     @Override
     public IncidentDashboardResponse getDashboardByState(Long stateId) throws NotFoundException {
-        getState(stateId);
-        List<Incident> incidentList = incidentRepository.findAll();
-        Integer totalIncidents = getStateIncidents(stateId);
-        List<IncidentReport> incidentReports = getIncidentReport(stateId);
-        List<IncidentReport> lgaIncidentReport = getLgaReports(stateId);
+        State state =getState(stateId);
+        Integer totalIncidents = getStateIncidentsCount(state);
+        if(totalIncidents == 0) {
+            new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, null, null);
+        }
+        List<IncidentReport> incidentReports = getIncidentReport(state);
+        List<IncidentReport> lgaIncidentReport = getLgaReports(state);
 
         return new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, incidentReports, lgaIncidentReport);
     }
 
-    public Integer getStateIncidents(Long stateId){
+    public Integer getStateIncidentsCount(State state){
         List<Incident> incidentList = incidentRepository.findAll();
-        return (int) incidentList.stream().filter(incident -> incident.getLga().getState().getId().equals(stateId)).count();
+        return (int)incidentList.stream()
+                .filter(incident -> getLgabyId(incident.getId()).getState().equals(state))
+                .count();
+    }
+
+    public List<Incident> getStateIncidents(State state){
+        List<Incident> incidentList = incidentRepository.findAll();
+        return incidentList.stream()
+                .filter(incident -> getLgabyId(incident.getId()).getState().equals(state)).collect(Collectors.toList());
+    }
+
+    private State getState() {
+        State state = stateRepository.findByDefaultState(true);
+        return state;
     }
 
     @Override
     public IncidentDashboardResponse getDashboardByLga(Long lgaId) throws NotFoundException {
         Lga lga = getLga(lgaId);
-        List<Incident> incidentList = incidentRepository.findAll();
-        Integer totalIncidents = getLgaIncidents(lga.getId());
+        List<Incident> incidentList = incidentRepository.findByLga(lga);
+        Integer totalIncidents = getLgaIncidents(lga);
         List<IncidentReport> incidentReports = new ArrayList<>();
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         incidentList.stream()
-                .filter(incident -> incident.getLga().getId().equals(lga.getId()))
-                .forEach(incident -> {
-                    String incidentType = incident.getIncidentType().getName();
-                    Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
-                    incidentTypeMap.put(incidentType, currentValue+1);
-                });
+            .forEach(incident -> {
+                String incidentType = incident.getIncidentType().getName();
+                Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
+                incidentTypeMap.put(incidentType, currentValue+1);
+            });
         incidentTypeMap.forEach((type, count)->{
             BigDecimal bd = BigDecimal.valueOf((count * 100.0)/totalIncidents);
             bd = bd.setScale(2,BigDecimal.ROUND_HALF_DOWN);
@@ -69,23 +84,22 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         return new IncidentDashboardResponse("00","Incident Report loaded.", incidentReports);
     }
 
-    public Integer getLgaIncidents(Long lgaId){
-        List<Incident> incidentList = incidentRepository.findAll();
-        return (int) incidentList.stream().filter(incident -> incident.getLga().getId().equals(lgaId)).count();
+    public Integer getLgaIncidents(Lga lga){
+        List<Incident> incidentList = incidentRepository.findByLga(lga);
+        return incidentList.size();
     }
 
-    private List<IncidentReport> getIncidentReport(Long stateId){
-        List<Incident> incidentList = incidentRepository.findAll();
+    private List<IncidentReport> getIncidentReport(State state){
+        List<Incident> incidentList = getStateIncidents(state);
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         List<IncidentReport> incidentReports = new ArrayList<>();
         incidentList.stream()
-                .filter(incident -> incident.getLga().getState().getId().equals(stateId))
                 .forEach(incident -> {
                     String incidentType = incident.getIncidentType().getName();
                     Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
                     incidentTypeMap.put(incidentType, currentValue+1);
                 });
-        Integer totalIncident = getStateIncidents(stateId);
+        Integer totalIncident = getStateIncidentsCount(state);
         incidentTypeMap.forEach((type, count)->{
             Double percent = (count * 100.0)/totalIncident;
             incidentReports.add(new IncidentReport(type, count, percent));
@@ -93,15 +107,14 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         return incidentReports;
     }
 
-    private List<IncidentReport> getLgaReports(Long stateId){
-
-        List<Lga> lgas = lgaRepository.findAll();
+    private List<IncidentReport> getLgaReports(State state){
+        List<Lga> lgas = lgaRepository.findByState(state);
         List<IncidentReport> incidentReports  = new ArrayList<>();
 
-        List<Incident> incidentList = incidentRepository.findAll();
-        lgas.stream().filter(lga -> lga.getState().getId().equals(stateId))
+        List<Incident> incidentList = getStateIncidents(state);
+        lgas.stream()
                 .forEach(lga -> {
-                    Integer totalIncidents = getLgaIncidents(lga.getId());
+                    Integer totalIncidents = getLgaIncidents(lga);
                     HashMap<String, Integer> incidentTypeMap = new HashMap<>();
                     AtomicInteger totalIncident = new AtomicInteger(0);
                     AtomicInteger totalWeight = new AtomicInteger(0);
@@ -132,6 +145,14 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         Optional<Lga> currentLga = lgaRepository.findById(id);
         if(!currentLga.isPresent()){
             throw new NotFoundException(String.format("%s not found.", "Lga"));
+        }
+        return currentLga.get();
+    }
+
+    private Lga getLgabyId(Long id) {
+        Optional<Lga> currentLga = lgaRepository.findById(id);
+        if(!currentLga.isPresent()){
+           return new Lga();
         }
         return currentLga.get();
     }
