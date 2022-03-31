@@ -86,7 +86,7 @@ public class PollingUnitController {
         return ResponseEntity.ok(pollingUnitService.findByState(stateCode));
     }
 
-    @GetMapping(value = "/polling-unit/senatorial-district/{wardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/polling-unit/senatorial-district/{senatorialDistrictCode}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find polling unit by senatorial id.")
     public ResponseEntity<PollingUnitResponse> filterPollingUnitBySenatorialDistrict(@PathVariable Long senatorialDistrictCode) throws Exception {
         return ResponseEntity.ok(pollingUnitService.findBySenatorialDistrict(senatorialDistrictCode));

@@ -144,6 +144,35 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     }
 
     @Override
+    public PartyAgentResponse findPartyAgentBySenatorialDistrict(Long senatorialDistrictId) throws NotFoundException {
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrictRepository.findById(senatorialDistrictId).get());
+        lgas.stream()
+                .forEach(lga -> {
+                    List<PartyAgent> partyAgents = partyAgentRepository.findByLga(lga);
+                    partyAgents.forEach(agents -> {
+                        PartyAgentDto partyAgentDto = new PartyAgentDto();
+                        partyAgentDto.setLgaName(agents.getLga().getName());
+                        partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+                        partyAgentDto.setWardName(agents.getWard().getName());
+                        partyAgentDto.setAddress(agents.getAddress());
+                        partyAgentDto.setFirstname(agents.getFirstname());
+                        partyAgentDto.setLastname(agents.getLastname());
+                        partyAgentDto.setEmail(agents.getEmail());
+                        partyAgentDto.setId(agents.getId());
+                        partyAgentDto.setPhone(agents.getPhone());
+                        partyAgentDtoList.add(partyAgentDto);
+                    });
+
+                });
+
+        if(partyAgentDtoList.size() <1){
+            throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
+        }
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
+    }
+
+    @Override
     public PartyAgentResponse findPartyAgentByWard(Long wardId) throws NotFoundException {
         Ward ward = getWard(wardId);
         List<PartyAgent> partyAgent = partyAgentRepository.findByWard(ward);

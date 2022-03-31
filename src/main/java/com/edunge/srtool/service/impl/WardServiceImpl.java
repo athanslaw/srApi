@@ -133,16 +133,13 @@ public class WardServiceImpl implements WardService {
         List<Ward> wards = wardRepository.findAll();
         List<Ward> filter = new ArrayList<>();
 
-        if(stateId>0 && senatorialDistrictId > 0 && lgaId>0){
+        if(lgaId>0){
             filter = wards.stream()
-                    .filter(ward -> ward.getState().getId().equals(stateId))
-                    .filter(ward -> ward.getSenatorialDistrict().getId().equals(senatorialDistrictId))
                     .filter(ward -> ward.getLga().getId().equals(lgaId))
                     .collect(Collectors.toList());
         }
-        else if(stateId>0 && senatorialDistrictId >0){
+        else if(senatorialDistrictId >0){
             filter = wards.stream()
-                    .filter(ward -> ward.getState().getId().equals(stateId))
                     .filter(ward -> ward.getSenatorialDistrict().getId().equals(senatorialDistrictId))
                     .collect(Collectors.toList());
         }

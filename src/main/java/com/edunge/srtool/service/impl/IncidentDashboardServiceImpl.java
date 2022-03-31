@@ -67,6 +67,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         Lga lga = getLga(lgaId);
         List<Incident> incidentList = incidentRepository.findByLga(lga);
         Integer totalIncidents = getLgaIncidents(lga);
+        if(totalIncidents < 1){
+            return new IncidentDashboardResponse("00","Incident Report loaded.", null);
+        }
         List<IncidentReport> incidentReports = new ArrayList<>();
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         incidentList.stream()
@@ -100,6 +103,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                     incidentTypeMap.put(incidentType, currentValue+1);
                 });
         Integer totalIncident = getStateIncidentsCount(state);
+        if(totalIncident < 1){
+            return new ArrayList<IncidentReport>();
+        }
         incidentTypeMap.forEach((type, count)->{
             Double percent = (count * 100.0)/totalIncident;
             incidentReports.add(new IncidentReport(type, count, percent));
@@ -115,28 +121,32 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         lgas.stream()
                 .forEach(lga -> {
                     Integer totalIncidents = getLgaIncidents(lga);
-                    HashMap<String, Integer> incidentTypeMap = new HashMap<>();
-                    AtomicInteger totalIncident = new AtomicInteger(0);
-                    AtomicInteger totalWeight = new AtomicInteger(0);
-                    incidentList.stream()
-                            .filter(incident -> incident.getLga().getId().equals(lga.getId()))
-                            .forEach(incident -> {
-                                String incidentType = incident.getIncidentType().getName();
-                                Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
-                                incidentTypeMap.put(incidentType, currentValue+1);
-                            });
-                    incidentList.stream()
-                            .filter(incident -> incident.getLga().getId().equals(lga.getId()))
-                            .filter(incident -> incident.getIncidentStatus().getName().equals("Unresolved"))
+                    if(totalIncidents > 0) {
+                        HashMap<String, Integer> incidentTypeMap = new HashMap<>();
+                        AtomicInteger totalIncident = new AtomicInteger(0);
+                        AtomicInteger totalWeight = new AtomicInteger(0);
+                        incidentList.stream()
+                                .filter(incident -> incident.getLga().getId().equals(lga.getId()))
+                                .forEach(incident -> {
+                                    String incidentType = incident.getIncidentType().getName();
+                                    Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
+                                    incidentTypeMap.put(incidentType, currentValue + 1);
+                                });
+                        incidentList.stream()
+                                .filter(incident -> incident.getLga().getId().equals(lga.getId()))
+                                .filter(incident -> incident.getIncidentStatus().getName().equals("Unresolved"))
                                 .forEach(incident -> {
                                     totalWeight.addAndGet(incident.getWeight());
                                     totalIncident.addAndGet(1);
                                 });
-                    incidentTypeMap.forEach((type, count)->{
-                        Double percent = (count * 100.0)/totalIncidents;
-                        int weight = totalWeight.get() / totalIncident.get();
-                        incidentReports.add(new IncidentReport(lga,type, count, percent, totalIncident.get(), weight));
-                    });
+                        if(totalIncident.get() > 0) {
+                            incidentTypeMap.forEach((type, count) -> {
+                                Double percent = (count * 100.0) / totalIncidents;
+                                int weight = totalWeight.get() / totalIncident.get();
+                                incidentReports.add(new IncidentReport(lga, type, count, percent, totalIncident.get(), weight));
+                            });
+                        }
+                    }
                 });
         return incidentReports;
     }
