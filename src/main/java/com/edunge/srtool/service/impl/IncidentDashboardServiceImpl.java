@@ -52,8 +52,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     public Integer getStateIncidentsCount(State state){
         try {
             List<Incident> incidentList = incidentRepository.findAll();
+            System.out.println("getStateIncidentsCount: "+incidentList.size());
             return (int) incidentList.stream()
-                    .filter(incident -> getLgabyId(incident.getId()).getState().equals(state))
+                    .filter(incident -> getLgabyId(incident.getLga().getId()).getState().equals(state))
                     .count();
         }catch (Exception e){
             System.out.println("Exception: "+e.getMessage());
@@ -66,7 +67,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         List<Incident> incidentList = incidentRepository.findAll();
         System.out.println("got something");
         return incidentList.stream()
-                .filter(incident -> getLgabyId(incident.getId()).getState().equals(state)).collect(Collectors.toList());
+                .filter(incident -> getLgabyId(incident.getLga().getId()).getState().equals(state)).collect(Collectors.toList());
     }
 
     private State getState() {
