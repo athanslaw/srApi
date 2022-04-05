@@ -60,7 +60,14 @@ public class DashboardController {
     @GetMapping(value = "/dashboard/incidents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Incident Dashboard By State")
     public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(incidentDashboardService.getDashboardByState(id));
+        try{
+            System.out.println("Athans got here");
+            return ResponseEntity.ok(incidentDashboardService.getDashboardByState(id));
+        }catch (Exception e){
+            System.out.println("Athans caught: "+e.getMessage());
+            System.out.println("Athans caught 2: "+e.getStackTrace());
+            return ResponseEntity.ok(null);
+        }
     }
 
 
