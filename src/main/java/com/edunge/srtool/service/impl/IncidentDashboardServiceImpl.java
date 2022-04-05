@@ -64,6 +64,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     public List<Incident> getStateIncidents(State state){
         System.out.println("getStateIncidents");
         List<Incident> incidentList = incidentRepository.findAll();
+        System.out.println("got something");
         return incidentList.stream()
                 .filter(incident -> getLgabyId(incident.getId()).getState().equals(state)).collect(Collectors.toList());
     }
@@ -106,6 +107,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
 
     private List<IncidentReport> getIncidentReport(State state){
         List<Incident> incidentList = getStateIncidents(state);
+        System.out.println("Hmmm");
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         List<IncidentReport> incidentReports = new ArrayList<>();
         System.out.println("Am2");
@@ -191,8 +193,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         return currentLga.get();
     }
 
-    private Lga getLgabyId(Long id) {
+    private Lga getLgabyId(long id) {
         Optional<Lga> currentLga = lgaRepository.findById(id);
+        System.out.println("getLgaById: "+id);
         if(!currentLga.isPresent()){
            return new Lga();
         }
