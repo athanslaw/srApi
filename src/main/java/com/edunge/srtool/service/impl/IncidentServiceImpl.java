@@ -155,7 +155,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
-        incident.setWeight(incidentDto.getSeverity());
+        incident.setWeight((int) incidentDto.getWeight());
         incidentRepository.save(incident);
         return incident;
     }
@@ -200,14 +200,13 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setDescription(incidentDto.getDescription());
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
-        incident.setWeight(incidentDto.getSeverity());
+        incident.setWeight((int)incidentDto.getWeight());
         incidentRepository.save(incident);
         return new IncidentResponse("00", String.format(successTemplate,SERVICE_NAME), incident);
     }
 
     @Override
     public IncidentResponse deleteIncidentById(Long id) throws NotFoundException {
-        Incident incident = getIncident(id);
         incidentRepository.deleteById(id);
         return new IncidentResponse("00",String.format(deleteTemplate,SERVICE_NAME));
     }

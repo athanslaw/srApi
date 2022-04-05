@@ -1,6 +1,5 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.config.FileConfigurationProperties;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Lga;
@@ -51,7 +50,7 @@ public class StateServiceImpl implements StateService {
     FileProcessingService fileProcessingService;
 
     @Autowired
-    public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository, FileConfigurationProperties fileConfigurationProperties) {
+    public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository) {
         this.stateRepository = stateRepository;
         this.lgaRepository = lgaRepository;
     }

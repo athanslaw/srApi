@@ -8,10 +8,7 @@ import com.edunge.srtool.exceptions.UserException;
 import com.edunge.srtool.jwt.JwtTokenUtil;
 import com.edunge.srtool.jwt.JwtUserDetailsService;
 import com.edunge.srtool.model.Login;
-import com.edunge.srtool.response.IncidentResponse;
-import com.edunge.srtool.response.LocationResponse;
-import com.edunge.srtool.response.LoginResponse;
-import com.edunge.srtool.response.UserResponse;
+import com.edunge.srtool.response.*;
 import com.edunge.srtool.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -82,10 +79,15 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    //@PreAuthorize("hasRole=ADMIN")
     @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
     public ResponseEntity<UserResponse> getUsers() throws Exception {
         return ResponseEntity.ok(userService.getAllUser());
+    }
+
+    @GetMapping(value = "/users/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find users by name.")
+    public ResponseEntity<UserResponse> filterUsersByName(@RequestParam(required = false) String name) throws Exception {
+        return ResponseEntity.ok(userService.findUsersAgentByName(name));
     }
 
     @RequestMapping(value = "/users/location", method = RequestMethod.GET)
@@ -99,6 +101,24 @@ public class UserController {
     @ApiOperation(value = "Fetch the user details by Id. Admin view")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) throws Exception {
         return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @RequestMapping(value = "/user/state/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch the user details by State. Admin view")
+    public ResponseEntity<UserResponse> getUserByState(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.getUserByState(id));
+    }
+
+    @RequestMapping(value = "/user/senatorial-district/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch the user details by District. Admin view")
+    public ResponseEntity<UserResponse> getUserByDistrict(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.getUserByDistrict(id));
+    }
+
+    @RequestMapping(value = "/user/lga/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch the user details by LGA. Admin view")
+    public ResponseEntity<UserResponse> getUserByLga(@PathVariable String id) throws Exception {
+        return ResponseEntity.ok(userService.getUserByLga(id));
     }
 
     @RequestMapping(value = "/user/id/{id}", method = RequestMethod.DELETE)

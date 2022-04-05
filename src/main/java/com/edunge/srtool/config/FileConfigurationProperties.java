@@ -2,7 +2,7 @@ package com.edunge.srtool.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "file")
+//@ConfigurationProperties(prefix = "file")
 public class FileConfigurationProperties {
     private String uploadDir;
     private String svgDir;

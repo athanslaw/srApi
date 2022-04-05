@@ -27,6 +27,7 @@ public class IncidentDto extends AbstractBaseModel {
     private String combinedKeys;
     private int severity;
     private LocalDateTime timeStamp;
+    private long weight;
 
     public String getDescription() {
         return description;
@@ -123,5 +124,13 @@ public class IncidentDto extends AbstractBaseModel {
 
     public void setSeverity(int severity) {
         this.severity = severity;
+    }
+
+    public long getWeight() {
+        return weight;
+    }
+
+    public void setWeight(long weight) {
+        this.weight = weight;
     }
 }

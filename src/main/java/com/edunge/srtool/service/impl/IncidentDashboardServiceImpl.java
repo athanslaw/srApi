@@ -6,6 +6,7 @@ import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.State;
 import com.edunge.srtool.repository.IncidentRepository;
 import com.edunge.srtool.repository.LgaRepository;
+import com.edunge.srtool.repository.PollingUnitRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.IncidentDashboardResponse;
 import com.edunge.srtool.response.IncidentReport;
@@ -13,10 +14,7 @@ import com.edunge.srtool.service.IncidentDashboardService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -24,16 +22,19 @@ import java.util.stream.Collectors;
 public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     private final IncidentRepository incidentRepository;
     private final LgaRepository lgaRepository;
+    private final PollingUnitRepository pollingUnitRepository;
     private final StateRepository stateRepository;
-    public IncidentDashboardServiceImpl(IncidentRepository incidentRepository, LgaRepository lgaRepository, StateRepository stateRepository) {
+    public IncidentDashboardServiceImpl(IncidentRepository incidentRepository, PollingUnitRepository pollingUnitRepository, LgaRepository lgaRepository, StateRepository stateRepository) {
         this.incidentRepository = incidentRepository;
         this.lgaRepository = lgaRepository;
         this.stateRepository = stateRepository;
+        this.pollingUnitRepository = pollingUnitRepository;
     }
 
     @Override
     public IncidentDashboardResponse getDashboardByState(Long stateId) throws NotFoundException {
-        State state =getState(stateId);
+
+        State state = this.getState();
         Integer totalIncidents = getStateIncidentsCount(state);
         if(totalIncidents == 0) {
             new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, null, null);
@@ -72,7 +73,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         }
         List<IncidentReport> incidentReports = new ArrayList<>();
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
-        incidentList.stream()
+        incidentList
             .forEach(incident -> {
                 String incidentType = incident.getIncidentType().getName();
                 Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
@@ -96,7 +97,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         List<Incident> incidentList = getStateIncidents(state);
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         List<IncidentReport> incidentReports = new ArrayList<>();
-        incidentList.stream()
+        incidentList
                 .forEach(incident -> {
                     String incidentType = incident.getIncidentType().getName();
                     Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
@@ -113,18 +114,24 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         return incidentReports;
     }
 
+    private int totalPUsByLga(Lga lga){
+        return pollingUnitRepository.findByLga(lga).size();
+    }
+
     private List<IncidentReport> getLgaReports(State state){
         List<Lga> lgas = lgaRepository.findByState(state);
         List<IncidentReport> incidentReports  = new ArrayList<>();
 
         List<Incident> incidentList = getStateIncidents(state);
-        lgas.stream()
-                .forEach(lga -> {
+        lgas.forEach(lga -> {
                     Integer totalIncidents = getLgaIncidents(lga);
                     if(totalIncidents > 0) {
                         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
                         AtomicInteger totalIncident = new AtomicInteger(0);
                         AtomicInteger totalWeight = new AtomicInteger(0);
+                        // no of PU with incidents
+                        Set<Long> distinctPUs = new LinkedHashSet<>();
+
                         incidentList.stream()
                                 .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                                 .forEach(incident -> {
@@ -136,16 +143,24 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                                 .filter(incident -> incident.getLga().getId().equals(lga.getId()))
                                 .filter(incident -> incident.getIncidentStatus().getName().equals("Unresolved"))
                                 .forEach(incident -> {
+                                    distinctPUs.add(incident.getPollingUnit().getId());
                                     totalWeight.addAndGet(incident.getWeight());
                                     totalIncident.addAndGet(1);
                                 });
                         if(totalIncident.get() > 0) {
                             incidentTypeMap.forEach((type, count) -> {
                                 Double percent = (count * 100.0) / totalIncidents;
-                                int weight = totalWeight.get() / totalIncident.get();
-                                incidentReports.add(new IncidentReport(lga, type, count, percent, totalIncident.get(), weight));
+                                incidentReports.add(new IncidentReport(lga, type, count, percent, totalIncident.get(), 0));
                             });
                         }
+
+                        int weight = (int) Math.ceil((totalWeight.get() * distinctPUs.size() * 2.0) / (totalIncidents * this.totalPUsByLga(lga)));
+                        incidentReports
+                                .forEach(incidentReport -> {
+                                    if(incidentReport.getLga().equals(lga)){
+                                        incidentReport.setWeight(weight);
+                                    }
+                                });
                     }
                 });
         return incidentReports;

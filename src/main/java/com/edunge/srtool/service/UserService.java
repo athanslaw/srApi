@@ -14,7 +14,10 @@ public interface UserService {
     UserResponse getAllUser() throws NotFoundException;
     LocationResponse getUserLgaById(String id);
     UserResponse getUserById(Long userId) throws NotFoundException;
+    UserResponse getUserByState(Long id) throws NotFoundException;
+    UserResponse getUserByDistrict(Long id) throws NotFoundException;
+    UserResponse getUserByLga(String id) throws NotFoundException;
     UserResponse deleteUserById(Long userId) throws NotFoundException;
-
+    UserResponse findUsersAgentByName(String firstName)throws NotFoundException;
     UserResponse uploadUsers(MultipartFile file);
 }

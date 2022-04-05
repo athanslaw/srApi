@@ -5,20 +5,18 @@ import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.jwt.JwtTokenUtil;
 import com.edunge.srtool.model.*;
-import com.edunge.srtool.repository.AuthorityRepository;
-import com.edunge.srtool.repository.UserRepository;
+import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.LocationResponse;
 import com.edunge.srtool.response.UserResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.UserService;
 import com.edunge.srtool.util.FileUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +24,10 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final LgaRepository lgaRepository;
+
+    private final StateRepository stateRepository;
+    private final SenatorialDistrictRepository senatorialDistrictRepository;
 
     private final JwtTokenUtil jwtTokenUtil;
 
@@ -39,15 +41,17 @@ public class UserServiceImpl implements UserService {
 
     LgaServiceImpl lgaService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, JwtTokenUtil jwtTokenUtil,
-                           AuthorityRepository authorityRepository, LgaServiceImpl lgaService) {
+    public UserServiceImpl(UserRepository userRepository, LgaRepository lgaRepository, JwtTokenUtil jwtTokenUtil,
+                           AuthorityRepository authorityRepository, LgaServiceImpl lgaService,
+                           StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
         this.userRepository = userRepository;
+        this.lgaRepository = lgaRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.authorityRepository = authorityRepository;
         this.lgaService = lgaService;
+        this.stateRepository = stateRepository;
+        this.senatorialDistrictRepository = senatorialDistrictRepository;
     }
 
     @Override
@@ -70,7 +74,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse uploadUsers(MultipartFile file){
-        System.out.println("Also got here");
         List<String> csvLines = FileUtil.getCsvLines(file, fileProcessingService.getFileStorageLocation());
         return processUpload(csvLines);
     }
@@ -156,13 +159,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getAllUser() throws NotFoundException {
         List<User> users = userRepository.findAll();
-        users.stream().forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
         return new UserResponse("00", "List of users", users);
     }
 
     private String getLgaById(String id){
         try {
-            System.out.println("LGA id: "+id);
             return lgaService.findLgaById(new Long(id)).getLga().getName();
         }catch (Exception ne){
             return "";
@@ -171,7 +173,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LocationResponse getUserLgaById(String id){
-        System.out.println("UserId: "+id);
         try {
             String lga = userRepository.findByEmail(id).getLgaId();
 
@@ -192,6 +193,57 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Users not found");
         }
         return new UserResponse("00","User retrieved", user.get());
+    }
+
+    private Optional<State> getStateById(long id){
+        return stateRepository.findById(id);
+    }
+
+    private Optional<SenatorialDistrict> getSenatorialDistrict(long id){
+        return senatorialDistrictRepository.findById(id);
+    }
+
+    @Override
+    public UserResponse getUserByState(Long id) throws NotFoundException {
+        Optional<State> state = this.getStateById(id);
+        List<User> users = new ArrayList();
+        if(state.isPresent()) {
+            List<Lga> lgas = lgaRepository.findByState(state.get());
+            lgas.forEach(lga -> {
+                List<User> userList = userRepository.findByLgaId(lga.getId()+"");
+                users.addAll(userList);
+            });
+        }
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        return new UserResponse("00","User retrieved", users);
+    }
+
+    @Override
+    public UserResponse getUserByDistrict(Long id) throws NotFoundException {
+        Optional<SenatorialDistrict> senatorialDistrict = this.getSenatorialDistrict(id);
+        List<User> users = new ArrayList();
+        if(senatorialDistrict.isPresent()) {
+            List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict.get());
+            lgas.forEach(lga -> {
+                List<User> userList = userRepository.findByLgaId(lga.getId()+"");
+                users.addAll(userList);
+            });
+        }
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        return new UserResponse("00","User retrieved", users);
+    }
+
+    @Override
+    public UserResponse getUserByLga(String id) throws NotFoundException {
+        List<User> users = userRepository.findByLgaId(id);
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        return new UserResponse("00","User retrieved", users);
+    }
+
+    public UserResponse findUsersAgentByName(String name)throws NotFoundException{
+        List<User> users = userRepository.findByFirstnameOrLastnameOrPhone(name, name, name);
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        return new UserResponse("00", "List of users", users);
     }
 
     @Override
