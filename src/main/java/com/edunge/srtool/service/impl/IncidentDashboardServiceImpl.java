@@ -39,10 +39,14 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         if(totalIncidents == 0) {
             new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, null, null);
         }
-        List<IncidentReport> incidentReports = getIncidentReport(state);
-        List<IncidentReport> lgaIncidentReport = getLgaReports(state);
-
+        try {
+            List<IncidentReport> incidentReports = getIncidentReport(state);
+            List<IncidentReport> lgaIncidentReport = getLgaReports(state);
         return new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, incidentReports, lgaIncidentReport);
+        }catch (Exception e){
+            System.out.println("Exception: "+e.getStackTrace());
+            return new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, null, null);
+        }
     }
 
     public Integer getStateIncidentsCount(State state){
