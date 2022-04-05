@@ -65,7 +65,8 @@ public class DashboardController {
             return ResponseEntity.ok(incidentDashboardService.getDashboardByState(id));
         }catch (Exception e){
             System.out.println("Athans caught: "+e.getMessage());
-            System.out.println("Athans caught 2: "+e.getStackTrace());
+            System.out.println("Athans caught 2: "+e);
+            System.out.println("Athans caught 2: "+e.getLocalizedMessage());
             return ResponseEntity.ok(null);
         }
     }
