@@ -50,13 +50,19 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     }
 
     public Integer getStateIncidentsCount(State state){
-        List<Incident> incidentList = incidentRepository.findAll();
-        return (int)incidentList.stream()
-                .filter(incident -> getLgabyId(incident.getId()).getState().equals(state))
-                .count();
+        try {
+            List<Incident> incidentList = incidentRepository.findAll();
+            return (int) incidentList.stream()
+                    .filter(incident -> getLgabyId(incident.getId()).getState().equals(state))
+                    .count();
+        }catch (Exception e){
+            System.out.println("Exception: "+e.getMessage());
+            return 0;
+        }
     }
 
     public List<Incident> getStateIncidents(State state){
+        System.out.println("getStateIncidents");
         List<Incident> incidentList = incidentRepository.findAll();
         return incidentList.stream()
                 .filter(incident -> getLgabyId(incident.getId()).getState().equals(state)).collect(Collectors.toList());
@@ -94,6 +100,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
 
     public Integer getLgaIncidents(Lga lga){
         List<Incident> incidentList = incidentRepository.findByLga(lga);
+        System.out.println("law3");
         return incidentList.size();
     }
 
@@ -101,13 +108,16 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
         List<Incident> incidentList = getStateIncidents(state);
         HashMap<String, Integer> incidentTypeMap = new HashMap<>();
         List<IncidentReport> incidentReports = new ArrayList<>();
+        System.out.println("Am2");
         incidentList
                 .forEach(incident -> {
                     String incidentType = incident.getIncidentType().getName();
                     Integer currentValue = incidentTypeMap.getOrDefault(incidentType, 0);
                     incidentTypeMap.put(incidentType, currentValue+1);
                 });
+        System.out.println("Am3");
         Integer totalIncident = getStateIncidentsCount(state);
+        System.out.println("Am4: "+totalIncident);
         if(totalIncident < 1){
             return new ArrayList<IncidentReport>();
         }
@@ -115,6 +125,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
             Double percent = (count * 100.0)/totalIncident;
             incidentReports.add(new IncidentReport(type, count, percent));
         });
+        System.out.println("Am5: "+incidentReports.size());
         return incidentReports;
     }
 
@@ -125,8 +136,9 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     private List<IncidentReport> getLgaReports(State state){
         List<Lga> lgas = lgaRepository.findByState(state);
         List<IncidentReport> incidentReports  = new ArrayList<>();
-
+        System.out.println("Law1");
         List<Incident> incidentList = getStateIncidents(state);
+        System.out.println("Law2");
         lgas.forEach(lga -> {
                     Integer totalIncidents = getLgaIncidents(lga);
                     if(totalIncidents > 0) {
@@ -153,7 +165,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                                 });
                         if(totalIncident.get() > 0) {
                             incidentTypeMap.forEach((type, count) -> {
-                                Double percent = (count * 100.0) / totalIncidents;
+                                Double percent = (count * 100.0) / totalIncident.get();
                                 incidentReports.add(new IncidentReport(lga, type, count, percent, totalIncident.get(), 0));
                             });
                         }
@@ -167,6 +179,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                                 });
                     }
                 });
+        System.out.println("Law 5");
         return incidentReports;
     }
 
