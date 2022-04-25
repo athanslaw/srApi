@@ -19,6 +19,7 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
     List<Result> findByLga(Lga lga);
     List<Result> findBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
     List<Result> findByPollingUnit(PollingUnit pollingUnit);
+    List<Result> findByStateId(Long stateId);
     void deleteByWard(Ward ward);
     void deleteByLga(Lga lga);
     

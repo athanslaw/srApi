@@ -1,5 +1,6 @@
 package com.edunge.srtool.controller;
 
+import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.DashboardResponse;
 import com.edunge.srtool.response.IncidentDashboardResponse;
 import com.edunge.srtool.service.DashboardService;
@@ -29,14 +30,14 @@ public class DashboardController {
 
     @GetMapping(value = "/dashboard/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve default dashboard.")
-    public ResponseEntity<DashboardResponse> getDashboard(){
+    public ResponseEntity<DashboardResponse> getDashboard() throws NotFoundException {
         return new ResponseEntity<>(dashboardService.getDefaultDashboard(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/dashboard/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve default by id.")
-    public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(dashboardService.getDashboardByState(id));
+    @GetMapping(value = "/dashboard/default-state", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve results for default state.")
+    public ResponseEntity<DashboardResponse> getDashboardByState() throws NotFoundException {
+        return ResponseEntity.ok(dashboardService.getDashboardByState());
     }
 
     @GetMapping(value = "/dashboard/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,20 +58,17 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getDashboardByLga(3L));
     }
 
-    @GetMapping(value = "/dashboard/incidents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/incidents", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Incident Dashboard By State")
-    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState(@PathVariable Long id) throws Exception {
-        try{
-            System.out.println("Athans got here");
-            return ResponseEntity.ok(incidentDashboardService.getDashboardByState(id));
-        }catch (Exception e){
-            System.out.println("Athans caught: "+e.getMessage());
-            System.out.println("Athans caught 2: "+e);
-            System.out.println("Athans caught 2: "+e.getLocalizedMessage());
-            return ResponseEntity.ok(null);
-        }
+    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState() throws Exception {
+        return ResponseEntity.ok(incidentDashboardService.getDashboardByState());
     }
 
+    @GetMapping(value = "/dashboard/incidents/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Incident Dashboard By District")
+    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByDistrict(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(incidentDashboardService.getDashboardBySenatorialDistrict(id));
+    }
 
     @GetMapping(value = "/dashboard/incidents/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Incident Dashboard By Lga")

@@ -68,6 +68,12 @@ public class LgaController {
         return ResponseEntity.ok(lgaService.filterByName(name));
     }
 
+    @GetMapping(value = "/lga/state", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find LGA by stateCode.")
+    public ResponseEntity<LgaResponse> filterLGAByStateCode() throws Exception {
+        return ResponseEntity.ok(lgaService.findLgaByStateCode());
+    }
+
     @GetMapping(value = "/lga/state/{stateCode}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find LGA by stateCode.")
     public ResponseEntity<LgaResponse> filterLGAByStateCode(@PathVariable Long stateCode) throws Exception {

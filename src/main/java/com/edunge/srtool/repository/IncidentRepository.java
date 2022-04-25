@@ -11,6 +11,7 @@ import java.util.List;
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByCombinedKeysOrderByTimeStampDesc( String combinedKeys); // order by timestamp descending
     List<Incident> findByLga(Lga lga);
+    List<Incident> findByStateId(long stateId);
     List<Incident> findByWard(Ward ward);
     List<Incident> findByPollingUnit(PollingUnit pollingUnit);
     @Query(nativeQuery = true, value="SELECT * FROM incident a ORDER BY a.id DESC LIMIT 10")

@@ -123,7 +123,6 @@ public class User extends BaseModel {
 
     public void setLgaId(String lgaId) {
         this.lgaId = lgaId;
-        System.out.println("LLGGAA: "+lgaId);
     }
 
     @Override

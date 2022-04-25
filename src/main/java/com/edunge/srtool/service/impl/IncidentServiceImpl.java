@@ -86,6 +86,8 @@ public class IncidentServiceImpl implements IncidentService {
 
         Incident incident = new Incident();
 
+        State state = getState();
+        incidentDto.setStateId(state.getId());
         Lga lga = getLga(incidentDto.getLgaId());
         // validate incident levels
         if(incidentDto.getIncidentLevelId() == 2){
@@ -141,9 +143,9 @@ public class IncidentServiceImpl implements IncidentService {
         }catch (Exception e){
         }
        // float weight = (incidentType.getWeight() + this.processWeight()) /2;
-        System.out.println("Level: "+incidentLevel);
         Incident incident = new Incident();
         incident.setLga(lga);
+        incident.setStateId(incidentDto.getStateId());
         incident.setTimeStamp(LocalDateTime.now());
         incident.setCombinedKeys(combinedKeys);
         incident.setWard(ward);
@@ -164,7 +166,6 @@ public class IncidentServiceImpl implements IncidentService {
         SimpleDateFormat sd = new SimpleDateFormat("HH");
         String str = sd.format(new Date());
         int weight = 1;
-        System.out.println("Weight: "+str);
         if(str.compareTo("0") >= 0){
             weight = 5;
         }else if(str.compareTo("09") >= 0){
@@ -300,7 +301,6 @@ public class IncidentServiceImpl implements IncidentService {
 
         try {
             Long incidentTypeId = Long.parseLong(incidentType);
-            System.out.println("Here"+incidentTypeId);
             elections  = elections.stream()
                     .filter(election -> election.getIncidentType().getId() ==incidentTypeId)
                     .collect(Collectors.toList());

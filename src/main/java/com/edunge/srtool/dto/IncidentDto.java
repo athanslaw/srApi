@@ -28,6 +28,7 @@ public class IncidentDto extends AbstractBaseModel {
     private int severity;
     private LocalDateTime timeStamp;
     private long weight;
+    private long stateId;
 
     public String getDescription() {
         return description;
@@ -132,5 +133,13 @@ public class IncidentDto extends AbstractBaseModel {
 
     public void setWeight(long weight) {
         this.weight = weight;
+    }
+
+    public long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(long stateId) {
+        this.stateId = stateId;
     }
 }

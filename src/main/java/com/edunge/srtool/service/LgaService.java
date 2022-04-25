@@ -14,6 +14,7 @@ public interface LgaService {
     LgaResponse findAll() ;
     LgaResponse filterByName(String name) throws NotFoundException;
     LgaResponse findLgaByStateCode(Long stateCode) throws NotFoundException;
+    LgaResponse findLgaByStateCode() throws NotFoundException;
     LgaResponse findLgaFilter(Long stateId, Long senatorialDistrictId) throws NotFoundException;
     LgaResponse findLgaBySenatorialDistrictCode(Long senatorialDistrictId) throws NotFoundException;
 

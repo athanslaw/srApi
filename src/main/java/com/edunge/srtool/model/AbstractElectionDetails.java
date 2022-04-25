@@ -34,6 +34,8 @@ public class AbstractElectionDetails extends BaseModel {
     @JoinColumn(name = "voting_level_id",nullable = false)
     private VotingLevel votingLevel;
 
+    private Long stateId;
+
     public Election getElection() {
         return election;
     }
@@ -88,5 +90,13 @@ public class AbstractElectionDetails extends BaseModel {
 
     public void setVotingLevel(VotingLevel votingLevel) {
         this.votingLevel = votingLevel;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
     }
 }

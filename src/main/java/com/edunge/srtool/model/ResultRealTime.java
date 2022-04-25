@@ -99,4 +99,20 @@ public class ResultRealTime extends AbstractElectionDetails {
     public void setVoteCount(Integer voteCount) {
         this.voteCount = voteCount;
     }
+
+    @Override
+    public String toString() {
+        return "ResultRealTime{" +
+                "partyAgent=" + partyAgent +
+                ", accreditedVotersCount=" + accreditedVotersCount +
+                ", registeredVotersCount=" + registeredVotersCount +
+                ", party_1=" + party_1 +
+                ", party_2=" + party_2 +
+                ", party_3=" + party_3 +
+                ", party_4=" + party_4 +
+                ", voteCount=" + voteCount +
+                ", result=" + result +
+                ", pollingUnitCount=" + pollingUnitCount +
+                '}';
+    }
 }

@@ -5,6 +5,7 @@ import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
+import com.edunge.srtool.response.ResultRealTimeResponse;
 import com.edunge.srtool.response.ResultResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.ResultService;
@@ -28,6 +29,7 @@ public class ResultServiceImpl implements ResultService {
     private final PartyAgentRepository partyAgentRepository;
     private final ElectionRepository electionRepository;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
+    private final StateRepository stateRepository;
     private final WardRepository wardRepository;
     private final LgaRepository lgaRepository;
     private final PollingUnitRepository pollingUnitRepository;
@@ -69,7 +71,8 @@ public class ResultServiceImpl implements ResultService {
     FileProcessingService fileProcessingService;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository) {
+    public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentRepository partyAgentRepository, ElectionRepository electionRepository, SenatorialDistrictRepository senatorialDistrictRepository,
+            StateRepository stateRepository, WardRepository wardRepository, LgaRepository lgaRepository, PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyRepository politicalPartyRepository) {
         this.resultRepository = resultRepository;
         this.resultRealTimeRepository = resultRealTimeRepository;
         this.partyAgentRepository = partyAgentRepository;
@@ -81,10 +84,12 @@ public class ResultServiceImpl implements ResultService {
         this.votingLevelRepository = votingLevelRepository;
         this.resultPerPartyRepository = resultPerPartyRepository;
         this.politicalPartyRepository = politicalPartyRepository;
+        this.stateRepository = stateRepository;
     }
 
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
+        State state = getState();
         Optional<PartyAgent> partyAgent = partyAgentRepository.findById(resultDto.getPartyAgentId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
 
@@ -93,7 +98,6 @@ public class ResultServiceImpl implements ResultService {
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
         Ward ward = getWard(resultDto.getWardId());
-        System.out.println("after ward");
         //Result result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
         Lga lga = getLga(resultDto.getLgaId());
         int pollingUnitCount = 1;
@@ -102,39 +106,34 @@ public class ResultServiceImpl implements ResultService {
         Result result = new Result();
         ResultRealTime resultRealTime = new ResultRealTime();
 
-        System.out.println("before voting level: "+votingLevel.getCode());
         //Delete existing result if the voting level is either LGA or Ward level.
         if(votingLevel.getCode().equals(VOTING_LEVEL_WARD)){
             result = resultRepository.findByElectionAndWardAndVotingLevel(election, ward, votingLevel);
             if(result != null){
-                System.out.println(String.format("Ward Result for %s in %s already exists.", ward.getName(), election.getDescription()));
                 throw new DuplicateException(String.format("Result for %s in %s already exists.", ward.getName(), election.getDescription()));
             }
             result = new Result();
             result.setWard(ward);
             resultRealTime.setWard(ward);
             if(checkingRealTime) resultRealTimeRepository.deleteByWard(ward);
-            System.out.println("Deleting existing results with ward {} "+ ward.getCode());
 
             pollingUnitCount = pollingUnitRepository.findByWard(ward).size();
         }
         else if(votingLevel.getCode().equals(VOTING_LEVEL_LGA)){
-            result = resultRepository.findByElectionAndLgaAndVotingLevel(election, lga, votingLevel);
-            if(result != null){System.out.println(String.format("LGA Result for %s in %s already exists.", lga.getName(), election.getDescription()));
+            List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionAndLgaAndVotingLevel(election, lga, votingLevel);
+            if(resultRealTimeList.size() >0){
                 throw new DuplicateException(String.format("Result for %s in %s already exists.", lga.getName(), election.getDescription()));
             }
             result = new Result();
             result.setLga(lga);
             resultRealTime.setLga(lga);
             if(checkingRealTime) resultRealTimeRepository.deleteByLga(lga);
-            System.out.println("Deleting existing results with LGA {} "+ lga.getCode());
             pollingUnitCount = pollingUnitRepository.findByLga(lga).size();
         }
 
         else if(votingLevel.getCode().equals(VOTING_LEVEL_POLLING_UNIT)){
             result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
             if(result != null){
-                System.out.println(String.format("PU Result for %s in %s already exists.", pollingUnit.getName(), election.getDescription()));
                 throw new DuplicateException(String.format("Result for %s in %s already exists.", pollingUnit.getName(), election.getDescription()));
             }
             result = new Result();
@@ -142,9 +141,10 @@ public class ResultServiceImpl implements ResultService {
             resultRealTime.setPollingUnit(pollingUnit);
         }
 
-        System.out.println("after voting level");
         result.setSenatorialDistrict(senatorialDistrict);
         resultRealTime.setSenatorialDistrict(senatorialDistrict);
+        result.setStateId(state.getId());
+        resultRealTime.setStateId(state.getId());
         if(partyAgent.isPresent()){
             result.setPartyAgent(partyAgent.get());
             resultRealTime.setPartyAgent(partyAgent.get());
@@ -314,6 +314,17 @@ public class ResultServiceImpl implements ResultService {
         return new ResultResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
+    @Override
+    public ResultResponse findByStateId() {
+        try {
+            State state = this.getState();
+            List<Result> elections = resultRepository.findByStateId(state.getId());
+            return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), elections);
+        }catch (NotFoundException e){
+            return new ResultResponse("99", String.format(fetchRecordTemplate, SERVICE_NAME));
+        }
+    }
+
 
     private Election getElection() throws NotFoundException {
         List<Election> election = electionRepository.findByStatus(true);
@@ -353,6 +364,14 @@ public class ResultServiceImpl implements ResultService {
             throw new NotFoundException("Senatorial District not found.");
         }
         return senatorialDistrict.get();
+    }
+
+    private State getState() throws NotFoundException {
+        State state = stateRepository.findByDefaultState(true);
+        if(state == null){
+            throw new NotFoundException("Default state not found.");
+        }
+        return state;
     }
 
     private Ward getWard(Long id) throws NotFoundException {

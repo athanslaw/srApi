@@ -46,7 +46,6 @@ public class UserController {
 
     @PostMapping(value="/user/upload")
     public ResponseEntity<UserResponse> uploadFile(@RequestParam("file") MultipartFile file) {
-        System.out.println("Got here");
         return new ResponseEntity<>(userService.uploadUsers(file), HttpStatus.OK);
     }
 

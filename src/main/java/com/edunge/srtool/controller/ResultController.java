@@ -1,6 +1,7 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.ResultDto;
+import com.edunge.srtool.response.ResultRealTimeResponse;
 import com.edunge.srtool.response.ResultResponse;
 import com.edunge.srtool.service.ResultService;
 import io.swagger.annotations.Api;
@@ -28,7 +29,7 @@ public class ResultController {
     @GetMapping(value = "/result/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
     public ResponseEntity<ResultResponse> findAllResults(){
-        return new ResponseEntity<>(resultService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(resultService.findByStateId(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/result", method = RequestMethod.POST)
