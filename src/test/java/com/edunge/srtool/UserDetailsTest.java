@@ -40,8 +40,6 @@ public class UserDetailsTest {
     @BeforeClass
     public static void deleteTestFiles(){
         userDto.setPhone("08067413041");
-        userDto.setFirstname("Adewale");
-        userDto.setLastname("Adeleye");
         userDto.setPassword("testPassword");
         userDto.setEmail("admin_test@gmail.com");
     }
