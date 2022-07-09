@@ -213,12 +213,30 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse findAll() {
+    public IncidentResponse findAll(String incidentType, String incidentWeight) {
         State state = getState();
-        List<Incident> elections = incidentRepository.findTop10(state);
+        List<Incident> elections = new ArrayList<>();
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            try {
+                if (incidentType == null || incidentType.equals("")) {
+                    int weight = Integer.parseInt(incidentWeight.trim());
+                    elections = incidentRepository.findByWeight(weight);
+                } else if (incidentWeight == null || incidentWeight.equals("")) {
+                    long type = Long.parseLong(incidentType.trim());
+                    elections = incidentRepository.findByIncidentType(getIncidentType(type));
+                } else {
+                    int weight = Integer.parseInt(incidentWeight);
+                    long type = Long.parseLong(incidentType.trim());
+                    elections = incidentRepository.findByWeight(weight);
+                    elections = elections.stream().filter(election -> election.getIncidentType().getId()==type)
+                            .collect(Collectors.toList());
+                }
+            }catch (NotFoundException e){}
+        }else{
+            elections = incidentRepository.findTop10(state);
+        }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
-
 
     private Election getElection(Long id) throws NotFoundException {
         Optional<Election> election = electionRepository.findById(id);
@@ -295,61 +313,106 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse findIncidentByLga(Long id, String incidentType) throws NotFoundException {
-        Lga lga = getLga(id);
-        List<Incident> elections = incidentRepository.findByLga(lga);
-
-        try {
-            Long incidentTypeId = Long.parseLong(incidentType);
-            elections  = elections.stream()
-                    .filter(election -> election.getIncidentType().getId() ==incidentTypeId)
-                    .collect(Collectors.toList());
-        }catch (Exception e){}
+    public IncidentResponse findIncidentByLga(Long id, String incidentType, String incidentWeight){
+        Lga lga = new Lga(){{setId(id);}};
+        List<Incident> elections;
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            if(incidentType == null || incidentType.trim().equals("")){
+                int weight = Integer.parseInt(incidentWeight.trim());
+                elections = incidentRepository.findByLgaAndWeight(lga, weight);
+            }
+            else if(incidentWeight == null || incidentWeight.trim().equals("")){
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByLgaAndIncidentType(lga, new IncidentType(){{setId(type);}});
+            }
+            else{
+                int weight = Integer.parseInt(incidentWeight.trim());
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByLgaAndWeight(lga, weight);
+                elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
+            }
+        }
+        else{
+            elections = incidentRepository.findByLga(lga);
+        }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
     @Override
-    public IncidentResponse findIncidentBySenatorial(Long id, String incidentType){
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
+    public IncidentResponse findIncidentBySenatorial(Long id, String incidentType, String incidentWeight){
+        SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(id);}};
         List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict);
         List<Incident> incidentList = new ArrayList<>();
-        lgas.stream().forEach(lga -> {
-            incidentRepository.findByLga(lga)
-                .forEach(incident -> {
-                    incidentList.add(incident);
-                });
-        });
+        lgas.stream().forEach(lga ->
+            incidentList.addAll(this.findIncidentByLga(lga.getId(), incidentType, incidentWeight).getIncidents())
+        );
         try{
-            Long incidentTypeId = Long.parseLong(incidentType);
+            Long incidentTypeId = Long.parseLong(incidentType.trim());
             incidentList.stream()
                     .filter(election -> election.getIncidentType().getId() == incidentTypeId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
+        try{
+            Long incidentWeightId = Long.parseLong(incidentWeight);
+            incidentList.stream()
+                    .filter(election -> election.getWeight() == incidentWeightId)
                     .collect(Collectors.toList());
         }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 
     @Override
-    public IncidentResponse findIncidentByWard(Long id, String incidentType) throws NotFoundException {
-        Ward ward = getWard(id);
-        List<Incident> elections = incidentRepository.findByWard(ward);
-        try{
-            Long incidentTypeId = Long.parseLong(incidentType);
-            elections.stream()
-                    .filter(election -> election.getIncidentType().getId() == incidentTypeId)
-                    .collect(Collectors.toList());
-        }catch (Exception e){}
+    public IncidentResponse findIncidentByWard(Long id, String incidentType, String incidentWeight) throws NotFoundException {
+        Ward ward = new Ward(){{setId(id);}};
+        List<Incident> elections;
+
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            if(incidentType == null || incidentType.trim().equals("")){
+                int weight = Integer.parseInt(incidentWeight.trim());
+                elections = incidentRepository.findByWardAndWeight(ward, weight);
+            }
+            else if(incidentWeight == null || incidentWeight.trim().equals("")){
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByWardAndIncidentType(ward, new IncidentType(){{setId(type);}});
+            }
+            else{
+                int weight = Integer.parseInt(incidentWeight.trim());
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByWardAndWeight(ward, weight);
+                elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
+            }
+        }
+        else{
+            elections = incidentRepository.findByWard(ward);
+        }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 
     @Override
-    public IncidentResponse findIncidentByPollingUnit(Long id, String incidentType) throws NotFoundException {
-        PollingUnit pollingUnit = getPollingUnit(id);
-        List<Incident> elections = incidentRepository.findByPollingUnit(pollingUnit);
-        try{
-            Long incidentTypeId = Long.parseLong(incidentType);
-            elections.stream()
-                    .filter(election -> election.getIncidentType().getId() == incidentTypeId);
-        }catch (Exception e){}
+    public IncidentResponse findIncidentByPollingUnit(Long id, String incidentType, String incidentWeight) throws NotFoundException {
+        PollingUnit pollingUnit = new PollingUnit(){{setId(id);}};
+        List<Incident> elections;
+
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            if(incidentType == null || incidentType.trim().equals("")){
+                int weight = Integer.parseInt(incidentWeight.trim());
+                elections = incidentRepository.findByPollingUnitAndWeight(pollingUnit, weight);
+            }
+            else if(incidentWeight == null || incidentWeight.trim().equals("")){
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByPollingUnitAndIncidentType(pollingUnit, new IncidentType(){{setId(type);}});
+            }
+            else{
+                int weight = Integer.parseInt(incidentWeight.trim());
+                long type = Long.parseLong(incidentType.trim());
+                elections = incidentRepository.findByPollingUnitAndWeight(pollingUnit, weight);
+                elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
+            }
+        }
+        else{
+            elections = incidentRepository.findByPollingUnit(pollingUnit);
+        }
+
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
 

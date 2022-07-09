@@ -27,8 +27,8 @@ public class IncidentController {
 
     @GetMapping(value = "/incident/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all incidents.")
-    public ResponseEntity<IncidentResponse> findAllIncidents(){
-        return new ResponseEntity<>(incidentService.findAll(), HttpStatus.OK);
+    public ResponseEntity<IncidentResponse> findAllIncidents(@RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight){
+        return new ResponseEntity<>(incidentService.findAll(incidentType, incidentWeight), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/incident", method = RequestMethod.POST)
@@ -57,26 +57,26 @@ public class IncidentController {
 
     @GetMapping(value = "/incident/senatorial/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Senatorial.")
-    public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentBySenatorial(id, incidentType));
+    public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentBySenatorial(id, incidentType, incidentWeight));
     }
 
     @GetMapping(value = "/incident/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Lga.")
-    public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByLga(id, incidentType));
+    public ResponseEntity<IncidentResponse> filterIncidentByLga(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) {
+        return ResponseEntity.ok(incidentService.findIncidentByLga(id, incidentType, incidentWeight));
     }
 
     @GetMapping(value = "/incident/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Ward.")
-    public ResponseEntity<IncidentResponse> filterIncidentByWard(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByWard(id, incidentType));
+    public ResponseEntity<IncidentResponse> filterIncidentByWard(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByWard(id, incidentType, incidentWeight));
     }
 
     @GetMapping(value = "/incident/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Polling Unit.")
-    public ResponseEntity<IncidentResponse> filterIncidentByPollingUnit(@PathVariable Long id, @RequestParam(required = false) String incidentType) throws Exception {
-        return ResponseEntity.ok(incidentService.findIncidentByPollingUnit(id, incidentType));
+    public ResponseEntity<IncidentResponse> filterIncidentByPollingUnit(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByPollingUnit(id, incidentType, incidentWeight));
     }
 
     @PostMapping("/incident/upload")

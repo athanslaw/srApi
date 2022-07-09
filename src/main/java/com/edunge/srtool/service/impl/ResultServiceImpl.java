@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Transactional
 @Service
@@ -241,28 +242,29 @@ public class ResultServiceImpl implements ResultService {
         return new ResultResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), result);
     }
 
-
     @Override
     public ResultResponse updateResult(Long id, ResultDto resultDto) throws NotFoundException {
         Result result = getResult(id);
+
+        VotingLevel votingLevel = result.getVotingLevel();
+
+        ResultRealTime resultRealTime = resultRealTimeRepository.findByElectionAndLgaAndVotingLevel(result.getElection(), result.getLga(), votingLevel).get(0);
         Optional<PartyAgent> partyAgent = partyAgentRepository.findById(resultDto.getPartyAgentId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
-        Lga lga = getLga(resultDto.getLgaId());
-        PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
-        Election election = getElection();
-        VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
-        Ward ward = getWard(resultDto.getWardId());
-        result.setSenatorialDistrict(senatorialDistrict);
-        result.setLga(lga);
-        result.setWard(ward);
         partyAgent.ifPresent(result::setPartyAgent);
-        result.setPollingUnit(pollingUnit);
-        result.setElection(election);
-        result.setVotingLevel(votingLevel);
-        result.setLga(lga);
         result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
         result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
+
+        resultRealTime.setParty_1(resultDto.getParty_1());
+        resultRealTime.setParty_2(resultDto.getParty_2());
+        resultRealTime.setParty_3(resultDto.getParty_3());
+        resultRealTime.setParty_4(resultDto.getParty_4());
+        resultRealTime.setResult(id);
+        resultRealTime.setVoteCount(resultDto.getParty_1()+resultDto.getParty_2()+resultDto.getParty_3()+resultDto.getParty_4());
+
+
         resultRepository.save(result);
+
+        resultRealTimeRepository.save(resultRealTime);
 
 
         PoliticalParty apc = politicalPartyRepository.findByCode(SECOND_PARTY);
@@ -383,14 +385,6 @@ public class ResultServiceImpl implements ResultService {
             throw new NotFoundException(String.format(notFoundTemplate,"Ward"));
         }
         return currentWard.get();
-    }
-
-    private PartyAgent getPartyAgent(Long id) throws NotFoundException {
-        Optional<PartyAgent> partyAgent = partyAgentRepository.findById(id);
-        if(!partyAgent.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Party Agent"));
-        }
-        return partyAgent.get();
     }
 
     private PollingUnit getPollingUnit(Long id) throws NotFoundException {

@@ -339,7 +339,6 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                                 String pollingUnitCode,
                                 String pollingUnitName)  {
 
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
         Lga lga = lgaRepository .findByCode(lgaCode);
         Ward ward = wardRepository.findByCode(wardCode);
         PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
