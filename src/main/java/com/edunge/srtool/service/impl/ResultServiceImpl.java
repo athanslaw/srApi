@@ -5,7 +5,6 @@ import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
-import com.edunge.srtool.response.ResultRealTimeResponse;
 import com.edunge.srtool.response.ResultResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.ResultService;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Transactional
 @Service

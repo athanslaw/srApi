@@ -23,7 +23,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByWardAndWeight(Ward ward, int weight);
     List<Incident> findByPollingUnitAndWeight(PollingUnit pollingUnit, int weight);
 
-    @Query(nativeQuery = true, value="SELECT * FROM incident a ORDER BY a.id DESC LIMIT 10")
+    @Query(nativeQuery = true, value="SELECT * FROM incident a WHERE a.state_id=?1 ORDER BY a.id DESC LIMIT 10")
     List<Incident> findTop10(State state);
     List<Incident> findByWeight(int weight);
     List<Incident> findByIncidentType(IncidentType incidentType);
