@@ -158,8 +158,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getAllUser() throws NotFoundException {
-        List<User> users = userRepository.findAll();
-        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
+        // get all lga under the default state
+        List<Lga> lgaList = lgaRepository.findByState(stateRepository.findByDefaultState(true));
+        List<User> users = userRepository.findByRole("Administrator");
+        lgaList.forEach(lga -> {
+            users.addAll(userRepository.findByLgaId(lga.getCode()));
+        });
         return new UserResponse("00", "List of users", users);
     }
 

@@ -11,11 +11,11 @@ import java.net.URISyntaxException;
 @RestController
 public class CallController {
 
-    @Autowired
-    CallService callService;
+//    @Autowired
+//    CallService callService;
 
     @GetMapping("/call/{phone}")
     public void makeCall(@PathVariable("phone") String phoneNo) throws URISyntaxException {
-        callService.makeCall(phoneNo);
+        //callService.makeCall(phoneNo);
     }
 }
