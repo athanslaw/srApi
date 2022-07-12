@@ -148,7 +148,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
     @Override
     public PollingUnitResponse findByState(Long stateCode) throws NotFoundException {
-        State state = getState(stateCode);
+        State state = new State(){{setId(stateCode);}};
         List<PollingUnit> pollingUnit = pollingUnitRepository.findByState(state);
         if(pollingUnit!=null){
             return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
