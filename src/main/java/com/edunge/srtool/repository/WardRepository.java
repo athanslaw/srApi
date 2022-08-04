@@ -13,5 +13,8 @@ public interface WardRepository extends JpaRepository<Ward, Long> {
     List<Ward> findByNameStartingWith(String name);
     List<Ward> findByLga(Lga lga);
     List<Ward> findByState(State state);
+    long countByState(State state);
+    long countByLga(Lga lga);
+    long countBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
     List<Ward> findBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
 }

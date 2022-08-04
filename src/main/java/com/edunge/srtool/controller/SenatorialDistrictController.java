@@ -2,7 +2,10 @@ package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
+import com.edunge.srtool.service.LgaService;
+import com.edunge.srtool.service.PollingUnitService;
 import com.edunge.srtool.service.SenatorialDistrictService;
+import com.edunge.srtool.service.WardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class SenatorialDistrictController {
 
     private final SenatorialDistrictService senatorialDistrictService;
+    private final LgaService lgaService;
+    private final WardService wardService;
+    private final PollingUnitService pollingUnitService;
 
     @Autowired
-    public SenatorialDistrictController(SenatorialDistrictService senatorialDistrictService) {
+    public SenatorialDistrictController(SenatorialDistrictService senatorialDistrictService,
+                                        LgaService lgaService, WardService wardService, PollingUnitService pollingUnitService) {
         this.senatorialDistrictService = senatorialDistrictService;
+        this.lgaService = lgaService;
+        this.wardService = wardService;
+        this.pollingUnitService = pollingUnitService;
     }
 
     @GetMapping(value = "/senatorial-districts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +63,11 @@ public class SenatorialDistrictController {
     @RequestMapping(value = "/senatorial-district/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "Update senatorial district to the DB")
     public ResponseEntity<SenatorialDistrictResponse> updateSenatorialDistrict(@PathVariable Long id, @RequestBody SenatorialDistrictDto senatorialDistrictDto) throws Exception {
-        return ResponseEntity.ok(senatorialDistrictService.updateSenatorialDistrict(id,senatorialDistrictDto));
+        SenatorialDistrictResponse senatorialDistrictResponse = senatorialDistrictService.updateSenatorialDistrict(id,senatorialDistrictDto);
+        lgaService.updateLgaDistrict(id, senatorialDistrictResponse.getSenatorialDistrict());
+        wardService.updateWardDistrict(id, senatorialDistrictResponse.getSenatorialDistrict());
+        pollingUnitService.updatePollingUnitDistrict(id, senatorialDistrictResponse.getSenatorialDistrict());
+        return ResponseEntity.ok(senatorialDistrictResponse);
     }
 
     @RequestMapping(value = "/senatorial-district/delete/{id}", method = RequestMethod.DELETE)

@@ -14,6 +14,9 @@ public class Incident extends BaseModel{
     @JoinColumn(name = "lga_id",nullable = false)
     private Lga lga;
 
+
+    private Long geoPoliticalZoneId;
+
     private String combinedKeys;
     private LocalDateTime timeStamp;
     private int weight;
@@ -145,5 +148,13 @@ public class Incident extends BaseModel{
 
     public void setStateId(Long stateId) {
         this.stateId = stateId;
+    }
+
+    public Long getGeoPoliticalZoneId() {
+        return geoPoliticalZoneId;
+    }
+
+    public void setGeoPoliticalZoneId(Long geoPoliticalZoneId) {
+        this.geoPoliticalZoneId = geoPoliticalZoneId;
     }
 }

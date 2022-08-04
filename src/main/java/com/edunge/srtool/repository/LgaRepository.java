@@ -11,5 +11,7 @@ public interface LgaRepository extends JpaRepository<Lga, Long> {
     Lga findByCode(String lgaCode);
     List<Lga> findByNameStartingWith(String name);
     List<Lga> findByState(State state);
+    long countByState(State state);
+    long countBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
     List<Lga> findBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
 }

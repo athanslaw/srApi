@@ -146,6 +146,7 @@ public class IncidentServiceImpl implements IncidentService {
         Incident incident = new Incident();
         incident.setLga(lga);
         incident.setStateId(incidentDto.getStateId());
+        incident.setGeoPoliticalZoneId(lga.getState().getGeoPoliticalZone().getId());
         incident.setTimeStamp(LocalDateTime.now());
         incident.setCombinedKeys(combinedKeys);
         incident.setWard(ward);
@@ -351,6 +352,31 @@ public class IncidentServiceImpl implements IncidentService {
             incidentList.stream()
                     .filter(election -> election.getIncidentType().getId() == incidentTypeId)
                     .collect(Collectors.toList());
+        }catch (Exception e){}
+        try{
+            Long incidentWeightId = Long.parseLong(incidentWeight);
+            incidentList.stream()
+                    .filter(election -> election.getWeight() == incidentWeightId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
+    }
+
+    @Override
+    public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
+        State state = new State(){{setId(id);}};
+        List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
+        List<Incident> incidentList = new ArrayList<>();
+        senatorialDistricts.stream().forEach(senatorialDistrict ->
+            incidentList.addAll(this.findIncidentBySenatorial(senatorialDistrict.getId(), incidentType, incidentWeight).getIncidents())
+        );
+        try{
+            if(!incidentType.equals("") && !incidentWeight.equals("")){
+                Long incidentTypeId = Long.parseLong(incidentType.trim());
+                incidentList.stream()
+                    .filter(election -> election.getIncidentType().getId() == incidentTypeId)
+                    .collect(Collectors.toList());
+            }
         }catch (Exception e){}
         try{
             Long incidentWeightId = Long.parseLong(incidentWeight);

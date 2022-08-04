@@ -2,8 +2,10 @@ package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
+import com.edunge.srtool.model.GeoPoliticalZone;
 import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.State;
+import com.edunge.srtool.repository.GeoPoliticalZoneRepository;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
@@ -24,6 +26,7 @@ import java.util.Optional;
 @Service
 public class StateServiceImpl implements StateService {
     private final StateRepository stateRepository;
+    private final GeoPoliticalZoneRepository geoPoliticalZoneRepository;
     private final LgaRepository lgaRepository;
     private static final String SERVICE_NAME = "State";
     private static final Logger LOGGER = LoggerFactory.getLogger(StateService.class);
@@ -50,23 +53,24 @@ public class StateServiceImpl implements StateService {
     FileProcessingService fileProcessingService;
 
     @Autowired
-    public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository) {
+    public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository, GeoPoliticalZoneRepository geoPoliticalZoneRepository) {
         this.stateRepository = stateRepository;
         this.lgaRepository = lgaRepository;
+        this.geoPoliticalZoneRepository = geoPoliticalZoneRepository;
     }
 
     @Override
-    public StateResponse saveState(String code, String name, MultipartFile file) throws NotFoundException {
+    public StateResponse saveState(String code, String name, Long geoPoliticalZone, MultipartFile file) throws NotFoundException {
         State existingState = stateRepository.findByCode(code);
         if(existingState==null){
             existingState = new State();
             existingState.setCode(code);
             existingState.setName(name);
-            FileUtil.uploadFile(file, fileProcessingService.getFileStorageLocation());
-            String fileUrl = getSvgUrl(file.getOriginalFilename());
-            existingState.setSvgUrl(fileUrl);
+            existingState.setGeoPoliticalZone(new GeoPoliticalZone(){{setId(geoPoliticalZone);}});
+            existingState.setSvgUrl("default.svg");
 
             stateRepository.save(existingState);
+            System.out.println("Got here 3");
             return new StateResponse("00", "State updated successfully", existingState);
         }
         throw new DuplicateException(String.format("%s already exist.", existingState.getCode()));
@@ -88,16 +92,13 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
-    public StateResponse editState(Long id, String code, String name, MultipartFile file) throws NotFoundException {
+    public StateResponse editState(Long id, String code, String name, Long geoPoliticalZone, MultipartFile file) throws NotFoundException {
         State currentState =  getState(id);
         currentState.setId(id);
         currentState.setCode(code);
         currentState.setName(name);
-        if(file!=null){
-            FileUtil.uploadFile(file, fileProcessingService.getFileStorageLocation());
-            String fileUrl = getSvgUrl(file.getOriginalFilename());
-            currentState.setSvgUrl(fileUrl);
-        }
+        GeoPoliticalZone geoPoliticalZone1 = geoPoliticalZoneRepository.findById(geoPoliticalZone).get();
+        currentState.setGeoPoliticalZone(geoPoliticalZone1);
         stateRepository.save(currentState);
         return new StateResponse("00", "State updated successfully", currentState);
     }
@@ -127,6 +128,11 @@ public class StateServiceImpl implements StateService {
     public StateResponse findAll() {
         List<State> states = stateRepository.findAll();
         return new StateResponse("00", "All states retrieved.", states);
+    }
+
+    @Override
+    public long countState() {
+        return stateRepository.count();
     }
 
     private State getState(Long id) throws NotFoundException {
@@ -165,13 +171,14 @@ public class StateServiceImpl implements StateService {
         return new StateResponse("00", "Default state", state);
     }
 
-    private void saveState(String code, String name)  {
+    private void saveState(String code, String name, String geoPoliticalZone)  {
         State existingState = stateRepository.findByCode(code);
         try{
             if(existingState==null){
                 existingState = new State();
                 existingState.setCode(code);
                 existingState.setName(name);
+                geoPoliticalZoneRepository.findById(Long.valueOf(geoPoliticalZone)).get();
                 existingState.setSvgUrl("default.svg");
                 existingState.setDefaultState(false);
                 stateRepository.save(existingState);
@@ -192,7 +199,7 @@ public class StateServiceImpl implements StateService {
     private StateResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            saveState(state[0].trim(), state[1].trim());
+            saveState(state[0].trim(), state[1].trim(), state[2].trim());
         }
         return new StateResponse("00", "File Uploaded.");
     }

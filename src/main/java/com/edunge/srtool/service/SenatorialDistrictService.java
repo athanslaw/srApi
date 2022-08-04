@@ -2,12 +2,15 @@ package com.edunge.srtool.service;
 
 import com.edunge.srtool.dto.SenatorialDistrictDto;
 import com.edunge.srtool.exceptions.NotFoundException;
+import com.edunge.srtool.model.State;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface SenatorialDistrictService {
     SenatorialDistrictResponse saveSenatorialDistrict(SenatorialDistrictDto senatorialDistrictDto) throws NotFoundException;
     SenatorialDistrictResponse findSenatorialDistrictById(Long id) throws NotFoundException;
+    long countSenatorialDistrictByState(State state);
+    long countSenatorialDistrict();
     SenatorialDistrictResponse findSenatorialDistrictByCode(String code) throws NotFoundException;
     SenatorialDistrictResponse updateSenatorialDistrict(Long id, SenatorialDistrictDto senatorialDistrict) throws NotFoundException;
     SenatorialDistrictResponse deleteSenatorialDistrictById(Long id) throws NotFoundException;

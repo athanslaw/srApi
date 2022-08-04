@@ -9,6 +9,7 @@ import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.LocationResponse;
 import com.edunge.srtool.response.UserResponse;
 import com.edunge.srtool.service.FileProcessingService;
+import com.edunge.srtool.service.StateService;
 import com.edunge.srtool.service.UserService;
 import com.edunge.srtool.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final LgaRepository lgaRepository;
 
-    private final StateRepository stateRepository;
+    private final StateService stateService;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
 
     private final JwtTokenUtil jwtTokenUtil;
@@ -44,13 +45,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, LgaRepository lgaRepository, JwtTokenUtil jwtTokenUtil,
                            AuthorityRepository authorityRepository, LgaServiceImpl lgaService,
-                           StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
+                           StateService stateService, SenatorialDistrictRepository senatorialDistrictRepository) {
         this.userRepository = userRepository;
         this.lgaRepository = lgaRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.authorityRepository = authorityRepository;
         this.lgaService = lgaService;
-        this.stateRepository = stateRepository;
+        this.stateService = stateService;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
     }
 
@@ -159,7 +160,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getAllUser() throws NotFoundException {
         // get all lga under the default state
-        List<Lga> lgaList = lgaRepository.findByState(stateRepository.findByDefaultState(true));
+        List<Lga> lgaList = lgaRepository.findByState(stateService.getDefaultState().getState());
         List<User> users = userRepository.findByRole("Administrator");
         lgaList.forEach(lga -> {
             users.addAll(userRepository.findByLgaId(lga.getCode()));
@@ -199,25 +200,19 @@ public class UserServiceImpl implements UserService {
         return new UserResponse("00","User retrieved", user.get());
     }
 
-    private Optional<State> getStateById(long id){
-        return stateRepository.findById(id);
-    }
-
     private Optional<SenatorialDistrict> getSenatorialDistrict(long id){
         return senatorialDistrictRepository.findById(id);
     }
 
     @Override
     public UserResponse getUserByState(Long id) throws NotFoundException {
-        Optional<State> state = this.getStateById(id);
+        State state = stateService.findStateById(id).getState();
         List<User> users = new ArrayList();
-        if(state.isPresent()) {
-            List<Lga> lgas = lgaRepository.findByState(state.get());
-            lgas.forEach(lga -> {
-                List<User> userList = userRepository.findByLgaId(lga.getId()+"");
-                users.addAll(userList);
-            });
-        }
+        List<Lga> lgas = lgaRepository.findByState(state);
+        lgas.forEach(lga -> {
+            List<User> userList = userRepository.findByLgaId(lga.getId()+"");
+            users.addAll(userList);
+        });
         users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
         return new UserResponse("00","User retrieved", users);
     }

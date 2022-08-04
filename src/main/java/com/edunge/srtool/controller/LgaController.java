@@ -3,6 +3,8 @@ package com.edunge.srtool.controller;
 import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.response.LgaResponse;
 import com.edunge.srtool.service.LgaService;
+import com.edunge.srtool.service.PollingUnitService;
+import com.edunge.srtool.service.WardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class LgaController {
 
     private final LgaService lgaService;
+    private final WardService wardService;
+    private final PollingUnitService pollingUnitService;
 
     @Autowired
-    public LgaController(LgaService lgaService) {
+    public LgaController(LgaService lgaService, WardService wardService, PollingUnitService pollingUnitService) {
         this.lgaService = lgaService;
+        this.wardService = wardService;
+        this.pollingUnitService = pollingUnitService;
     }
 
     @GetMapping(value = "/lgas", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +59,10 @@ public class LgaController {
     @RequestMapping(value = "/lga/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "Update LGA to the DB")
     public ResponseEntity<LgaResponse> updateLga(@PathVariable Long id, @RequestBody LgaDto lgaDto) throws Exception {
-        return ResponseEntity.ok(lgaService.updateLga(id,lgaDto));
+        LgaResponse lgaResponse = lgaService.updateLga(id,lgaDto);
+        wardService.updateWardLga(id, lgaResponse.getLga());
+        pollingUnitService.updatePollingUnitLga(id, lgaResponse.getLga());
+        return ResponseEntity.ok(lgaResponse);
     }
 
     @RequestMapping(value = "/lga/delete/{id}", method = RequestMethod.DELETE)

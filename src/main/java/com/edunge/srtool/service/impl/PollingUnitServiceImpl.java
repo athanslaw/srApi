@@ -6,8 +6,7 @@ import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PollingUnitResponse;
-import com.edunge.srtool.service.FileProcessingService;
-import com.edunge.srtool.service.PollingUnitService;
+import com.edunge.srtool.service.*;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,10 @@ import java.util.Optional;
 @Service
 public class PollingUnitServiceImpl implements PollingUnitService {
 
-    private final LgaRepository lgaRepository;
-    private final StateRepository stateRepository;
-    private final SenatorialDistrictRepository senatorialDistrictRepository;
-    private final WardRepository wardRepository;
+    private final LgaService lgaService;
+    private final StateService stateService;
+    private final SenatorialDistrictService senatorialDistrictService;
+    private final WardService wardService;
     private final PollingUnitRepository pollingUnitRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(PollingUnitService.class);
 
@@ -53,11 +52,11 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     FileProcessingService fileProcessingService;
 
     @Autowired
-    public PollingUnitServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository, PollingUnitRepository pollingUnitRepository) {
-        this.lgaRepository = lgaRepository;
-        this.stateRepository = stateRepository;
-        this.senatorialDistrictRepository = senatorialDistrictRepository;
-        this.wardRepository = wardRepository;
+    public PollingUnitServiceImpl(LgaService lgaService, StateService stateService, SenatorialDistrictService senatorialDistrictService, WardService wardService, PollingUnitRepository pollingUnitRepository) {
+        this.lgaService = lgaService;
+        this.stateService = stateService;
+        this.senatorialDistrictService = senatorialDistrictService;
+        this.wardService = wardService;
         this.pollingUnitRepository = pollingUnitRepository;
     }
 
@@ -66,20 +65,20 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         State state = getState(pollingUnitDto.getStateId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(pollingUnitDto.getSenatorialDistrictId());
         Lga lga = getLga(pollingUnitDto.getLgaId());
-       Ward ward = getWard(pollingUnitDto.getWardId());
+        Ward ward = getWard(pollingUnitDto.getWardId());
         PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitDto.getCode());
 
 
-        if(pollingUnit==null){
-            pollingUnit = new PollingUnit();
-            pollingUnit.setSenatorialDistrict(senatorialDistrict);
-            pollingUnit.setState(state);
-            pollingUnit.setCode(pollingUnitDto.getCode());
-            pollingUnit.setName(pollingUnitDto.getName());
-            pollingUnit.setLga(lga);
-            pollingUnit.setWard(ward);
-            pollingUnitRepository.save(pollingUnit);
-            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit);
+        if(pollingUnit == null){
+            PollingUnit pollingUnit1 = new PollingUnit();
+            pollingUnit1.setSenatorialDistrict(senatorialDistrict);
+            pollingUnit1.setState(state);
+            pollingUnit1.setCode(pollingUnitDto.getCode());
+            pollingUnit1.setName(pollingUnitDto.getName());
+            pollingUnit1.setLga(lga);
+            pollingUnit1.setWard(ward);
+            pollingUnitRepository.save(pollingUnit1);
+            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit1);
         }
         throw new DuplicateException(String.format(duplicateTemplate, pollingUnitDto.getCode()));
     }
@@ -118,6 +117,39 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     }
 
     @Override
+    public void updatePollingUnitWard(Long wardIdOld, Ward ward) {
+        List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(new Ward(){{setId(wardIdOld);}});
+        pollingUnits.forEach(pollingUnit -> {
+            pollingUnit.setWard(ward);
+            pollingUnit.setLga(ward.getLga());
+            pollingUnit.setSenatorialDistrict(ward.getSenatorialDistrict());
+            pollingUnit.setState(ward.getState());
+            pollingUnitRepository.save(pollingUnit);
+        });
+    }
+
+    @Override
+    public void updatePollingUnitLga(Long lgaOld, Lga lga) {
+        List<PollingUnit> pollingUnits = pollingUnitRepository.findByLga(new Lga(){{setId(lgaOld);}});
+        pollingUnits.forEach(pollingUnit -> {
+            pollingUnit.setLga(lga);
+            pollingUnit.setSenatorialDistrict(lga.getSenatorialDistrict());
+            pollingUnit.setState(lga.getState());
+            pollingUnitRepository.save(pollingUnit);
+        });
+    }
+
+    @Override
+    public void updatePollingUnitDistrict(Long districtOld, SenatorialDistrict senatorialDistrict){
+        List<PollingUnit> pollingUnits = pollingUnitRepository.findBySenatorialDistrict(new SenatorialDistrict(){{setId(districtOld);}});
+        pollingUnits.forEach(pollingUnit -> {
+            pollingUnit.setSenatorialDistrict(senatorialDistrict);
+            pollingUnit.setState(senatorialDistrict.getState());
+            pollingUnitRepository.save(pollingUnit);
+        });
+    }
+
+    @Override
     public PollingUnitResponse filterByName(String name) throws NotFoundException {
         List<PollingUnit> pollingUnit = pollingUnitRepository.findByNameStartingWith(name);
         if(pollingUnit!=null){
@@ -147,6 +179,35 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     }
 
     @Override
+    public long findCountByLga(Long lgaCode) {
+        Lga lga = new Lga(){{setId(lgaCode);}};
+        long pollingUnit = pollingUnitRepository.countByLga(lga);
+        return pollingUnit;
+
+    }
+
+    @Override
+    public long findCountByWard(Long wardCode) {
+        Ward ward = new Ward(){{setId(wardCode);}};
+        long pollingUnit = pollingUnitRepository.countByWard(ward);
+        return pollingUnit;
+    }
+
+    @Override
+    public long findCountBySenatorialDistrict(Long districtCode) {
+        SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(districtCode);}};
+        long pollingUnit = pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
+        return pollingUnit;
+    }
+
+    @Override
+    public long findCountByState(Long stateId) {
+        State state = new State(){{setId(stateId);}};
+        long pollingUnit = pollingUnitRepository.countByState(state);
+        return pollingUnit;
+    }
+
+    @Override
     public PollingUnitResponse findByState(Long stateCode) throws NotFoundException {
         State state = new State(){{setId(stateCode);}};
         List<PollingUnit> pollingUnit = pollingUnitRepository.findByState(state);
@@ -156,6 +217,27 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         throw new NotFoundException(String.format(notFoundTemplate, SERVICE_NAME));
     }
 
+    @Override
+    public long countByState(State state){
+        return pollingUnitRepository.countByState(state);
+    }
+
+    @Override
+    public long countBySenatorialDistrict(SenatorialDistrict senatorialDistrict){
+        return pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
+    }
+    @Override
+    public long countByLga(Lga lga){
+        return pollingUnitRepository.countByLga(lga);
+    }
+    @Override
+    public long countByWard(Ward ward){
+        return pollingUnitRepository.countByWard(ward);
+    }
+    @Override
+    public long countPollingUnit(){
+        return pollingUnitRepository.count();
+    }
     @Override
     public PollingUnitResponse findBySenatorialDistrict(Long senatorialDistrictCode) throws NotFoundException {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(senatorialDistrictCode);
@@ -181,35 +263,35 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
 
     private Lga getLga(Long id) throws NotFoundException {
-        Optional<Lga> currentLga = lgaRepository.findById(id);
-        if(!currentLga.isPresent()){
+        Lga currentLga = lgaService.findLgaById(id).getLga();
+        if(currentLga == null){
             throw new NotFoundException("Lga not found.");
         }
-        return currentLga.get();
+        return currentLga;
     }
 
     private State getState(Long id) throws NotFoundException {
-        Optional<State> currentState = stateRepository.findById(id);
-        if(!currentState.isPresent()){
+        State currentState = stateService.findStateById(id).getState();
+        if(currentState == null){
             throw new NotFoundException("State not found.");
         }
-        return currentState.get();
+        return currentState;
     }
 
     private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
-        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
-        if(!senatorialDistrict.isPresent()){
+        SenatorialDistrict senatorialDistrict = senatorialDistrictService.findSenatorialDistrictById(id).getSenatorialDistrict();
+        if(senatorialDistrict == null){
             throw new NotFoundException("Senatorial District not found.");
         }
-        return senatorialDistrict.get();
+        return senatorialDistrict;
     }
 
     private Ward getWard(Long id) throws NotFoundException {
-        Optional<Ward> currentWard = wardRepository.findById(id);
-        if(!currentWard.isPresent()){
+        Ward currentWard = wardService.findWardById(id).getWard();
+        if(currentWard == null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return currentWard.get();
+        return currentWard;
     }
 
     private PollingUnit getPollingUnit(Long id) throws NotFoundException {
@@ -221,21 +303,19 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     }
 
     private void savePollingUnit(String stateCode, String senatorialDistrictCode, String lgaCode, String wardCode, String code, String name)  {
-        State state = stateRepository.findByCode(stateCode);
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
-        Lga lga = lgaRepository .findByCode(lgaCode);
-        Ward ward = wardRepository.findByCode(wardCode);
-        PollingUnit pollingUnit = pollingUnitRepository.findByCode(code);
         try{
-            if(pollingUnit==null){
-                pollingUnit = new PollingUnit();
-                pollingUnit.setState(state);
-                pollingUnit.setLga(lga);
-                pollingUnit.setSenatorialDistrict(senatorialDistrict);
-                pollingUnit.setCode(code);
-                pollingUnit.setWard(ward);
-                pollingUnit.setName(name);
-                pollingUnitRepository.save(pollingUnit);
+            Lga lga = lgaService.findLgaById(Long.valueOf(lgaCode)).getLga();
+            Ward ward = wardService.findWardById(Long.valueOf(wardCode)).getWard();
+            Optional<PollingUnit> pollingUnit = pollingUnitRepository.findById(Long.valueOf(code));
+            if(!pollingUnit.isPresent()){
+                PollingUnit pollingUnit1 = new PollingUnit();
+                pollingUnit1.setState(lga.getState());
+                pollingUnit1.setLga(lga);
+                pollingUnit1.setSenatorialDistrict(lga.getSenatorialDistrict());
+                pollingUnit1.setCode(code);
+                pollingUnit1.setWard(ward);
+                pollingUnit1.setName(name);
+                pollingUnitRepository.save(pollingUnit1);
             }
         }
         catch (Exception ex){
@@ -257,4 +337,19 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         }
         return new PollingUnitResponse("00", "File Uploaded.");
     }
+
+    public void updatePollingUnitWard(Ward oldWard, Ward newWard)  {
+        List<PollingUnit> pollingUnits = pollingUnitRepository.findByWard(oldWard);
+        pollingUnits.forEach(pollingUnit -> {
+            try {
+                pollingUnit.setLga(newWard.getLga());
+                pollingUnit.setWard(newWard);
+                pollingUnit.setSenatorialDistrict(newWard.getSenatorialDistrict());
+                pollingUnit.setState(newWard.getState());
+                pollingUnitRepository.save(pollingUnit);
+            }catch (Exception e){}
+        });
+
+    }
+
 }

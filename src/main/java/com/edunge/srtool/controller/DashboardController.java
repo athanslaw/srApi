@@ -3,6 +3,7 @@ package com.edunge.srtool.controller;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.DashboardResponse;
 import com.edunge.srtool.response.IncidentDashboardResponse;
+import com.edunge.srtool.response.NationalDashboardResponse;
 import com.edunge.srtool.service.DashboardService;
 import com.edunge.srtool.service.IncidentDashboardService;
 import io.swagger.annotations.Api;
@@ -28,34 +29,51 @@ public class DashboardController {
         this.incidentDashboardService = incidentDashboardService;
     }
 
-    @GetMapping(value = "/dashboard/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve default dashboard.")
-    public ResponseEntity<DashboardResponse> getDashboard() throws NotFoundException {
-        return new ResponseEntity<>(dashboardService.getDefaultDashboard(), HttpStatus.OK);
+    public ResponseEntity<DashboardResponse> getDashboard(@PathVariable Long electionType) throws NotFoundException {
+        return new ResponseEntity<>(dashboardService.getDefaultDashboard(electionType), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/dashboard/default-state", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/default-state/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve results for default state.")
-    public ResponseEntity<DashboardResponse> getDashboardByState() throws NotFoundException {
-        return ResponseEntity.ok(dashboardService.getDashboardByState());
+    public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long electionType) throws NotFoundException {
+        return ResponseEntity.ok(dashboardService.getDashboardByState(electionType));
     }
 
-    @GetMapping(value = "/dashboard/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/senatorial-district/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Senatorial District Dashboard")
-    public ResponseEntity<DashboardResponse> getDashboardBySenatorialDistrict(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(dashboardService.getDashboardBySenatorialDistrict(id));
+    public ResponseEntity<DashboardResponse> getDashboardBySenatorialDistrict(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardBySenatorialDistrict(id, electionType));
     }
 
-    @GetMapping(value = "/dashboard/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/lga/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Dashboard result by LGA")
-    public ResponseEntity<DashboardResponse> getDashboardByLga(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(dashboardService.getDashboardByLga(id));
+    public ResponseEntity<DashboardResponse> getDashboardByLga(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByLga(id, electionType));
     }
 
-    @GetMapping(value = "/dashboard/lga", produces = MediaType.APPLICATION_JSON_VALUE)
+
+    /**
+     * implement results for national report
+     */
+
+    @GetMapping(value = "/dashboard/national/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve results for default state.")
+    public ResponseEntity<NationalDashboardResponse> getDashboardByCountry(@PathVariable Long electionType) throws NotFoundException {
+        return ResponseEntity.ok(dashboardService.getDashboardByCountry(electionType));
+    }
+
+    @GetMapping(value = "/dashboard/zonal/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Geo Political Zone Dashboard")
+    public ResponseEntity<NationalDashboardResponse> getDashboardByZone(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByZone(id, electionType));
+    }
+
+    @GetMapping(value = "/dashboard/state/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Dashboard result by LGA")
-    public ResponseEntity<DashboardResponse> getDashboardByLga() throws Exception {
-        return ResponseEntity.ok(dashboardService.getDashboardByLga(3L));
+    public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByLga(id, electionType));
     }
 
     @GetMapping(value = "/dashboard/incidents", produces = MediaType.APPLICATION_JSON_VALUE)

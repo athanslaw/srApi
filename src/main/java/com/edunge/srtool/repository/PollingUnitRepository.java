@@ -10,6 +10,10 @@ public interface PollingUnitRepository extends JpaRepository<PollingUnit, Long> 
     List<PollingUnit> findByNameStartingWith(String name);
     List<PollingUnit> findByWard(Ward ward);
     List<PollingUnit> findByLga(Lga lga);
+    long countByLga(Lga lga);
+    long countByWard(Ward ward);
+    long countBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
+    long countByState(State state);
     List<PollingUnit> findByState(State state);
     List<PollingUnit> findBySenatorialDistrict(SenatorialDistrict senatorialDistrict);
 }

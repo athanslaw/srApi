@@ -2,6 +2,7 @@ package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.WardDto;
 import com.edunge.srtool.response.WardResponse;
+import com.edunge.srtool.service.PollingUnitService;
 import com.edunge.srtool.service.WardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class WardController {
 
     private final WardService wardService;
+    private final PollingUnitService pollingUnitService;
 
     @Autowired
-    public WardController(WardService wardService) {
+    public WardController(WardService wardService, PollingUnitService pollingUnitService) {
         this.wardService = wardService;
+        this.pollingUnitService = pollingUnitService;
     }
 
     @GetMapping(value = "/wards", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +56,9 @@ public class WardController {
     @RequestMapping(value = "/ward/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "Update ward to the DB")
     public ResponseEntity<WardResponse> updateWard(@PathVariable Long id, @RequestBody WardDto wardDto) throws Exception {
-        return ResponseEntity.ok(wardService.updateWard(id,wardDto));
+        WardResponse wardResponse = wardService.updateWard(id,wardDto);
+        pollingUnitService.updatePollingUnitWard(id, wardResponse.getWard());
+        return ResponseEntity.ok(wardResponse);
     }
 
     @RequestMapping(value = "/ward/delete/{id}", method = RequestMethod.DELETE)

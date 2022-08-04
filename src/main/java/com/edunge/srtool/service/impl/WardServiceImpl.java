@@ -3,16 +3,11 @@ package com.edunge.srtool.service.impl;
 import com.edunge.srtool.dto.WardDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.Lga;
-import com.edunge.srtool.model.SenatorialDistrict;
-import com.edunge.srtool.model.State;
-import com.edunge.srtool.model.Ward;
-import com.edunge.srtool.repository.LgaRepository;
-import com.edunge.srtool.repository.SenatorialDistrictRepository;
-import com.edunge.srtool.repository.StateRepository;
+import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.WardRepository;
 import com.edunge.srtool.response.WardResponse;
 import com.edunge.srtool.service.FileProcessingService;
+import com.edunge.srtool.service.LgaService;
 import com.edunge.srtool.service.WardService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
@@ -22,17 +17,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class WardServiceImpl implements WardService {
 
-    private final LgaRepository lgaRepository;
-    private final StateRepository stateRepository;
-    private final SenatorialDistrictRepository senatorialDistrictRepository;
+    @Autowired
+    private LgaService lgaService;
+
     private final WardRepository wardRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(WardService.class);
 
@@ -59,23 +52,18 @@ public class WardServiceImpl implements WardService {
     @Autowired
     FileProcessingService fileProcessingService;
     @Autowired
-    public WardServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository, WardRepository wardRepository) {
-        this.lgaRepository = lgaRepository;
-        this.stateRepository = stateRepository;
-        this.senatorialDistrictRepository = senatorialDistrictRepository;
+    public WardServiceImpl(WardRepository wardRepository) {
         this.wardRepository = wardRepository;
     }
 
     @Override
     public WardResponse saveWard(WardDto wardDto) throws NotFoundException {
-        State state = getState(wardDto.getStateId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(wardDto.getSenatorialDistrictId());
         Lga lga = getLga(wardDto.getLgaId());
         Ward ward = wardRepository.findByCode(wardDto.getCode());
         if(ward==null){
             ward = new Ward();
-            ward.setSenatorialDistrict(senatorialDistrict);
-            ward.setState(state);
+            ward.setSenatorialDistrict(lga.getSenatorialDistrict());
+            ward.setState(lga.getState());
             ward.setCode(wardDto.getCode());
             ward.setName(wardDto.getName());
             ward.setLga(lga);
@@ -84,11 +72,56 @@ public class WardServiceImpl implements WardService {
         }
         throw new DuplicateException(String.format(duplicateTemplate, wardDto.getCode()));
     }
-
     @Override
     public WardResponse findWardById(Long id) throws NotFoundException {
         Ward currentWard = getWard(id);
         return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), currentWard);
+    }
+
+    @Override
+    public List<Ward> findWardByState(Long id) {
+        return wardRepository.findByState(new State(){{setId(id);}});
+    }
+
+    @Override
+    public long countWardByState(State state) {
+        return wardRepository.countByState(state);
+    }
+
+    @Override
+    public long countWardByLga(Lga lga) {
+        return wardRepository.countByLga(lga);
+    }
+
+    @Override
+    public long countWard() {
+        return wardRepository.count();
+    }
+
+    @Override
+    public void updateWardLga(Long lgaOld, Lga lga) throws NotFoundException {
+        List<Ward> wards = wardRepository.findByLga(new Lga(){{setId(lgaOld);}});
+        wards.forEach(ward -> {
+            ward.setLga(lga);
+            ward.setSenatorialDistrict(lga.getSenatorialDistrict());
+            ward.setState(lga.getState());
+            wardRepository.save(ward);
+        });
+    }
+
+    @Override
+    public void updateWardDistrict(Long districtOld, SenatorialDistrict senatorialDistrict) throws NotFoundException {
+        List<Ward> wards = wardRepository.findBySenatorialDistrict(new SenatorialDistrict(){{setId(districtOld);}});
+        wards.forEach(ward -> {
+            ward.setSenatorialDistrict(senatorialDistrict);
+            ward.setState(senatorialDistrict.getState());
+            wardRepository.save(ward);
+        });
+    }
+
+    @Override
+    public long countWardBySenatorialDistrict(SenatorialDistrict senatorialDistrict) {
+        return wardRepository.countBySenatorialDistrict(senatorialDistrict);
     }
 
     @Override
@@ -102,15 +135,13 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse updateWard(Long id, WardDto wardDto) throws NotFoundException {
-        State state = getState(wardDto.getStateId());
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(wardDto.getSenatorialDistrictId());
         Lga lga = getLga(wardDto.getLgaId());
         Ward currentWard = getWard(id);
         currentWard.setId(id);
         currentWard.setCode(wardDto.getCode());
         currentWard.setName(wardDto.getName());
-        currentWard.setState(state);
-        currentWard.setSenatorialDistrict(senatorialDistrict);
+        currentWard.setState(lga.getState());
+        currentWard.setSenatorialDistrict(lga.getSenatorialDistrict());
         currentWard.setLga(lga);
         wardRepository.save(currentWard);
         return new WardResponse("00", String.format(successTemplate, SERVICE_NAME), currentWard);
@@ -130,24 +161,17 @@ public class WardServiceImpl implements WardService {
     }
 
     public WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId) {
-        List<Ward> wards = wardRepository.findAll();
-        List<Ward> filter = new ArrayList<>();
-
-        if(lgaId>0){
-            filter = wards.stream()
-                    .filter(ward -> ward.getLga().getId().equals(lgaId))
-                    .collect(Collectors.toList());
-        }
-        else if(senatorialDistrictId >0){
-            filter = wards.stream()
-                    .filter(ward -> ward.getSenatorialDistrict().getId().equals(senatorialDistrictId))
-                    .collect(Collectors.toList());
-        }
-        else if(stateId>0){
-            filter = wards.stream()
-                    .filter(ward -> ward.getState().getId().equals(stateId))
-                    .collect(Collectors.toList());
-        }
+        List<Ward> filter;
+            if (lgaId > 0) {
+                filter = wardRepository.findByLga(new Lga(){{setId(lgaId);}});
+            } else if (senatorialDistrictId > 0) {
+                filter = wardRepository.findBySenatorialDistrict(new SenatorialDistrict(){{setId(senatorialDistrictId);}});
+            } else if (stateId > 0) {
+                filter = wardRepository.findByState(new State(){{setId(stateId);}});
+            }
+            else{
+                filter = wardRepository.findAll();
+            }
         return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), filter);
     }
 
@@ -162,8 +186,7 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse findByLga(Long lgaCode) throws NotFoundException {
-        Lga lga = getLga(lgaCode);
-        List<Ward> ward = wardRepository.findByLga(lga);
+        List<Ward> ward = wardRepository.findByLga(new Lga(){{setId(lgaCode);}});
         if(ward!=null){
             return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), ward);
         }
@@ -172,27 +195,11 @@ public class WardServiceImpl implements WardService {
 
 
     private Lga getLga(Long id) throws NotFoundException {
-        Optional<Lga> currentLga = lgaRepository.findById(id);
-        if(!currentLga.isPresent()){
+        Lga currentLga = lgaService.findLgaById(id).getLga();
+        if(currentLga == null){
             throw new NotFoundException("Lga not found.");
         }
-        return currentLga.get();
-    }
-
-    private State getState(Long id) throws NotFoundException {
-        Optional<State> currentState = stateRepository.findById(id);
-        if(!currentState.isPresent()){
-            throw new NotFoundException("State not found.");
-        }
-        return currentState.get();
-    }
-
-    private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
-        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
-        if(!senatorialDistrict.isPresent()){
-            throw new NotFoundException("Senatorial District not found.");
-        }
-        return senatorialDistrict.get();
+        return currentLga;
     }
 
     private Ward getWard(Long id) throws NotFoundException {
@@ -204,19 +211,17 @@ public class WardServiceImpl implements WardService {
     }
 
     private void saveWard(String stateCode,String senatorialDistrictCode,String lgaCode, String code, String name)  {
-        State state = stateRepository.findByCode(stateCode);
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
-        Lga lga = lgaRepository.findByCode(lgaCode);
-        Ward ward = wardRepository.findByCode(code);
         try{
-            if(ward==null){
-                ward = new Ward();
-                ward.setState(state);
-                ward.setLga(lga);
-                ward.setSenatorialDistrict(senatorialDistrict);
-                ward.setCode(code);
-                ward.setName(name);
-                wardRepository.save(ward);
+            Optional<Ward> ward = wardRepository.findById(Long.parseLong(code));
+            Lga lga = lgaService.findLgaById(Long.parseLong(lgaCode)).getLga();
+            if(!ward.isPresent()){
+                Ward ward1 = ward.get();
+                ward1.setState(lga.getState());
+                ward1.setLga(lga);
+                ward1.setSenatorialDistrict(lga.getSenatorialDistrict());
+                ward1.setCode(code);
+                ward1.setName(name);
+                wardRepository.save(ward1);
             }
         }
         catch (Exception ex){

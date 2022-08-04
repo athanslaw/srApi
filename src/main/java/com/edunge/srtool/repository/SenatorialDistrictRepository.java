@@ -10,4 +10,5 @@ public interface SenatorialDistrictRepository extends JpaRepository<SenatorialDi
     SenatorialDistrict findByCode(String code);
     List<SenatorialDistrict> findByNameStartingWith(String name);
     List<SenatorialDistrict> findByState(State state);
+    long countByState(State state);
 }

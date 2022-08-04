@@ -33,7 +33,7 @@ public class PoliticalPartyController {
     @GetMapping(value = "/political-party", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find Political Party by code.")
     public ResponseEntity<PoliticalPartyResponse> findPoliticalPartyByCode(@RequestParam String code) throws Exception {
-        return ResponseEntity.ok(politicalService.findPoliticalPartyByCode(code));
+        return ResponseEntity.ok(politicalService.findPoliticalPartyByCodeAndDefaultState(code));
     }
 
     @GetMapping(value = "/political-party/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

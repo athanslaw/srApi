@@ -14,6 +14,8 @@ public class AbstractElectionDetails extends BaseModel {
     @JoinColumn(name = "party_agent_id",nullable = false)
     private PartyAgent partyAgent;
 
+    private Long geoPoliticalZoneId;
+
     @ManyToOne
     @JoinColumn(name = "senatorial_district_id",nullable = false)
     private SenatorialDistrict senatorialDistrict;
@@ -35,6 +37,7 @@ public class AbstractElectionDetails extends BaseModel {
     private VotingLevel votingLevel;
 
     private Long stateId;
+    private Long electionType;
 
     public Election getElection() {
         return election;
@@ -98,5 +101,21 @@ public class AbstractElectionDetails extends BaseModel {
 
     public void setStateId(Long stateId) {
         this.stateId = stateId;
+    }
+
+    public Long getElectionType() {
+        return electionType;
+    }
+
+    public void setElectionType(Long electionType) {
+        this.electionType = electionType;
+    }
+
+    public Long getGeoPoliticalZoneId() {
+        return geoPoliticalZoneId;
+    }
+
+    public void setGeoPoliticalZoneId(Long geoPoliticalZoneId) {
+        this.geoPoliticalZoneId = geoPoliticalZoneId;
     }
 }

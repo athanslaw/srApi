@@ -16,6 +16,8 @@ public class ResultRealTime extends AbstractElectionDetails {
     private Integer party_2;
     private Integer party_3;
     private Integer party_4;
+    private Integer party_5;
+    private Integer party_6;
     private Integer voteCount;
     private Long result;
     private Integer pollingUnitCount;
@@ -84,6 +86,22 @@ public class ResultRealTime extends AbstractElectionDetails {
         this.party_4 = party_4;
     }
 
+    public Integer getParty_5() {
+        return party_5;
+    }
+
+    public void setParty_5(Integer party_5) {
+        this.party_5 = party_5;
+    }
+
+    public Integer getParty_6() {
+        return party_6;
+    }
+
+    public void setParty_6(Integer party_6) {
+        this.party_6 = party_6;
+    }
+
     public Long getResult() {
         return result;
     }
@@ -110,6 +128,8 @@ public class ResultRealTime extends AbstractElectionDetails {
                 ", party_2=" + party_2 +
                 ", party_3=" + party_3 +
                 ", party_4=" + party_4 +
+                ", party_5=" + party_5 +
+                ", party_6=" + party_6 +
                 ", voteCount=" + voteCount +
                 ", result=" + result +
                 ", pollingUnitCount=" + pollingUnitCount +

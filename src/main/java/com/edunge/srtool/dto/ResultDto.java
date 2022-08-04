@@ -19,11 +19,12 @@ public class ResultDto extends AbstractBaseModel {
     private Long  wardId;
 
     private Long  PollingUnitId;
+    private Long  electionType;
     @NotNull
     private Integer registeredVotersCount;
     @NotNull
     private Integer  accreditedVotersCount;
-    private Integer party_1, party_2, party_3, party_4, result_id;
+    private Integer party_1, party_2, party_3, party_4, party_5, party_6, result_id;
 
     public Long getElectionId() {
         return electionId;
@@ -129,6 +130,22 @@ public class ResultDto extends AbstractBaseModel {
         this.party_4 = party_4;
     }
 
+    public Integer getParty_5() {
+        return party_5;
+    }
+
+    public void setParty_5(Integer party_5) {
+        this.party_5 = party_5;
+    }
+
+    public Integer getParty_6() {
+        return party_6;
+    }
+
+    public void setParty_6(Integer party_6) {
+        this.party_6 = party_6;
+    }
+
     public Integer getResult_id() {
         return result_id;
     }
@@ -137,4 +154,11 @@ public class ResultDto extends AbstractBaseModel {
         this.result_id = result_id;
     }
 
+    public Long getElectionType() {
+        return electionType;
+    }
+
+    public void setElectionType(Long electionType) {
+        this.electionType = electionType;
+    }
 }

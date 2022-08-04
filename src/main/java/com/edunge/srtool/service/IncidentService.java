@@ -13,6 +13,7 @@ public interface IncidentService {
     IncidentResponse findAll(String incidentType, String incidentWeight) ;
     IncidentResponse findIncidentByLga(Long id, String incidentType, String incidentWeight);
     IncidentResponse findIncidentBySenatorial(Long id, String incidentType, String incidentWeight) throws NotFoundException;
+    IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight) throws NotFoundException;
     IncidentResponse findIncidentByWard(Long id, String incidentType, String incidentWeight) throws NotFoundException;
     IncidentResponse findIncidentByPollingUnit(Long id, String incidentType, String incidentWeight) throws NotFoundException;
 

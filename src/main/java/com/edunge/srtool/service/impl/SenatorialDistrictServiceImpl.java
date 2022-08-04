@@ -10,6 +10,7 @@ import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.SenatorialDistrictService;
+import com.edunge.srtool.service.StateService;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,9 @@ import java.util.Optional;
 @Service
 public class SenatorialDistrictServiceImpl implements SenatorialDistrictService {
 
-    private final StateRepository stateRepository;
+    private final StateService stateService;
     private final SenatorialDistrictRepository senatorialDistrictRepository;
+
     private static final String SERVICE_NAME = "Senatorial District";
     private static final Logger LOGGER = LoggerFactory.getLogger(SenatorialDistrict.class);
 
@@ -51,8 +53,8 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
     FileProcessingService fileProcessingService;
 
     @Autowired
-    public SenatorialDistrictServiceImpl(StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
-        this.stateRepository = stateRepository;
+    public SenatorialDistrictServiceImpl(StateService stateService, SenatorialDistrictRepository senatorialDistrictRepository) {
+        this.stateService = stateService;
         this.senatorialDistrictRepository = senatorialDistrictRepository;
     }
 
@@ -75,6 +77,16 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
     public SenatorialDistrictResponse findSenatorialDistrictById(Long id) throws NotFoundException {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
         return new SenatorialDistrictResponse("00", "Senatorial District retrieved successfully", senatorialDistrict);
+    }
+
+    @Override
+    public long countSenatorialDistrictByState(State state) {
+        return senatorialDistrictRepository.countByState(state);
+    }
+
+    @Override
+    public long countSenatorialDistrict() {
+        return senatorialDistrictRepository.count();
     }
 
     @Override
@@ -143,22 +155,22 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
     }
 
     private State getState(Long id) throws NotFoundException {
-        Optional<State> currentState = stateRepository.findById(id);
-        if(!currentState.isPresent()){
+        State currentState = stateService.findStateById(id).getState();
+        if(currentState == null){
             throw new NotFoundException("State not found.");
         }
-        return currentState.get();
+        return currentState;
     }
 
     private State getState() throws NotFoundException {
-        State currentState = stateRepository.findByDefaultState(true);
+        State currentState = stateService.getDefaultState().getState();
         return currentState;
     }
 
     private void saveSenatorialDistrict(String stateCode, String code, String name)  {
-        State state = stateRepository.findByCode(stateCode);
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(code);
         try{
+            State state = stateService.findStateById(Long.parseLong(stateCode)).getState();
+            SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(code);
             if(senatorialDistrict==null){
                 senatorialDistrict = new SenatorialDistrict();
                 senatorialDistrict.setState(state);

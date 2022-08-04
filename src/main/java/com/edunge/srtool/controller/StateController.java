@@ -52,14 +52,14 @@ public class StateController {
 
     @PostMapping(value =  "/state")
     @ApiOperation(value = "Save state to the DB")
-    public ResponseEntity<StateResponse> storeState( @RequestParam String code, @RequestParam String name, @RequestParam MultipartFile file) throws Exception {
-        return ResponseEntity.ok(stateService.saveState(code, name, file));
+    public ResponseEntity<StateResponse> storeState( @RequestParam String code, @RequestParam String name, @RequestParam Long geoPoliticalZone, @RequestParam(required = false) MultipartFile file) throws Exception {
+        return ResponseEntity.ok(stateService.saveState(code, name, geoPoliticalZone, file));
     }
 
     @PutMapping(value = "/state/{id}")
     @ApiOperation(value = "Update state to the DB")
-    public ResponseEntity<StateResponse> updateState(@PathVariable Long id, @RequestParam String code, @RequestParam String name, @RequestParam(required = false) MultipartFile file) throws Exception {
-        return ResponseEntity.ok(stateService.editState(id, code, name, file));
+    public ResponseEntity<StateResponse> updateState(@PathVariable Long id, @RequestParam String code, @RequestParam String name, @RequestParam Long geoPoliticalZone, @RequestParam(required = false) MultipartFile file) throws Exception {
+        return ResponseEntity.ok(stateService.editState(id, code, name, geoPoliticalZone, file));
     }
 
     @RequestMapping(value = "/state/delete/{id}", method = RequestMethod.DELETE)

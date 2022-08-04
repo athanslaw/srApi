@@ -1,11 +1,19 @@
 package com.edunge.srtool.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
 public class State extends AbstractBaseModel {
+
+    @ManyToOne
+    @JoinColumn(name = "geo_political_zone_id")
+    private GeoPoliticalZone geoPoliticalZone;
     @OneToMany(mappedBy="state")
     Set<Lga> lgaSet;
 
@@ -42,5 +50,13 @@ public class State extends AbstractBaseModel {
 
     public void setSenatorialDistricts(Set<SenatorialDistrict> senatorialDistricts) {
         this.senatorialDistricts = senatorialDistricts;
+    }
+
+    public GeoPoliticalZone getGeoPoliticalZone() {
+        return geoPoliticalZone;
+    }
+
+    public void setGeoPoliticalZone(GeoPoliticalZone geoPoliticalZone) {
+        this.geoPoliticalZone = geoPoliticalZone;
     }
 }

@@ -3,15 +3,10 @@ package com.edunge.srtool.service.impl;
 import com.edunge.srtool.dto.LgaDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.Lga;
-import com.edunge.srtool.model.SenatorialDistrict;
-import com.edunge.srtool.model.State;
+import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.LgaRepository;
-import com.edunge.srtool.repository.SenatorialDistrictRepository;
-import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.LgaResponse;
-import com.edunge.srtool.service.FileProcessingService;
-import com.edunge.srtool.service.LgaService;
+import com.edunge.srtool.service.*;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,16 +43,17 @@ public class LgaServiceImpl implements LgaService {
     @Value("${fetch.message.template}")
     private String fetchRecordTemplate;
     private final LgaRepository lgaRepository;
-    private final StateRepository stateRepository;
-    private final SenatorialDistrictRepository senatorialDistrictRepository;
+    private final StateService stateService;
+
+    private final SenatorialDistrictService senatorialDistrictService;
 
     @Autowired
     FileProcessingService fileProcessingService;
     @Autowired
-    public LgaServiceImpl(LgaRepository lgaRepository, StateRepository stateRepository, SenatorialDistrictRepository senatorialDistrictRepository) {
+    public LgaServiceImpl(LgaRepository lgaRepository, StateService stateService, SenatorialDistrictService senatorialDistrictService) {
         this.lgaRepository = lgaRepository;
-        this.stateRepository = stateRepository;
-        this.senatorialDistrictRepository = senatorialDistrictRepository;
+        this.stateService = stateService;
+        this.senatorialDistrictService = senatorialDistrictService;
     }
 
     @Override
@@ -95,16 +91,16 @@ public class LgaServiceImpl implements LgaService {
 
     @Override
     public LgaResponse updateLga(Long id, LgaDto lgaDto) throws NotFoundException {
-        State state = getState(lgaDto.getStateId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(lgaDto.getSenatorialDistrictId());
 
         Lga currentLga = getLga(id);
         currentLga.setId(id);
         currentLga.setCode(lgaDto.getCode());
         currentLga.setName(lgaDto.getName());
-        currentLga.setState(state);
+        currentLga.setState(senatorialDistrict.getState());
         currentLga.setSenatorialDistrict(senatorialDistrict);
         lgaRepository.save(currentLga);
+
         return new LgaResponse("00", String.format(updateTemplate, lgaDto.getCode()), currentLga);
     }
 
@@ -161,9 +157,36 @@ public class LgaServiceImpl implements LgaService {
 
     @Override
     public LgaResponse findLgaByStateCode(Long stateCode) throws NotFoundException {
-        State state = getState(stateCode);
+        State state = new State(){{setId(stateCode);}};
         List<Lga> lgaByState = lgaRepository.findByState(state);
         return new LgaResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
+    }
+
+    @Override
+    public long countLgaByStateCode(Long stateCode) {
+        State state = new State(){{setId(stateCode);}};
+        return lgaRepository.countByState(state);
+    }
+
+    @Override
+    public long countLga() {
+        return lgaRepository.count();
+    }
+
+    @Override
+    public long countLgaBySenatorialDistrict(Long districtCode) {
+        SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(districtCode);}};
+        return lgaRepository.countBySenatorialDistrict(senatorialDistrict);
+    }
+
+    @Override
+    public void updateLgaDistrict(Long districtOld, SenatorialDistrict senatorialDistrict) throws NotFoundException {
+        List<Lga> lgas = lgaRepository.findBySenatorialDistrict(new SenatorialDistrict(){{setId(districtOld);}});
+        lgas.forEach(lga -> {
+            lga.setSenatorialDistrict(senatorialDistrict);
+            lga.setState(senatorialDistrict.getState());
+            lgaRepository.save(lga);
+        });
     }
 
     @Override
@@ -182,15 +205,15 @@ public class LgaServiceImpl implements LgaService {
     }
 
     private State getState(Long id) throws NotFoundException {
-        Optional<State> currentState = stateRepository.findById(id);
-        if(!currentState.isPresent()){
+        State currentState = stateService.findStateById(id).getState();
+        if(currentState == null){
             throw new NotFoundException(String.format(notFoundTemplate, "State"));
         }
-        return currentState.get();
+        return currentState;
     }
 
     private State getDefaultState() throws NotFoundException {
-        State currentState = stateRepository.findByDefaultState(true);
+        State currentState = stateService.getDefaultState().getState();
         if(currentState == null){
             throw new NotFoundException(String.format(notFoundTemplate, "State"));
         }
@@ -198,25 +221,25 @@ public class LgaServiceImpl implements LgaService {
     }
 
     private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
-        Optional<SenatorialDistrict> senatorialDistrict = senatorialDistrictRepository.findById(id);
-        if(!senatorialDistrict.isPresent()){
+        SenatorialDistrict senatorialDistrict = senatorialDistrictService.findSenatorialDistrictById(id).getSenatorialDistrict();
+        if(senatorialDistrict == null){
             throw new NotFoundException(String.format(notFoundTemplate, "Senatorial District"));
         }
-        return senatorialDistrict.get();
+        return senatorialDistrict;
     }
 
-    private void saveLga(String stateCode,String senatorialDistrictCode, String code, String name)  {
-        State state = stateRepository.findByCode(stateCode);
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findByCode(senatorialDistrictCode);
-        Lga lga = lgaRepository.findByCode(code);
+    private void saveLga(String stateId,String senatorialDistrictCode, String code, String name)  {
         try{
-            if(lga==null){
-                lga = new Lga();
-                lga.setState(state);
-                lga.setSenatorialDistrict(senatorialDistrict);
-                lga.setCode(code);
-                lga.setName(name);
-                lgaRepository.save(lga);
+            SenatorialDistrict senatorialDistrict = senatorialDistrictService.findSenatorialDistrictById(Long.parseLong(senatorialDistrictCode)).getSenatorialDistrict();
+            Optional<Lga> lga = lgaRepository.findById(Long.parseLong(code));
+
+            if(!lga.isPresent()){
+                Lga lga1 = new Lga();
+                lga1.setState(senatorialDistrict.getState());
+                lga1.setSenatorialDistrict(senatorialDistrict);
+                lga1.setCode(code);
+                lga1.setName(name);
+                lgaRepository.save(lga1);
             }
         }
         catch (Exception ex){

@@ -132,7 +132,6 @@ public class User extends BaseModel {
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", authorities=" + authorities +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
