@@ -21,6 +21,7 @@ public class User extends BaseModel {
     @JsonIgnore
     private String password;
     private String lgaId;
+    private Long stateId;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(
@@ -123,6 +124,14 @@ public class User extends BaseModel {
 
     public void setLgaId(String lgaId) {
         this.lgaId = lgaId;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
     }
 
     @Override

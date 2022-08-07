@@ -35,6 +35,13 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
     public IncidentDashboardResponse getDashboardByState() throws NotFoundException {
 
         State state = this.getState();
+        return getDashboardByState(state.getId());
+    }
+
+    @Override
+    public IncidentDashboardResponse getDashboardByState(Long stateId) throws NotFoundException {
+
+        State state = new State(){{setId(stateId);}};
         Integer totalIncidents = getStateIncidentsCount(state);
         if(totalIncidents == 0) {
             new IncidentDashboardResponse("00","Incident Report loaded.",totalIncidents, null, null);
@@ -83,8 +90,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
 
     public List<Incident> getStateIncidents(State state){
         List<Incident> incidentList = incidentService.findIncidentByStateId(state.getId(), "", "").getIncidents();
-        return incidentList.stream()
-                .filter(incident -> incident.getLga().getState().equals(state)).collect(Collectors.toList());
+        return incidentList;
     }
 
     public List<Incident> getDistrictIncidents(long state, long senatorialDistrict){
@@ -134,7 +140,7 @@ public class IncidentDashboardServiceImpl implements IncidentDashboardService {
                 });
         Integer totalIncident = getStateIncidentsCount(state);
         if(totalIncident < 1){
-            return new ArrayList<IncidentReport>();
+            return new ArrayList<>();
         }
         incidentTypeMap.forEach((type, count)->{
             Double percent = (count * 100.0)/totalIncident;

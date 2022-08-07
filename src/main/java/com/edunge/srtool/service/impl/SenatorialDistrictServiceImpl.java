@@ -135,8 +135,8 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
     @Override
     public SenatorialDistrictResponse findSenatorialDistrictByStateCode(Long stateCode) throws NotFoundException {
         State state = getState(stateCode);
-        List<SenatorialDistrict> lgaByState = senatorialDistrictRepository.findByState(state);
-        return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), lgaByState);
+        List<SenatorialDistrict> districtByState = senatorialDistrictRepository.findByState(state);
+        return new SenatorialDistrictResponse("00", String.format(successTemplate,SERVICE_NAME), districtByState);
     }
 
     @Override

@@ -35,6 +35,12 @@ public class DashboardController {
         return new ResponseEntity<>(dashboardService.getDefaultDashboard(electionType), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/dashboard/default-state/{stateId}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve results for default state.")
+    public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long stateId, @PathVariable Long electionType) throws NotFoundException {
+        return ResponseEntity.ok(dashboardService.getDashboardByState(stateId, electionType));
+    }
+
     @GetMapping(value = "/dashboard/default-state/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve results for default state.")
     public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long electionType) throws NotFoundException {
@@ -72,7 +78,7 @@ public class DashboardController {
 
     @GetMapping(value = "/dashboard/state/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Dashboard result by LGA")
-    public ResponseEntity<DashboardResponse> getDashboardByState(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+    public ResponseEntity<DashboardResponse> getDashboardByStateLga(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
         return ResponseEntity.ok(dashboardService.getDashboardByLga(id, electionType));
     }
 
@@ -80,6 +86,12 @@ public class DashboardController {
     @ApiOperation(value = "Get Incident Dashboard By State")
     public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState() throws Exception {
         return ResponseEntity.ok(incidentDashboardService.getDashboardByState());
+    }
+
+    @GetMapping(value = "/dashboard/incidents/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Incident Dashboard By State")
+    public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByState(@PathVariable Long stateId) throws Exception {
+        return ResponseEntity.ok(incidentDashboardService.getDashboardByState(stateId));
     }
 
     @GetMapping(value = "/dashboard/incidents/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

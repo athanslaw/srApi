@@ -11,7 +11,8 @@ public interface UserService {
     UserResponse updateUser(UserDto userDto);
     UserResponse updateLga(UserDto userDto);
     UserResponse changePassword(UserDto userDto);
-    UserResponse getAllUser() throws NotFoundException;
+    UserResponse getAllUser(Long stateId);
+    UserResponse getAllUser();
     LocationResponse getUserLgaById(String id);
     UserResponse getUserById(Long userId) throws NotFoundException;
     UserResponse getUserByState(Long id) throws NotFoundException;

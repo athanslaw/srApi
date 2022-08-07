@@ -364,17 +364,13 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
-        State state = new State(){{setId(id);}};
-        List<SenatorialDistrict> senatorialDistricts = senatorialDistrictRepository.findByState(state);
-        List<Incident> incidentList = new ArrayList<>();
-        senatorialDistricts.stream().forEach(senatorialDistrict ->
-            incidentList.addAll(this.findIncidentBySenatorial(senatorialDistrict.getId(), incidentType, incidentWeight).getIncidents())
-        );
+        List<Incident> incidentList = incidentRepository.findByStateId(id);
+        System.out.println("Here "+incidentList.size());
         try{
             if(!incidentType.equals("") && !incidentWeight.equals("")){
                 Long incidentTypeId = Long.parseLong(incidentType.trim());
                 incidentList.stream()
-                    .filter(election -> election.getIncidentType().getId() == incidentTypeId)
+                    .filter(incident -> incident.getIncidentType().getId() == incidentTypeId)
                     .collect(Collectors.toList());
             }
         }catch (Exception e){}
@@ -384,6 +380,7 @@ public class IncidentServiceImpl implements IncidentService {
                     .filter(election -> election.getWeight() == incidentWeightId)
                     .collect(Collectors.toList());
         }catch (Exception e){}
+        System.out.println("Here 2 "+incidentList.size());
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 

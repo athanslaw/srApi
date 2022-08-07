@@ -70,11 +70,11 @@ public class UserController {
         return ResponseEntity.ok(userDetailsService.login(authenticationRequest));
     }
 
-    @RequestMapping(value = "/users/all", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/state/{stateId}", method = RequestMethod.POST)
     @PreAuthorize("hasRole=ADMIN")
     @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
-    public ResponseEntity<UserResponse> getAllUsers() throws Exception {
-        return ResponseEntity.ok(userService.getAllUser());
+    public ResponseEntity<UserResponse> getAllUsers(@PathVariable Long stateId) throws Exception {
+        return ResponseEntity.ok(userService.getAllUser(stateId));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)

@@ -5,6 +5,8 @@ import com.edunge.srtool.model.Login;
 import com.edunge.srtool.model.User;
 import com.edunge.srtool.repository.UserRepository;
 import com.edunge.srtool.response.LoginResponse;
+import com.edunge.srtool.service.LgaService;
+import com.edunge.srtool.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +32,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     private UserRepository userRepository;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private LgaService lgaService;
 
 
     @Autowired
@@ -84,6 +89,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         final String token = jwtTokenUtil.generateToken(details);
         authenticate(login.getUsername(), login.getPassword());
         User user = userRepository.findByEmail(login.getUsername());
+        Long stateId = lgaService.findLgaById(Long.valueOf(user.getLgaId())).getLga().getState().getId();
         return new LoginResponse("00","Login Successful.", token, user);
     }
 }

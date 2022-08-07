@@ -69,6 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDto.getPhone());
         user.setRole(userDto.getRole().toLowerCase());
         user.setLgaId(userDto.getLgaId());
+        user.setStateId(lgaRepository.findById(Long.valueOf(userDto.getLgaId())).get().getState().getId());
         userRepository.save(user);
         return new UserResponse("00", "User Registered Successfully.",null, user);
     }
@@ -112,6 +113,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDto.getPhone());
         user.setRole(userDto.getRole());
         user.setLgaId(existingUser.getLgaId());
+        user.setStateId(existingUser.getStateId());
 
         userRepository.save(user);
         return new UserResponse("00", "User Updated Successfully.",null, user);
@@ -132,6 +134,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(existingUser.getPhone());
         user.setRole(existingUser.getRole());
         user.setLgaId(userDto.getLgaId());
+        user.setStateId(lgaRepository.findById(Long.valueOf(userDto.getLgaId())).get().getState().getId());
 
         userRepository.save(user);
         return new UserResponse("00", "LGA Updated Successfully.",null, user);
@@ -152,19 +155,16 @@ public class UserServiceImpl implements UserService {
         user.setPhone(existingUser.getPhone());
         user.setRole(existingUser.getRole());
         user.setLgaId(existingUser.getLgaId());
+        user.setStateId(existingUser.getStateId());
 
         userRepository.save(user);
         return new UserResponse("00", "LGA Updated Successfully.",null, user);
     }
 
     @Override
-    public UserResponse getAllUser() throws NotFoundException {
-        // get all lga under the default state
-        List<Lga> lgaList = lgaRepository.findByState(stateService.getDefaultState().getState());
+    public UserResponse getAllUser(Long stateId) {
         List<User> users = userRepository.findByRole("Administrator");
-        lgaList.forEach(lga -> {
-            users.addAll(userRepository.findByLgaId(lga.getCode()));
-        });
+        users.addAll(userRepository.findByStateId(stateId));
         return new UserResponse("00", "List of users", users);
     }
 
@@ -175,6 +175,13 @@ public class UserServiceImpl implements UserService {
             return "";
         }
     }
+
+    @Override
+    public UserResponse getAllUser() {
+        List<User> users = userRepository.findAll();
+        return new UserResponse("00", "List of users", users);
+    }
+
 
     @Override
     public LocationResponse getUserLgaById(String id){

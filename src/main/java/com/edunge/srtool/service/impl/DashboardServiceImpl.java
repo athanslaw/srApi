@@ -371,6 +371,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private List<PartyResult> processPartyResults(ResultRealTime resultSummary, State state){
         List<PartyResult> partyResults = new ArrayList<>();
+
         int totalVoteCounts = resultSummary.getParty_1() + resultSummary.getParty_2() +resultSummary.getParty_3()+resultSummary.getParty_4()+resultSummary.getParty_5()+resultSummary.getParty_6();
         // party 1
         PoliticalParty party1 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(FIRST_PARTY, state).getPoliticalParty();
@@ -395,7 +396,6 @@ public class DashboardServiceImpl implements DashboardService {
         // party 6
         PoliticalParty party6 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(SIXTH_PARTY, state).getPoliticalParty();;
         partyResults.add(this.extractPartyResult(totalVoteCounts, resultSummary.getParty_6(), party6));
-
         return partyResults;
     }
 
@@ -534,24 +534,20 @@ public class DashboardServiceImpl implements DashboardService {
         Long lgaWithResults = getLgasWithResult(resultRealTimeList);
         Long wardsWithResults = getWardsWithResult(resultRealTimeList);
 
-
         ResultRealTime resultSummary = this.resultSummary(resultRealTimeList);
         List<PartyResult> partyResults = this.processPartyResults(resultSummary, state);
-
         long pollingUnitsWithResults = resultSummary.getPollingUnitCount();
 
         HashMap<String, String> partyMap = partyMap(partyResults);
         // lga won
         HashMap<String,Integer> lgasWon = processPartiesWon(resultRealTimeList, state);
         List<LgaResult> lgaResults = getResultsGroupByLgaState(resultRealTimeList, state);
-
         List<PartyLgaResult> partyLgaResults = new ArrayList<>();
         for (Map.Entry<String, Integer> lgaWon:lgasWon.entrySet()) {
             PartyLgaResult partyLgaResult = new PartyLgaResult(partyMap.get(lgaWon.getKey()), lgaWon.getValue());
             partyLgaResults.add(partyLgaResult);
         }
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
-
         return new DashboardResponse("00", "Dashboard loaded.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
                 totalVoteCounts, totalWards, totalPollingUnits,
