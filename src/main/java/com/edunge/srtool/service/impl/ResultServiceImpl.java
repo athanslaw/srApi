@@ -91,12 +91,11 @@ public class ResultServiceImpl implements ResultService {
         PartyAgent partyAgent = partyAgentService.findPartyAgentById(resultDto.getPartyAgentId()).getPartyAgent();
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
 
-
         Election election = getElection();
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
         Ward ward = getWard(resultDto.getWardId());
-        State state = ward.getState();
+        State state = senatorialDistrict.getState();
         //Result result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
         Lga lga = getLga(resultDto.getLgaId());
         int pollingUnitCount = 1;
