@@ -16,8 +16,6 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ErrorResponse exceptionHandler(Exception ex){
         LOGGER.error(ex.getLocalizedMessage());
-        System.out.println("Ameh: "+ex.getMessage());
-        System.out.println("Ameh 2: "+ex);
         return new ErrorResponse("99", ex.getMessage());
     }
 

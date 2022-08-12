@@ -67,6 +67,12 @@ public class PartyAgentController {
         return ResponseEntity.ok(partyAgentService.findPartyAgentByName(firstname, lastname));
     }
 
+    @GetMapping(value = "/party-agent/filter/state/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter by name.")
+    public ResponseEntity<PartyAgentResponse> filterPartyAgentByState(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(partyAgentService.findPartyAgentByState(id));
+    }
+
     @GetMapping(value = "/party-agent/filter/senatorial/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by name.")
     public ResponseEntity<PartyAgentResponse> filterPartyAgentBySenatorialDistrict(@PathVariable Long id) throws Exception {

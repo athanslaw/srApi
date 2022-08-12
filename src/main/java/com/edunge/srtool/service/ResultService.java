@@ -13,7 +13,7 @@ public interface ResultService {
     ResultResponse updateResult(Long id, ResultDto ward) throws NotFoundException;
     ResultResponse deleteResultById(Long id) throws NotFoundException;
     ResultResponse findAll() ;
-    ResultResponse findByStateId() ;
+    ResultResponse findByStateId(Long stateId) ;
     Election getElection() throws NotFoundException;
     ResultResponse filterByLga(Long lgaId) throws NotFoundException;
 

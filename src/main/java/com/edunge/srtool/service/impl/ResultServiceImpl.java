@@ -28,7 +28,6 @@ public class ResultServiceImpl implements ResultService {
     private final PartyAgentServiceImpl partyAgentService;
     private final ElectionRepository electionRepository;
     private final SenatorialDistrictServiceImpl senatorialDistrictService;
-    private final StateServiceImpl stateService;
     private final WardServiceImpl wardService;
     private final LgaServiceImpl lgaService;
     private final PollingUnitServiceImpl pollingUnitService;
@@ -73,7 +72,7 @@ public class ResultServiceImpl implements ResultService {
 
     @Autowired
     public ResultServiceImpl(ResultRepository resultRepository, ResultRealTimeRepository resultRealTimeRepository, PartyAgentServiceImpl partyAgentService, ElectionRepository electionRepository, SenatorialDistrictServiceImpl senatorialDistrictService,
-            StateServiceImpl stateService, WardServiceImpl wardService, LgaServiceImpl lgaService, PollingUnitServiceImpl pollingUnitService, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyServiceImpl politicalPartyService) {
+            WardServiceImpl wardService, LgaServiceImpl lgaService, PollingUnitServiceImpl pollingUnitService, VotingLevelRepository votingLevelRepository, ResultPerPartyRepository resultPerPartyRepository, PoliticalPartyServiceImpl politicalPartyService) {
         this.resultRepository = resultRepository;
         this.resultRealTimeRepository = resultRealTimeRepository;
         this.partyAgentService = partyAgentService;
@@ -85,12 +84,10 @@ public class ResultServiceImpl implements ResultService {
         this.votingLevelRepository = votingLevelRepository;
         this.resultPerPartyRepository = resultPerPartyRepository;
         this.politicalPartyService = politicalPartyService;
-        this.stateService = stateService;
     }
 
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
-        State state = getState();
         PartyAgent partyAgent = partyAgentService.findPartyAgentById(resultDto.getPartyAgentId()).getPartyAgent();
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
 
@@ -99,6 +96,7 @@ public class ResultServiceImpl implements ResultService {
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
         Ward ward = getWard(resultDto.getWardId());
+        State state = ward.getState();
         //Result result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
         Lga lga = getLga(resultDto.getLgaId());
         int pollingUnitCount = 1;
@@ -309,14 +307,9 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ResultResponse findByStateId() {
-        try {
-            State state = this.getState();
-            List<Result> elections = resultRepository.findByStateId(state.getId());
-            return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), elections);
-        }catch (NotFoundException e){
-            return new ResultResponse("99", String.format(fetchRecordTemplate, SERVICE_NAME));
-        }
+    public ResultResponse findByStateId(Long stateId) {
+        List<Result> elections = resultRepository.findByStateId(stateId);
+        return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), elections);
     }
 
     @Override
@@ -352,14 +345,6 @@ public class ResultServiceImpl implements ResultService {
     private SenatorialDistrict getSenatorialDistrict(Long id) throws NotFoundException {
         SenatorialDistrict senatorialDistrict = senatorialDistrictService.findSenatorialDistrictById(id).getSenatorialDistrict();
         return senatorialDistrict;
-    }
-
-    private State getState() throws NotFoundException {
-        State state = stateService.getDefaultState().getState();
-        if(state == null){
-            throw new NotFoundException("Default state not found.");
-        }
-        return state;
     }
 
     private Ward getWard(Long id) throws NotFoundException {

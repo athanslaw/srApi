@@ -26,10 +26,10 @@ public class ResultController {
         this.resultService = resultService;
     }
 
-    @GetMapping(value = "/result/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/result/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
-    public ResponseEntity<ResultResponse> findAllResults(){
-        return new ResponseEntity<>(resultService.findByStateId(), HttpStatus.OK);
+    public ResponseEntity<ResultResponse> findAllResults(@PathVariable Long stateId){
+        return new ResponseEntity<>(resultService.findByStateId(stateId), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/result", method = RequestMethod.POST)

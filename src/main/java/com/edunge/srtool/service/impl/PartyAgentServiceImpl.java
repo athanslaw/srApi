@@ -144,6 +144,32 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     }
 
     @Override
+    public PartyAgentResponse findPartyAgentByState(Long stateId) throws NotFoundException{
+        List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
+        State state = new State(){{setId(stateId);}};
+        List<Lga> states = lgaRepository.findByState(state);
+        states.stream()
+                .forEach(lga -> {
+                    List<PartyAgent> partyAgents = partyAgentRepository.findByLga(lga);
+                    partyAgents.forEach(agents -> {
+                        PartyAgentDto partyAgentDto = new PartyAgentDto();
+                        partyAgentDto.setLgaName(agents.getLga().getName());
+                        partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
+                        partyAgentDto.setWardName(agents.getWard().getName());
+                        partyAgentDto.setAddress(agents.getAddress());
+                        partyAgentDto.setFirstname(agents.getFirstname());
+                        partyAgentDto.setLastname(agents.getLastname());
+                        partyAgentDto.setEmail(agents.getEmail());
+                        partyAgentDto.setId(agents.getId());
+                        partyAgentDto.setPhone(agents.getPhone());
+                        partyAgentDtoList.add(partyAgentDto);
+                    });
+
+                });
+
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
+    }
+    @Override
     public PartyAgentResponse findPartyAgentBySenatorialDistrict(Long senatorialDistrictId) throws NotFoundException {
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(senatorialDistrictId);}};

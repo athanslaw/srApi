@@ -12,6 +12,7 @@ public interface PartyAgentService {
     PartyAgentResponse deletePartyAgentById(Long id) throws NotFoundException;
     PartyAgentResponse findPartyAgentByName(String firstName, String lastname)throws NotFoundException;
     PartyAgentResponse findPartyAgentByLga(Long lgaId) throws NotFoundException;
+    PartyAgentResponse findPartyAgentByState(Long lgaId) throws NotFoundException;
     PartyAgentResponse findPartyAgentBySenatorialDistrict(Long lgaId) throws NotFoundException;
     PartyAgentResponse findPartyAgentByWard(Long wardId) throws NotFoundException;
     PartyAgentResponse findPartyAgentByPollingUnit(Long pollingUnitId) throws NotFoundException;
