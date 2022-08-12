@@ -52,6 +52,7 @@ public class StateServiceImpl implements StateService {
     @Autowired
     FileProcessingService fileProcessingService;
 
+
     @Autowired
     public StateServiceImpl(StateRepository stateRepository, LgaRepository lgaRepository, GeoPoliticalZoneRepository geoPoliticalZoneRepository) {
         this.stateRepository = stateRepository;
@@ -156,6 +157,7 @@ public class StateServiceImpl implements StateService {
     }
 
     public StateResponse getDefaultState() throws NotFoundException {
+
         State state = stateRepository.findByDefaultState(true);
         if(state==null) throw new NotFoundException("State not found.");
         return new StateResponse("00", "Default state", state);

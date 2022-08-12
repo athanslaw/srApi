@@ -188,8 +188,8 @@ public class UserServiceImpl implements UserService {
         try {
             String lga = userRepository.findByEmail(id).getLgaId();
 
-            Lga lgaData = lgaService.findLgaById(new Long(lga)).getLga();
-            return new LocationResponse("00", "Assigned location", lga,
+            Lga lgaData = lgaService.findLgaById(Long.valueOf(lga)).getLga();
+            return new LocationResponse("00", "Assigned location", lga, lgaData.getCode(),
                     lgaData.getSenatorialDistrict().getId(), lgaData.getName(),
                     lgaData.getSenatorialDistrict().getName()
                     );

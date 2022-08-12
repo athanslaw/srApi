@@ -81,7 +81,6 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
 
     @Override
     public PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code, State state) {
-        System.out.println("State id: "+state.getId());
         PoliticalParty currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, state.getId());
         if(currentPoliticalParty==null){
             currentPoliticalParty = politicalPartyRepository.findByCode(code).get(0);
