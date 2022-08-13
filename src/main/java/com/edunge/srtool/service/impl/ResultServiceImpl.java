@@ -88,17 +88,24 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
+        System.out.println("Athans saveResult 1");
         PartyAgent partyAgent = partyAgentService.findPartyAgentById(resultDto.getPartyAgentId()).getPartyAgent();
+        System.out.println("Athans saveResult 22");
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
+        System.out.println("Athans saveResult 3");
 
         Election election = getElection();
+        System.out.println("Athans saveResult 4");
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
-        PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
-        Ward ward = getWard(resultDto.getWardId());
+        System.out.println("Athans saveResult 5");
+
+        Ward ward = new Ward(){{setId(resultDto.getWardId());}};
         State state = senatorialDistrict.getState();
-        //Result result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
+        System.out.println("Athans saveResult 6");
+//Result result = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
         Lga lga = getLga(resultDto.getLgaId());
         int pollingUnitCount = 1;
+        System.out.println("Athans saveResult 2");
         boolean checkingRealTime = checkForDuplicate(election, votingLevel, lga, ward, resultDto.getElectionType());
 
         Result result = new Result();
@@ -130,12 +137,15 @@ public class ResultServiceImpl implements ResultService {
         }
 
         else if(votingLevel.getCode().equals(VOTING_LEVEL_POLLING_UNIT)){
+            PollingUnit pollingUnit = new PollingUnit(){{setId(resultDto.getPollingUnitId());}};
             result = resultRepository.findByElectionAndPollingUnitAndElectionType(election, pollingUnit, resultDto.getElectionType());
             if(result != null){
                 throw new DuplicateException(String.format("Result for %s in %s already exists.", pollingUnit.getName(), election.getDescription()));
             }
             result = new Result();
             result.setPollingUnit(pollingUnit);
+            resultRealTime.setWard(ward);
+            result.setWard(ward);
             resultRealTime.setPollingUnit(pollingUnit);
         }
 
@@ -151,12 +161,8 @@ public class ResultServiceImpl implements ResultService {
         resultRealTime.setPartyAgent(partyAgent);
         result.setElection(election);
         resultRealTime.setElection(election);
-        resultRealTime.setWard(ward);
-        result.setWard(ward);
         result.setLga(lga);
         resultRealTime.setLga(lga);
-        result.setPollingUnit(pollingUnit);
-        resultRealTime.setPollingUnit(pollingUnit);
         result.setVotingLevel(votingLevel);
         resultRealTime.setVotingLevel(votingLevel);
         result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
