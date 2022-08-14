@@ -8,6 +8,7 @@ public interface DashboardService {
     DashboardResponse getDefaultDashboard(Long electionType) throws NotFoundException;
     DashboardResponse getDashboardByState(Long electionType) throws NotFoundException;
     DashboardResponse getDashboardByState(Long stateId, Long electionType) throws NotFoundException;
+    NationalDashboardResponse getDashboardByStateGlobal(Long stateId, Long electionType);
     NationalDashboardResponse getDashboardByCountry(Long electionType) throws NotFoundException;
     NationalDashboardResponse getDashboardByZone(Long id, Long electionType) throws NotFoundException;
     DashboardResponse getDashboardBySenatorialDistrict(Long senatorialDistrictId, Long electionType) throws NotFoundException;

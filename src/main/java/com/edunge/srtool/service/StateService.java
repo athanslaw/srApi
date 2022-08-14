@@ -12,6 +12,7 @@ public interface StateService {
     StateResponse editState(Long id, String code, String name, Long geoPoliticalZone, MultipartFile file) throws NotFoundException;
     StateResponse deleteStateById(Long id) throws NotFoundException;
     StateResponse findAll() ;
+    StateResponse findByZone(Long zone);
     long countState();
     StateResponse filterByName(String name) throws NotFoundException;
     Resource loadSvg(String fileName);

@@ -37,6 +37,12 @@ public class StateController {
         return new ResponseEntity<>(stateService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/states/{zoneId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve all states.")
+    public ResponseEntity<StateResponse> findStatesByZone(@PathVariable Long zoneId){
+        return new ResponseEntity<>(stateService.findByZone(zoneId), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/state", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find state by state code.")
     public ResponseEntity<StateResponse> findStateByCode(@RequestParam String code) throws Exception {

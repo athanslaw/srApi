@@ -3,6 +3,7 @@ package com.edunge.srtool.response;
 import com.edunge.srtool.model.LgaResult;
 import com.edunge.srtool.model.PartyLgaResult;
 import com.edunge.srtool.model.PartyStateResult;
+import com.edunge.srtool.model.StateResult;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -16,13 +17,14 @@ public class NationalDashboardResponse extends BaseResponse{
     Integer totalAccreditedVotes;
     Integer totalVoteCounts;
     Long totalWards;
+    Long totalLgas;
     Long totalPollingUnits;
     Long totalPoliticalParties;
     Double resultReceived;
     Long lgaWithResults;
     Long geoPoliticalZonesWithResults;
     Long statesWithResults;
-    List<LgaResult> lgaResults;
+    List<StateResult> stateResults;
     Long wardsWithResults;
     Long pollingUnitsWithResults;
     List<PartyResult> partyResult;
@@ -33,7 +35,7 @@ public class NationalDashboardResponse extends BaseResponse{
                                      Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalLgas,
                                      Long totalPollingUnits, Long geoPoliticalZonesWithResults, Long statesWithResults, Long lgaWithResults,
                                      Long wardsWithResults, Long pollingUnitsWithResults,
-                                     Double resultsReceived, List<PartyResult> partyResults, List<LgaResult> lgaResults,
+                                     Double resultsReceived, List<PartyResult> partyResults, List<StateResult> stateResults,
                                      List<PartyStateResult> partyStateResults) {
         super(code, message);
         this.totalStates = totalStates;
@@ -46,19 +48,22 @@ public class NationalDashboardResponse extends BaseResponse{
         this.totalPollingUnits = totalPollingUnits;
         this.resultReceived = resultsReceived;
         this.lgaWithResults = lgaWithResults;
+        this.wardsWithResults = wardsWithResults;
+        this.pollingUnitsWithResults = pollingUnitsWithResults;
+        this.totalLgas = totalLgas;
         this.statesWithResults = statesWithResults;
         this.geoPoliticalZonesWithResults = geoPoliticalZonesWithResults;
         this.partyResult = partyResults;
-        this.lgaResults = lgaResults;
+        this.stateResults = stateResults;
         this.partyStatesResults = partyStateResults;
     }
 
-    public List<LgaResult> getLgaResults() {
-        return lgaResults;
+    public List<StateResult> getStateResults() {
+        return stateResults;
     }
 
-    public void setLgaResults(List<LgaResult> lgaResults) {
-        this.lgaResults = lgaResults;
+    public void setStateResults(List<StateResult> stateResults) {
+        this.stateResults = stateResults;
     }
 
     public NationalDashboardResponse() {

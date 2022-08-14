@@ -132,6 +132,12 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
+    public StateResponse findByZone(Long zone){
+        List<State> states = stateRepository.findByGeoPoliticalZone(zone);
+        return new StateResponse("00", "All states retrieved.", states);
+    }
+
+    @Override
     public long countState() {
         return stateRepository.count();
     }

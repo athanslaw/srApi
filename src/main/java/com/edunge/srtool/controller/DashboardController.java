@@ -67,13 +67,20 @@ public class DashboardController {
     @GetMapping(value = "/dashboard/national/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve results for default state.")
     public ResponseEntity<NationalDashboardResponse> getDashboardByCountry(@PathVariable Long electionType) throws NotFoundException {
+        System.out.println("Athans entered");
         return ResponseEntity.ok(dashboardService.getDashboardByCountry(electionType));
     }
 
-    @GetMapping(value = "/dashboard/zonal/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dashboard/national/zonal/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Geo Political Zone Dashboard")
     public ResponseEntity<NationalDashboardResponse> getDashboardByZone(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
         return ResponseEntity.ok(dashboardService.getDashboardByZone(id, electionType));
+    }
+
+    @GetMapping(value = "/dashboard/national/state/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Geo Political Zone Dashboard")
+    public ResponseEntity<NationalDashboardResponse> getDashboardByStateNational(@PathVariable Long id, @PathVariable Long electionType) throws Exception {
+        return ResponseEntity.ok(dashboardService.getDashboardByStateGlobal(id, electionType));
     }
 
     @GetMapping(value = "/dashboard/state/{id}/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)

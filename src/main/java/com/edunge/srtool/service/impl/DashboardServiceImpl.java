@@ -155,6 +155,27 @@ public class DashboardServiceImpl implements DashboardService {
         return results;
     }
 
+    private List<ResultRealTime> resultSummaryGroupByState(List<ResultRealTime> resultRealTime, List<State> states) throws NotFoundException{
+        List<ResultRealTime> results = new ArrayList<>();
+        states.forEach(state->{
+            ResultRealTime resultSummary = resultSummaryForState(resultRealTime, state);
+            if(resultSummary != null) {
+                ResultRealTime resultRealTime1 = new ResultRealTime();
+                resultRealTime1.setParty_1(resultSummary.getParty_1());
+                resultRealTime1.setStateId(state.getId());
+                resultRealTime1.setParty_2(resultSummary.getParty_2());
+                resultRealTime1.setParty_3(resultSummary.getParty_3());
+                resultRealTime1.setParty_4(resultSummary.getParty_4());
+                resultRealTime1.setParty_5(resultSummary.getParty_5());
+                resultRealTime1.setParty_6(resultSummary.getParty_6());
+                resultRealTime1.setVoteCount(resultSummary.getVoteCount());
+                resultRealTime1.setPollingUnitCount(resultSummary.getPollingUnitCount());
+                results.add(resultRealTime1);
+            }
+        });
+        return results;
+    }
+
     private List<ResultRealTime> resultSummaryGroupByLga(List<ResultRealTime> resultRealTime, List<Lga> lgas) throws NotFoundException{
         List<ResultRealTime> results = new ArrayList<>();
         lgas.forEach(lga->{
@@ -210,6 +231,51 @@ public class DashboardServiceImpl implements DashboardService {
         return results;
     }
 
+    private ResultRealTime resultSummaryForState(List<ResultRealTime> resultRealTime, State state){
+        AtomicInteger party1Sum= new AtomicInteger();
+        AtomicInteger party2Sum = new AtomicInteger();
+        AtomicInteger party3Sum= new AtomicInteger();
+        AtomicInteger party4Sum= new AtomicInteger();
+        AtomicInteger party5Sum= new AtomicInteger();
+        AtomicInteger party6Sum= new AtomicInteger();
+        AtomicInteger voteCount= new AtomicInteger();
+        AtomicInteger totalPU= new AtomicInteger();
+
+        party1Sum.set(0);
+        party2Sum.set(0);
+        party3Sum.set(0);
+        party4Sum.set(0);
+        party5Sum.set(0);
+        party6Sum.set(0);
+        voteCount.set(0);
+        totalPU.set(0);
+        resultRealTime.stream().filter(result->result.getStateId().equals(state.getId()))
+                .forEach(result -> {
+                party1Sum.addAndGet(result.getParty_1());
+                party2Sum.addAndGet(result.getParty_2());
+                party3Sum.addAndGet(result.getParty_3());
+                party4Sum.addAndGet(result.getParty_4());
+                party5Sum.addAndGet(result.getParty_4());
+                party6Sum.addAndGet(result.getParty_4());
+                voteCount.addAndGet(result.getVoteCount());
+                totalPU.addAndGet(result.getPollingUnitCount());
+            });
+        if(voteCount.get()>0) {
+            ResultRealTime resultRealTime1 = new ResultRealTime();
+            resultRealTime1.setParty_1(party1Sum.get());
+            resultRealTime1.setStateId(state.getId());
+            resultRealTime1.setParty_2(party2Sum.get());
+            resultRealTime1.setParty_3(party3Sum.get());
+            resultRealTime1.setParty_4(party4Sum.get());
+            resultRealTime1.setParty_5(party5Sum.get());
+            resultRealTime1.setParty_6(party6Sum.get());
+            resultRealTime1.setVoteCount(voteCount.get());
+            resultRealTime1.setPollingUnitCount(totalPU.get());
+            return resultRealTime1;
+        }
+        return null;
+    }
+
     private ResultRealTime resultSummaryForLga(List<ResultRealTime> resultRealTime, Lga lga){
         AtomicInteger party1Sum= new AtomicInteger();
         AtomicInteger party2Sum = new AtomicInteger();
@@ -252,6 +318,61 @@ public class DashboardServiceImpl implements DashboardService {
             resultRealTime1.setPollingUnitCount(totalPU.get());
             return resultRealTime1;
         }
+        return null;
+    }
+
+    private StateResult getResultsGroupByState(List<ResultRealTime> resultRealTime, State state) throws NotFoundException{
+        ResultRealTime result = resultSummaryForState(resultRealTime, state);
+
+        int party1Sum;
+        int party2Sum;
+        int party3Sum;
+        int party4Sum;
+        int party5Sum;
+        int party6Sum;
+        int voteCount;
+
+        if(result != null) {
+            party1Sum = result.getParty_1();
+            party2Sum = result.getParty_2();
+            party3Sum = result.getParty_3();
+            party4Sum = result.getParty_4();
+            party5Sum = result.getParty_5();
+            party6Sum = result.getParty_6();
+            voteCount = result.getVoteCount();
+
+            if (voteCount > 0) {
+                int totalVoteCounts = party1Sum + party2Sum + party3Sum + party4Sum + party5Sum + party6Sum;
+                List<PartyResult> partyResults = new ArrayList<>();
+
+                // party 1
+                PoliticalParty party1 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(FIRST_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party1Sum, party1));
+
+                // party 2
+                PoliticalParty party2 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(SECOND_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party2Sum, party2));
+
+                // party 3
+                PoliticalParty party3 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(THIRD_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party3Sum, party3));
+
+                // party 4
+                PoliticalParty party4 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(FOURTH_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party4Sum, party4));
+
+                // party 5
+                PoliticalParty party5 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(FIFTH_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party5Sum, party5));
+// party 4
+                PoliticalParty party6 = politicalPartyService.findPoliticalPartyByCodeAndDefaultState(SIXTH_PARTY, state).getPoliticalParty();
+                partyResults.add(this.extractPartyResult(totalVoteCounts, party6Sum, party6));
+
+                partyResults.sort(Comparator.comparingInt(PartyResult::getTotalVoteCount));
+                return new StateResult(state, partyResults);
+            }
+        }
+
         return null;
     }
 
@@ -347,6 +468,26 @@ public class DashboardServiceImpl implements DashboardService {
         });
 
         return lgaResults;
+    }
+
+    private List<StateResult> getResultsGroupByState(List<ResultRealTime> resultRealTime) throws NotFoundException{
+        List<StateResult> stateResults = new ArrayList<>();
+
+        List<State> states = stateService.findAll().getStates();
+        List<ResultRealTime> resultRealTime1 = resultSummaryGroupByState(resultRealTime, states);
+
+        states.forEach(state -> {
+            StateResult stateResult = null;
+            try {
+                stateResult = this.getResultsGroupByState(resultRealTime1, state);
+            } catch (NotFoundException e) {
+            }
+            if(stateResult != null) {
+                stateResults.add(stateResult);
+            }
+        });
+
+        return stateResults;
     }
 
     private List<LgaResult> getResultsGroupByLga(List<ResultRealTime> resultRealTime) throws NotFoundException{
@@ -564,10 +705,9 @@ public class DashboardServiceImpl implements DashboardService {
         Election election = resultService.getElection();
         Long totalStates = getTotalStates();
         Long totalZones = countGeoPoliticalZone();
-
-        List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElection(election);
+        List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionAndElectionType(election, electionType);
         Long totalSenatorialDistricts = senatorialDistrict(); // totalZone
-        Integer totalRegisteredVotes = getRegisteredVoters(election); // global by electionId
+        Integer totalRegisteredVotes = getRegisteredVoters(election, electionType); // global by electionId
         Integer totalAccreditedVotes =  getAccreditedVotes(election, electionType); // global by electionId
         Long totalPollingUnits = Long.valueOf(countPollingUnit()); // global by electionId
         Long totalLgas = lgaService.countLga();
@@ -577,35 +717,80 @@ public class DashboardServiceImpl implements DashboardService {
         Long statesWithResults = getStatesWithResult(resultRealTimeList); // global by electionId; stateWithResults
         Long zonesWithResults = getZonesWithResult(resultRealTimeList); // global by electionId; stateWithResults
 
-
         ResultRealTime resultSummary = this.resultSummary(resultRealTimeList);
-        List<PartyResult> partyResults = this.processPartyResults(resultSummary, resultSummary.getLga().getState());
+        State state = resultRealTimeList.isEmpty()?
+                new State(){{setId(resultRealTimeList.get(0).getStateId());}}
+                :new State(){{setId(13L);}};
+        List<PartyResult> partyResults = this.processPartyResults(resultSummary, state);
         long pollingUnitsWithResults = resultSummary.getPollingUnitCount();
-
 
         HashMap<String, String> partyMap = partyMap(partyResults);
         // lga won
         HashMap<String,Integer> statesWon = processPartiesWon(resultRealTimeList);
-        List<LgaResult> lgaResults = getResultsGroupByLga(resultRealTimeList);
-
+        List<StateResult> stateResults = getResultsGroupByState(resultRealTimeList);
         List<PartyStateResult> partyStateResults = new ArrayList<>();
         for (Map.Entry<String, Integer> stateWon:statesWon.entrySet()) {
             PartyStateResult partyStateResult = new PartyStateResult(partyMap.get(stateWon.getKey()), stateWon.getValue());
             partyStateResults.add(partyStateResult);
         }
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
-
         return new NationalDashboardResponse("00", "Dashboard loaded.", totalZones, totalStates, totalSenatorialDistricts,
                 totalRegisteredVotes, totalAccreditedVotes, totalVoteCounts, totalLgas,
                 totalPollingUnits, zonesWithResults, statesWithResults, lgasWithResults, wardsWithResults, pollingUnitsWithResults,
-                resultsReceived, partyResults, lgaResults,partyStateResults
+                resultsReceived, partyResults, stateResults,partyStateResults
         );
     }
+
     @Override
     public NationalDashboardResponse getDashboardByZone(Long zoneId, Long electionType) throws NotFoundException{
         return new NationalDashboardResponse();
     }
+    /*
+    @Override
+    public NationalDashboardResponse getDashboardByZone(Long zoneId, Long electionType) throws NotFoundException{
+        Election election = resultService.getElection();
+        Long totalStates = getTotalStatesByZone(zoneId);
+        Long totalZones = 1L;
+        List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionAndElectionTypeAndGeoPoliticalZone(election, electionType, zoneId);
+        Long totalSenatorialDistricts = senatorialDistrict(); // totalZone
+        Integer totalRegisteredVotes = getRegisteredVoters(election, electionType, zone); // global by electionId
+        Integer totalAccreditedVotes =  getAccreditedVotes(election, electionType); // global by electionId
+        Long totalPollingUnits = Long.valueOf(countPollingUnit()); // global by electionId
+        Long totalLgas = lgaService.countLga();
+        Integer totalVoteCounts = getTotalVotes(election, electionType); // global by electionId
+        Long lgasWithResults = getLgasWithResult(resultRealTimeList); // global by electionId;
+        Long wardsWithResults = getWardsWithResult(resultRealTimeList); // global by electionId; stateWithResults
+        Long statesWithResults = getStatesWithResult(resultRealTimeList); // global by electionId; stateWithResults
+        Long zonesWithResults = getZonesWithResult(resultRealTimeList); // global by electionId; stateWithResults
 
+        ResultRealTime resultSummary = this.resultSummary(resultRealTimeList);
+        State state = resultRealTimeList.isEmpty()?
+                new State(){{setId(resultRealTimeList.get(0).getStateId());}}
+                :new State(){{setId(13L);}};
+        List<PartyResult> partyResults = this.processPartyResults(resultSummary, state);
+        long pollingUnitsWithResults = resultSummary.getPollingUnitCount();
+
+        HashMap<String, String> partyMap = partyMap(partyResults);
+        // lga won
+        HashMap<String,Integer> statesWon = processPartiesWon(resultRealTimeList);
+        List<StateResult> stateResults = getResultsGroupByState(resultRealTimeList);
+        List<PartyStateResult> partyStateResults = new ArrayList<>();
+        for (Map.Entry<String, Integer> stateWon:statesWon.entrySet()) {
+            PartyStateResult partyStateResult = new PartyStateResult(partyMap.get(stateWon.getKey()), stateWon.getValue());
+            partyStateResults.add(partyStateResult);
+        }
+        Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
+        return new NationalDashboardResponse("00", "Dashboard loaded.", totalZones, totalStates, totalSenatorialDistricts,
+                totalRegisteredVotes, totalAccreditedVotes, totalVoteCounts, totalLgas,
+                totalPollingUnits, zonesWithResults, statesWithResults, lgasWithResults, wardsWithResults, pollingUnitsWithResults,
+                resultsReceived, partyResults, stateResults,partyStateResults
+        );
+    }
+*/
+    @Override
+    public NationalDashboardResponse getDashboardByStateGlobal(Long stateId, Long electionType){
+        return new NationalDashboardResponse();
+    }
     private PartyResult extractPartyResult(int totalVoteCounts, int partyVotes, PoliticalParty politicalParty) {
         double percent;
         PartyResult partyResult = new PartyResult();
@@ -649,8 +834,8 @@ public class DashboardServiceImpl implements DashboardService {
     private Long senatorialDistrict(){
         return senatorialDistrictService.countSenatorialDistrict();
     }
-    private Integer getRegisteredVoters(Election electionId){
-        return resultRealTimeRepository.findSumRegisteredVotes(electionId).intValue();
+    private Integer getRegisteredVoters(Election electionId, Long electionType){
+        return resultRealTimeRepository.findSumRegisteredVotes(electionId, electionType).intValue();
     }
 
     private Integer getAccreditedVotes(Election election, Long electionType){

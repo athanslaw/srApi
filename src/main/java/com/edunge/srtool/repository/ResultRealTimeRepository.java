@@ -17,20 +17,22 @@ public interface ResultRealTimeRepository extends JpaRepository<ResultRealTime, 
     List<ResultRealTime> findByElectionAndLgaAndElectionType(Election election, Lga lga, Long electionType);
     List<ResultRealTime> findByLgaAndElectionTypeAndElection(Lga lga, Long electionType, Election election);
     List<ResultRealTime> findByElection(Election election);
+    List<ResultRealTime> findByElectionAndElectionType(Election election, Long electionType);
+    List<ResultRealTime> findByElectionAndElectionTypeAndGeoPoliticalZone(Election election, Long electionType, Long zone);
     List<ResultRealTime> findBySenatorialDistrictAndElectionTypeAndElection(SenatorialDistrict senatorialDistrict, Long electionType, Election election);
     List<ResultRealTime> findByStateIdAndElectionTypeAndElection(long stateId, Long electionType, Election election);
     void deleteByLga(Lga lga);
-    @Query(nativeQuery = true, value="SELECT SUM(registeredVotersCount) FROM resultRealTime WHERE electionId=?1 AND electionType=?2")
-    Long findSumRegisteredVotes(Election election);
-    @Query(nativeQuery = true, value="SELECT SUM(registeredVotersCount) FROM resultRealTime WHERE electionId=?1 AND geoPoliticalZone=?2 AND electionType=?3")
+    @Query(nativeQuery = true, value="SELECT SUM(registered_voters_count) FROM result_real_time WHERE election_id=?1 AND election_type=?2")
+    Long findSumRegisteredVotes(Election election, Long electionType);
+    @Query(nativeQuery = true, value="SELECT SUM(registered_voters_count) FROM resultRealTime WHERE election_id=?1 AND geo_political_zone=?2 AND election_type=?3")
     Long findSumRegisteredVotersZone(Election election, GeoPoliticalZone zone, Long electionType);
-    @Query(nativeQuery = true, value="SELECT SUM(accreditedVotersCount) FROM resultRealTime WHERE electionId=?1 AND electionType=?2")
+    @Query(nativeQuery = true, value="SELECT SUM(accredited_voters_count) FROM result_real_time WHERE election_id=?1 AND election_type=?2")
     Long findSumAccreditedVoters(Election election, Long electionType);
-    @Query(nativeQuery = true, value="SELECT SUM(accreditedVotersCount) FROM resultRealTime WHERE electionId=?1 AND geoPoliticalZone=?2 AND electionType=?3")
+    @Query(nativeQuery = true, value="SELECT SUM(accredited_voters_count) FROM result_real_time WHERE election_id=?1 AND geo_political_zone=?2 AND election_type=?3")
     Long findSumAccreditedVotersZone(Election election, GeoPoliticalZone zone, Long electionType);
-    @Query(nativeQuery = true, value="SELECT SUM(voteCount) FROM resultRealTime WHERE electionId=?1")
+    @Query(nativeQuery = true, value="SELECT SUM(vote_count) FROM result_real_time WHERE election_id=?1")
     Long findSumVoteCount(Election election, Long electionType);
-    @Query(nativeQuery = true, value="SELECT SUM(voteCount) FROM resultRealTime WHERE electionId=?1 AND geoPoliticalZone=?2 AND electionType=?3")
+    @Query(nativeQuery = true, value="SELECT SUM(vote_count) FROM result_real_time WHERE election_id=?1 AND geo_political_zone=?2 AND election_type=?3")
     Long findSumVoteCountZone(Election election, GeoPoliticalZone zone, Long electionType);
     
 }
