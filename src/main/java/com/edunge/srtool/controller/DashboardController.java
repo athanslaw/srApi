@@ -67,7 +67,6 @@ public class DashboardController {
     @GetMapping(value = "/dashboard/national/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve results for default state.")
     public ResponseEntity<NationalDashboardResponse> getDashboardByCountry(@PathVariable Long electionType) throws NotFoundException {
-        System.out.println("Athans entered");
         return ResponseEntity.ok(dashboardService.getDashboardByCountry(electionType));
     }
 

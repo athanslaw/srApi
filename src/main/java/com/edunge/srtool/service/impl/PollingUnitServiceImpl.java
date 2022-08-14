@@ -188,8 +188,6 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
     @Override
     public long findCountByWard(Long wardCode) {
-
-        System.out.println("Athans findCountByWard");
         Ward ward = new Ward(){{setId(wardCode);}};
         return pollingUnitRepository.countByWard(ward);
     }
