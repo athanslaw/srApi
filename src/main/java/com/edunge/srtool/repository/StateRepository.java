@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface StateRepository extends JpaRepository<State, Long> {
     State findByCode(String code);
-    List<State> findByGeoPoliticalZone(Long code);
+    List<State> findByGeoPoliticalZone(GeoPoliticalZone zoneId);
     State findByNameStartingWith(String name);
     State findByDefaultState(Boolean defaultState);
 

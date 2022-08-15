@@ -19,6 +19,7 @@ public interface ResultRealTimeRepository extends JpaRepository<ResultRealTime, 
     List<ResultRealTime> findByElection(Election election);
     List<ResultRealTime> findByElectionAndElectionType(Election election, Long electionType);
     List<ResultRealTime> findByElectionAndElectionTypeAndGeoPoliticalZoneId(Election election, Long electionType, Long zone);
+    List<ResultRealTime> findByElectionAndElectionTypeAndStateId(Election election, Long electionType, Long stateId);
     List<ResultRealTime> findBySenatorialDistrictAndElectionTypeAndElection(SenatorialDistrict senatorialDistrict, Long electionType, Election election);
     List<ResultRealTime> findByStateIdAndElectionTypeAndElection(long stateId, Long electionType, Election election);
     void deleteByLga(Lga lga);
