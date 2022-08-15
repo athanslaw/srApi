@@ -2,6 +2,7 @@ package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
+import com.edunge.srtool.model.AbstractBaseModel;
 import com.edunge.srtool.model.GeoPoliticalZone;
 import com.edunge.srtool.model.Lga;
 import com.edunge.srtool.model.State;
@@ -20,8 +21,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StateServiceImpl implements StateService {
@@ -128,12 +128,15 @@ public class StateServiceImpl implements StateService {
     @Override
     public StateResponse findAll() {
         List<State> states = stateRepository.findAll();
+        states.sort(Comparator.comparing(AbstractBaseModel::getName));
+
         return new StateResponse("00", "All states retrieved.", states);
     }
 
     @Override
     public StateResponse findByZone(Long zone){
         List<State> states = stateRepository.findByGeoPoliticalZone(new GeoPoliticalZone(){{setId(zone);}});
+        states.sort(Comparator.comparing(AbstractBaseModel::getId));
         return new StateResponse("00", "All states retrieved.", states);
     }
 
