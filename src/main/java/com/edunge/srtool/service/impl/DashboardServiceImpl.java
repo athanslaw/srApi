@@ -208,14 +208,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private List<ResultRealTime> resultSummaryGroupByState(List<ResultRealTime> resultRealTime) throws NotFoundException{
-        List<ResultRealTime> results = new ArrayList<>();
-        stateService.findAll().getStates().forEach(state -> {
-            try {
-                results.addAll(resultSummaryGroupByLga(resultRealTime, state));
-            } catch (NotFoundException e) {
-            }
-        });
-        return results;
+        return resultSummaryGroupByState(resultRealTime, stateService.findAll().getStates());
     }
 
     private List<ResultRealTime> resultSummaryForDistrictGroupByLga(List<ResultRealTime> resultRealTime, SenatorialDistrict senatorialDistrict) throws NotFoundException{
