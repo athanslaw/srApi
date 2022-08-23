@@ -12,6 +12,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByCombinedKeysOrderByTimeStampDesc( String combinedKeys); // order by timestamp descending
     List<Incident> findByLga(Lga lga);
     List<Incident> findByStateId(long stateId);
+    List<Incident> findByGeoPoliticalZoneId(long zone);
     List<Incident> findByWard(Ward ward);
     List<Incident> findByPollingUnit(PollingUnit pollingUnit);
 

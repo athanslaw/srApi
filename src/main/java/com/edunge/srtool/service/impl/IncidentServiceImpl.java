@@ -363,9 +363,9 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
-        List<Incident> incidentList = incidentRepository.findByStateId(id);
-        System.out.println("Here "+incidentList.size());
+    public IncidentResponse findIncidentByZone(Long id, String incidentType, String incidentWeight){
+        List<Incident> incidentList = incidentRepository.findByGeoPoliticalZoneId(id);
+
         try{
             if(!incidentType.equals("") && !incidentWeight.equals("")){
                 Long incidentTypeId = Long.parseLong(incidentType.trim());
@@ -380,7 +380,27 @@ public class IncidentServiceImpl implements IncidentService {
                     .filter(election -> election.getWeight() == incidentWeightId)
                     .collect(Collectors.toList());
         }catch (Exception e){}
-        System.out.println("Here 2 "+incidentList.size());
+
+        return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
+    }
+
+    @Override
+    public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
+        List<Incident> incidentList = incidentRepository.findByStateId(id);
+        try{
+            if(!incidentType.equals("") && !incidentWeight.equals("")){
+                Long incidentTypeId = Long.parseLong(incidentType.trim());
+                incidentList.stream()
+                    .filter(incident -> incident.getIncidentType().getId() == incidentTypeId)
+                    .collect(Collectors.toList());
+            }
+        }catch (Exception e){}
+        try{
+            Long incidentWeightId = Long.parseLong(incidentWeight);
+            incidentList.stream()
+                    .filter(election -> election.getWeight() == incidentWeightId)
+                    .collect(Collectors.toList());
+        }catch (Exception e){}
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 

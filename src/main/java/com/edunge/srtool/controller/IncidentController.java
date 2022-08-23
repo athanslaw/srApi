@@ -55,6 +55,16 @@ public class IncidentController {
         return ResponseEntity.ok(incidentService.findIncidentById(id));
     }
 
+    @GetMapping(value = "/incident/zone/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by zone.")
+    public ResponseEntity<IncidentResponse> filterIncidentByZone(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByZone(id, incidentType, incidentWeight));
+    }
+    @GetMapping(value = "/incident/state/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Filter incident by state.")
+    public ResponseEntity<IncidentResponse> filterIncidentByState(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {
+        return ResponseEntity.ok(incidentService.findIncidentByStateId(id, incidentType, incidentWeight));
+    }
     @GetMapping(value = "/incident/senatorial/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter incident by Senatorial.")
     public ResponseEntity<IncidentResponse> filterIncidentBySenatorial(@PathVariable Long id, @RequestParam(required = false) String incidentType, @RequestParam(required = false) String incidentWeight) throws Exception {

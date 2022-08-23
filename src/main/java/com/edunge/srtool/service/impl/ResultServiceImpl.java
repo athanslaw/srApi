@@ -299,8 +299,14 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public ResultResponse findByStateId(Long stateId) {
-        List<Result> elections = resultRepository.findByStateId(stateId);
-        return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), elections);
+        List<Result> results = resultRepository.findByStateId(stateId);
+        return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), results);
+    }
+
+    @Override
+    public ResultResponse findByZoneId(Long zoneId) {
+        List<Result> results = resultRepository.findByGeoPoliticalZoneId(zoneId);
+        return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), results);
     }
 
     @Override

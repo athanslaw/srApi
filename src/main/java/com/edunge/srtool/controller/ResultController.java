@@ -26,7 +26,14 @@ public class ResultController {
         this.resultService = resultService;
     }
 
-    @GetMapping(value = "/result/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/result/filter/zone/{zoneId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve all results.")
+    public ResponseEntity<ResultResponse> findResultsByZone(@PathVariable Long zoneId){
+        return new ResponseEntity<>(resultService.findByZoneId(zoneId), HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/result/filter/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
     public ResponseEntity<ResultResponse> findAllResults(@PathVariable Long stateId){
         return new ResponseEntity<>(resultService.findByStateId(stateId), HttpStatus.OK);

@@ -14,6 +14,7 @@ public interface ResultService {
     ResultResponse deleteResultById(Long id) throws NotFoundException;
     ResultResponse findAll() ;
     ResultResponse findByStateId(Long stateId) ;
+    ResultResponse findByZoneId(Long zoneId) ;
     Election getElection() throws NotFoundException;
     ResultResponse filterByLga(Long lgaId) throws NotFoundException;
 
