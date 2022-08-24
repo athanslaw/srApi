@@ -131,7 +131,6 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
 
     private Long getActiveState(){
         try{
-            System.out.println("Am here");
             return stateService.getDefaultState().getState().getId();
         }
         catch (Exception e){

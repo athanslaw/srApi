@@ -179,6 +179,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getAllUser() {
         List<User> users = userRepository.findAll();
+        users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
         return new UserResponse("00", "List of users", users);
     }
 
