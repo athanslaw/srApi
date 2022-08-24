@@ -8,14 +8,15 @@ public class PartyAgentDto extends BaseModel {
     private String phone;
     private String email;
     private String address;
-    private Long lgaId;
-    private Long wardId;
-    private Long pollingUnitId;
+    private String lgaId;
+    private String wardId;
+    private String pollingUnitId;
     private Long politicalPartyId;
 
     private String lgaName;
     private String wardName;
     private String pollingUnitName;
+    private Long stateId;
 
     public String getFirstname() {
         return firstname;
@@ -57,27 +58,27 @@ public class PartyAgentDto extends BaseModel {
         this.address = address;
     }
 
-    public Long getLgaId() {
+    public String getLgaId() {
         return lgaId;
     }
 
-    public void setLgaId(Long lgaId) {
+    public void setLgaId(String lgaId) {
         this.lgaId = lgaId;
     }
 
-    public Long getWardId() {
+    public String getWardId() {
         return wardId;
     }
 
-    public void setWardId(Long wardId) {
+    public void setWardId(String wardId) {
         this.wardId = wardId;
     }
 
-    public Long getPollingUnitId() {
+    public String getPollingUnitId() {
         return pollingUnitId;
     }
 
-    public void setPollingUnitId(Long pollingUnitId) {
+    public void setPollingUnitId(String pollingUnitId) {
         this.pollingUnitId = pollingUnitId;
     }
 
@@ -111,5 +112,13 @@ public class PartyAgentDto extends BaseModel {
 
     public void setPollingUnitName(String pollingUnitName) {
         this.pollingUnitName = pollingUnitName;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
     }
 }

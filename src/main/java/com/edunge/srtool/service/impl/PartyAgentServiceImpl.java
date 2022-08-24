@@ -68,9 +68,9 @@ public class PartyAgentServiceImpl implements PartyAgentService {
 
     @Override
     public PartyAgentResponse savePartyAgent(PartyAgentDto partyAgentDto) throws NotFoundException {
-        PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        Lga lga = getLga(partyAgentDto.getLgaId());
-        Ward ward = getWard(partyAgentDto.getWardId());
+        PollingUnit pollingUnit = getPollingUnit(Long.valueOf(partyAgentDto.getPollingUnitId()));
+        Lga lga = getLga(Long.valueOf(partyAgentDto.getLgaId()));
+        Ward ward = getWard(Long.valueOf(partyAgentDto.getWardId()));
         PartyAgent partyAgent = partyAgentRepository.findByPhone(partyAgentDto.getPhone());
         if(partyAgent==null){
             partyAgent  = new PartyAgent();
@@ -102,9 +102,13 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         partyAgent.stream().forEach(agents->{
             PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
             partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+            partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
             partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
             partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
             partyAgentDto.setAddress(agents.getAddress());
             partyAgentDto.setFirstname(agents.getFirstname());
             partyAgentDto.setLastname(agents.getLastname());
@@ -126,15 +130,19 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         partyAgent.stream().forEach(agents->{
             PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
             partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+            partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
             partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
             partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
             partyAgentDto.setAddress(agents.getAddress());
             partyAgentDto.setFirstname(agents.getFirstname());
             partyAgentDto.setLastname(agents.getLastname());
             partyAgentDto.setEmail(agents.getEmail());
-            partyAgentDto.setId(agents.getId());
             partyAgentDto.setPhone(agents.getPhone());
+            partyAgentDto.setId(agents.getId());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -153,15 +161,19 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                     List<PartyAgent> partyAgents = partyAgentRepository.findByLga(lga);
                     partyAgents.forEach(agents -> {
                         PartyAgentDto partyAgentDto = new PartyAgentDto();
+                        partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
                         partyAgentDto.setLgaName(agents.getLga().getName());
+                        partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+                        partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
                         partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
                         partyAgentDto.setWardName(agents.getWard().getName());
+                        partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
                         partyAgentDto.setAddress(agents.getAddress());
                         partyAgentDto.setFirstname(agents.getFirstname());
                         partyAgentDto.setLastname(agents.getLastname());
                         partyAgentDto.setEmail(agents.getEmail());
-                        partyAgentDto.setId(agents.getId());
                         partyAgentDto.setPhone(agents.getPhone());
+                        partyAgentDto.setId(agents.getId());
                         partyAgentDtoList.add(partyAgentDto);
                     });
 
@@ -179,15 +191,19 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                     List<PartyAgent> partyAgents = partyAgentRepository.findByLga(lga);
                     partyAgents.forEach(agents -> {
                         PartyAgentDto partyAgentDto = new PartyAgentDto();
+                        partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
                         partyAgentDto.setLgaName(agents.getLga().getName());
+                        partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+                        partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
                         partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
                         partyAgentDto.setWardName(agents.getWard().getName());
+                        partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
                         partyAgentDto.setAddress(agents.getAddress());
                         partyAgentDto.setFirstname(agents.getFirstname());
                         partyAgentDto.setLastname(agents.getLastname());
                         partyAgentDto.setEmail(agents.getEmail());
-                        partyAgentDto.setId(agents.getId());
                         partyAgentDto.setPhone(agents.getPhone());
+                        partyAgentDto.setId(agents.getId());
                         partyAgentDtoList.add(partyAgentDto);
                     });
 
@@ -203,9 +219,13 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         partyAgent.stream().forEach(agents->{
             PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
             partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+            partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
             partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
             partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
             partyAgentDto.setAddress(agents.getAddress());
             partyAgentDto.setFirstname(agents.getFirstname());
             partyAgentDto.setLastname(agents.getLastname());
@@ -224,9 +244,14 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         partyAgent.stream().forEach(agents->{
             PartyAgentDto partyAgentDto = new PartyAgentDto();
+            partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
             partyAgentDto.setLgaName(agents.getLga().getName());
+            partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+
+            partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
             partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
             partyAgentDto.setWardName(agents.getWard().getName());
+            partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
             partyAgentDto.setAddress(agents.getAddress());
             partyAgentDto.setFirstname(agents.getFirstname());
             partyAgentDto.setLastname(agents.getLastname());
@@ -253,9 +278,9 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     @Override
     public PartyAgentResponse updatePartyAgent(Long id, PartyAgentDto partyAgentDto) throws NotFoundException {
 
-        PollingUnit pollingUnit = getPollingUnit(partyAgentDto.getPollingUnitId());
-        Lga lga = getLga(partyAgentDto.getLgaId());
-        Ward ward = getWard(partyAgentDto.getWardId());
+        PollingUnit pollingUnit = getPollingUnit(Long.valueOf(partyAgentDto.getPollingUnitId()));
+        Lga lga = getLga(Long.valueOf(partyAgentDto.getLgaId()));
+        Ward ward = getWard(Long.valueOf(partyAgentDto.getWardId()));
         PartyAgent partyAgent = getPartyAgent(id);
         partyAgent.setFirstname(partyAgentDto.getFirstname());
         partyAgent.setLastname(partyAgentDto.getLastname());
@@ -287,11 +312,13 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             List<PartyAgent> partyAgents = partyAgentRepository.findByLga(lga);
             partyAgents.stream().forEach(agents->{
                 PartyAgentDto partyAgentDto = new PartyAgentDto();
+                partyAgentDto.setStateId(agents.getPollingUnit().getState().getId());
                 partyAgentDto.setLgaName(agents.getLga().getName());
-                partyAgentDto.setLgaId(agents.getLga().getId());
+                partyAgentDto.setLgaId(agents.getPollingUnit().getLga().getCode());
+                partyAgentDto.setPollingUnitId(agents.getPollingUnit().getCode());
                 partyAgentDto.setPollingUnitName(agents.getPollingUnit().getName());
                 partyAgentDto.setWardName(agents.getWard().getName());
-                partyAgentDto.setWardId(agents.getWard().getId());
+                partyAgentDto.setWardId(agents.getPollingUnit().getWard().getCode());
                 partyAgentDto.setAddress(agents.getAddress());
                 partyAgentDto.setFirstname(agents.getFirstname());
                 partyAgentDto.setLastname(agents.getLastname());
