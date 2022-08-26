@@ -8,6 +8,7 @@ import com.edunge.srtool.response.PoliticalPartyResponse;
 public interface PoliticalPartyService {
     PoliticalPartyResponse savePoliticalParty(PoliticalPartyDto politicalParty) throws NotFoundException;
     PoliticalPartyResponse findPoliticalPartyById(Long id) throws NotFoundException;
+    PoliticalPartyResponse findPoliticalPartyByState(Long stateId) throws NotFoundException;
     PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code);
     PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code, State state);
     PoliticalPartyResponse editPoliticalParty(Long id, PoliticalPartyDto politicalParty) throws NotFoundException;

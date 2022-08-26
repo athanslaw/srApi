@@ -71,6 +71,12 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     }
 
     @Override
+    public PoliticalPartyResponse findPoliticalPartyByState(Long stateId) throws NotFoundException {
+        List<PoliticalParty> politicalParties = politicalPartyRepository.findByStateId(stateId);
+        return new PoliticalPartyResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), politicalParties);
+    }
+
+    @Override
     public PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code) {
         PoliticalParty currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, getActiveState());
         if(currentPoliticalParty==null){

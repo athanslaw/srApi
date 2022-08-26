@@ -36,6 +36,12 @@ public class PoliticalPartyController {
         return ResponseEntity.ok(politicalService.findPoliticalPartyByCodeAndDefaultState(code));
     }
 
+    @GetMapping(value = "/political-party/state/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find Political Party by code.")
+    public ResponseEntity<PoliticalPartyResponse> findPoliticalPartyByCode(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(politicalService.findPoliticalPartyByState(id));
+    }
+
     @GetMapping(value = "/political-party/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find Political Party by id.")
     public ResponseEntity<PoliticalPartyResponse> findPoliticalPartyById(@PathVariable Long id) throws Exception {
