@@ -118,6 +118,7 @@ public class DashboardServiceImpl implements DashboardService {
         int voteCount;
         int accreditedVotersCount;
         int registeredVotersCount;
+        int voidVotes;
         int totalPU;
         party1Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_1).sum();
         party2Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_2).sum();
@@ -126,6 +127,7 @@ public class DashboardServiceImpl implements DashboardService {
         party5Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_5).sum();
         party6Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_6).sum();
         voteCount = resultRealTime.stream().mapToInt(ResultRealTime::getVoteCount).sum();
+        voidVotes = resultRealTime.stream().mapToInt(ResultRealTime::getVoidVotes).sum();
         accreditedVotersCount = resultRealTime.stream().mapToInt(ResultRealTime::getAccreditedVotersCount).sum();
         registeredVotersCount = resultRealTime.stream().mapToInt(ResultRealTime::getRegisteredVotersCount).sum();
         totalPU = resultRealTime.stream().mapToInt(ResultRealTime::getPollingUnitCount).sum();
@@ -137,6 +139,7 @@ public class DashboardServiceImpl implements DashboardService {
         resultRealTime1.setParty_5(party5Sum);
         resultRealTime1.setParty_6(party6Sum);
         resultRealTime1.setVoteCount(voteCount);
+        resultRealTime1.setVoidVotes(voidVotes);
         resultRealTime1.setPollingUnitCount(totalPU);
         resultRealTime1.setAccreditedVotersCount(accreditedVotersCount);
         resultRealTime1.setRegisteredVotersCount(registeredVotersCount);
@@ -680,6 +683,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
         List<PartyResult> partyResults = this.processPartyResults(resultSummary, state);
         long pollingUnitsWithResults = resultSummary.getPollingUnitCount();
@@ -696,7 +700,7 @@ public class DashboardServiceImpl implements DashboardService {
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
         return new DashboardResponse("00", "Dashboard loaded.", totalStates,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
-                totalVoteCounts, totalWards, totalPollingUnits,
+                totalVoidVotes, totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
                 wardsWithResults,
                 pollingUnitsWithResults,
@@ -723,6 +727,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
         State state = !resultRealTimeList.isEmpty()?
                 new State(){{setId(resultRealTimeList.get(0).getStateId());}}
@@ -741,7 +746,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
         return new NationalDashboardResponse("00", "Dashboard loaded.", totalZones, totalStates, totalSenatorialDistricts,
-                totalRegisteredVotes, totalAccreditedVotes, totalVoteCounts, totalLgas,
+                totalRegisteredVotes, totalAccreditedVotes, totalVoidVotes, totalVoteCounts, totalLgas,
                 totalPollingUnits, zonesWithResults, statesWithResults, lgasWithResults, wardsWithResults, pollingUnitsWithResults,
                 resultsReceived, partyResults, stateResults,partyStateResults
         );
@@ -774,7 +779,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
-
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
         HashMap<String, String> partyMap = partyMap(partyResults);
         // lga won
@@ -787,7 +792,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
         return new NationalDashboardResponse("00", "Dashboard loaded.", totalZones, totalStates, totalSenatorialDistricts,
-                totalRegisteredVotes, totalAccreditedVotes, totalVoteCounts, totalLgas,
+                totalRegisteredVotes, totalAccreditedVotes, totalVoidVotes, totalVoteCounts, totalLgas,
                 totalPollingUnits, zonesWithResults, statesWithResults, lgasWithResults, wardsWithResults, pollingUnitsWithResults,
                 resultsReceived, partyResults, stateResults,partyStateResults
         );
@@ -814,7 +819,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
-
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
         HashMap<String, String> partyMap = partyMap(partyResults);
         // lga won
@@ -827,7 +832,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
         Double resultsReceived = pollingUnitsWithResults>0?(pollingUnitsWithResults * 100.0 / totalPollingUnits) : 0;
         return new NationalDashboardResponse("00", "Dashboard loaded.", totalZones, totalStates, totalSenatorialDistricts,
-                totalRegisteredVotes, totalAccreditedVotes, totalVoteCounts, totalLgas,
+                totalRegisteredVotes, totalAccreditedVotes, totalVoidVotes, totalVoteCounts, totalLgas,
                 totalPollingUnits, zonesWithResults, statesWithResults, lgasWithResults, wardsWithResults, pollingUnitsWithResults,
                 resultsReceived, partyResults, stateResults,partyStateResults
         );
@@ -1025,6 +1030,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
 
         List<PartyResult> partyResults = this.processPartyResults(resultSummary, senatorialDistrict.getState());
@@ -1044,7 +1050,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         return new DashboardResponse("00", "Dashboard loaded.", 1L,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
-                totalVoteCounts, totalWards, totalPollingUnits,
+                totalVoidVotes, totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
                 wardsWithResults,
                 pollingUnitsWithResults,
@@ -1070,6 +1076,7 @@ public class DashboardServiceImpl implements DashboardService {
         Integer totalRegisteredVotes = resultSummary.getRegisteredVotersCount();
         Integer totalAccreditedVotes =  resultSummary.getAccreditedVotersCount();
         Integer totalVoteCounts = resultSummary.getVoteCount();
+        Integer totalVoidVotes = resultSummary.getVoidVotes();
 
         long pollingUnitsWithResults = resultSummary.getPollingUnitCount();
 
@@ -1090,7 +1097,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         return new DashboardResponse("00", "Dashboard loaded.", 1L,
                 totalLgas, totalSenatorialDistricts, totalRegisteredVotes, totalAccreditedVotes,
-                totalVoteCounts, totalWards, totalPollingUnits,
+                totalVoidVotes, totalVoteCounts, totalWards, totalPollingUnits,
                 lgaWithResults,
                 wardsWithResults,
                 pollingUnitsWithResults,

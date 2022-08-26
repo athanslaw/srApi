@@ -4,8 +4,11 @@ import com.edunge.srtool.dto.ElectionDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.Election;
+import com.edunge.srtool.model.ElectionType;
 import com.edunge.srtool.repository.ElectionRepository;
+import com.edunge.srtool.repository.ElectionTypeRepository;
 import com.edunge.srtool.response.ElectionResponse;
+import com.edunge.srtool.response.ElectionTypeResponse;
 import com.edunge.srtool.service.ElectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,7 @@ import java.util.Optional;
 @Service
 public class ElectionServiceImpl implements ElectionService {
     private final ElectionRepository electionRepository;
+    private final ElectionTypeRepository electionTypeRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ElectionServiceImpl.class);
 
@@ -46,8 +50,9 @@ public class ElectionServiceImpl implements ElectionService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public ElectionServiceImpl(ElectionRepository electionRepository) {
+    public ElectionServiceImpl(ElectionRepository electionRepository, ElectionTypeRepository electionTypeRepository) {
         this.electionRepository = electionRepository;
+        this.electionTypeRepository = electionTypeRepository;
     }
 
     @Override
@@ -116,6 +121,25 @@ public class ElectionServiceImpl implements ElectionService {
     public ElectionResponse findAll() {
         List<Election> elections = electionRepository.findAll();
         return new ElectionResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
+    }
+
+    @Override
+    public ElectionTypeResponse findAllElectionTypes() {
+        return new ElectionTypeResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME),
+                electionTypeRepository.findAll());
+    }
+
+    @Override
+    public ElectionTypeResponse findActiveElectionTypes() {
+        return new ElectionTypeResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME),
+                electionTypeRepository.findByStatus(true));
+    }
+
+    @Override
+    public void updateActiveElectionTypes(Long id){
+        ElectionType electionType = electionTypeRepository.findById(id).get();
+        electionType.setStatus(!electionType.isStatus());
+        electionTypeRepository.save(electionType);
     }
 
     @Override

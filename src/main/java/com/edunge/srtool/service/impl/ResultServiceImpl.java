@@ -153,6 +153,8 @@ public class ResultServiceImpl implements ResultService {
         resultRealTime.setVotingLevel(votingLevel);
         result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
         resultRealTime.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
+        result.setVoidVotes(resultDto.getVoidVotes());
+        resultRealTime.setVoidVotes(resultDto.getVoidVotes());
         result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
         resultRealTime.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
         result.setPollingUnitCount(pollingUnitCount);
@@ -263,7 +265,10 @@ public class ResultServiceImpl implements ResultService {
         result.setPartyAgent(partyAgent);
         result.setElectionType(resultDto.getElectionType());
         result.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
+        resultRealTime.setAccreditedVotersCount(resultDto.getAccreditedVotersCount());
         result.setRegisteredVotersCount(resultDto.getRegisteredVotersCount());
+        result.setVoidVotes(resultDto.getVoidVotes());
+        resultRealTime.setVoidVotes(resultDto.getVoidVotes());
         resultRealTime.setParty_1(resultDto.getParty_1());
         resultRealTime.setParty_2(resultDto.getParty_2());
         resultRealTime.setParty_3(resultDto.getParty_3());

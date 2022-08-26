@@ -16,6 +16,7 @@ public class NationalDashboardResponse extends BaseResponse{
     Integer totalRegisteredVotes;
     Integer totalAccreditedVotes;
     Integer totalVoteCounts;
+    Integer totalVoidVotes;
     Long totalWards;
     Long totalLgas;
     Long totalPollingUnits;
@@ -32,7 +33,7 @@ public class NationalDashboardResponse extends BaseResponse{
 
 
     public NationalDashboardResponse(String code, String message, Long totalGeopoliticalZones, Long totalStates, Long totalSenatorialDistricts,
-                                     Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalLgas,
+                                     Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoidVotes, Integer totalVoteCounts, Long totalLgas,
                                      Long totalPollingUnits, Long geoPoliticalZonesWithResults, Long statesWithResults, Long lgaWithResults,
                                      Long wardsWithResults, Long pollingUnitsWithResults,
                                      Double resultsReceived, List<PartyResult> partyResults, List<StateResult> stateResults,
@@ -44,6 +45,7 @@ public class NationalDashboardResponse extends BaseResponse{
         this.totalRegisteredVotes = totalRegisteredVotes;
         this.totalAccreditedVotes = totalAccreditedVotes;
         this.totalVoteCounts = totalVoteCounts;
+        this.totalVoidVotes = totalVoidVotes;
         this.totalWards = totalWards;
         this.totalPollingUnits = totalPollingUnits;
         this.resultReceived = resultsReceived;
@@ -203,5 +205,13 @@ public class NationalDashboardResponse extends BaseResponse{
 
     public void setPollingUnitsWithResults(Long pollingUnitsWithResults) {
         this.pollingUnitsWithResults = pollingUnitsWithResults;
+    }
+
+    public Integer getTotalVoidVotes() {
+        return totalVoidVotes;
+    }
+
+    public void setTotalVoidVotes(Integer totalVoidVotes) {
+        this.totalVoidVotes = totalVoidVotes;
     }
 }

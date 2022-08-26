@@ -17,6 +17,7 @@ public class Result extends AbstractElectionDetails {
     private Integer accreditedVotersCount;
     private Integer registeredVotersCount;
     private Integer pollingUnitCount;
+    private Integer voidVotes;
 
     public PartyAgent getPartyAgent() {
         return partyAgent;
@@ -56,5 +57,13 @@ public class Result extends AbstractElectionDetails {
 
     public void setPollingUnitCount(Integer pollingUnitCount) {
         this.pollingUnitCount = pollingUnitCount;
+    }
+
+    public Integer getVoidVotes() {
+        return voidVotes;
+    }
+
+    public void setVoidVotes(Integer voidVotes) {
+        this.voidVotes = voidVotes;
     }
 }

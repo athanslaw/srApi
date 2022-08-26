@@ -25,6 +25,7 @@ public class ResultDto extends AbstractBaseModel {
     @NotNull
     private Integer  accreditedVotersCount;
     private Integer party_1, party_2, party_3, party_4, party_5, party_6, result_id;
+    private Integer voidVotes;
 
     public Long getElectionId() {
         return electionId;
@@ -160,5 +161,13 @@ public class ResultDto extends AbstractBaseModel {
 
     public void setElectionType(Long electionType) {
         this.electionType = electionType;
+    }
+
+    public Integer getVoidVotes() {
+        return voidVotes;
+    }
+
+    public void setVoidVotes(Integer voidVotes) {
+        this.voidVotes = voidVotes;
     }
 }

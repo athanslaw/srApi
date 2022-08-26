@@ -21,6 +21,7 @@ public class ResultRealTime extends AbstractElectionDetails {
     private Integer voteCount;
     private Long result;
     private Integer pollingUnitCount;
+    private Integer voidVotes;
 
     public PartyAgent getPartyAgent() {
         return partyAgent;
@@ -116,6 +117,14 @@ public class ResultRealTime extends AbstractElectionDetails {
 
     public void setVoteCount(Integer voteCount) {
         this.voteCount = voteCount;
+    }
+
+    public Integer getVoidVotes() {
+        return voidVotes;
+    }
+
+    public void setVoidVotes(Integer voidVotes) {
+        this.voidVotes = voidVotes;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.ElectionDto;
 import com.edunge.srtool.response.ElectionResponse;
+import com.edunge.srtool.response.ElectionTypeResponse;
 import com.edunge.srtool.service.ElectionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +29,25 @@ public class ElectionController {
     @ApiOperation(value = "Retrieve all election.")
     public ResponseEntity<ElectionResponse> findAllElections(){
         return new ResponseEntity<>(electionService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/election-types", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve all election types.")
+    public ResponseEntity<ElectionTypeResponse> findAllElectionTypes(){
+        return new ResponseEntity<>(electionService.findAllElectionTypes(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/election-types/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve all election types.")
+    public ResponseEntity<ElectionTypeResponse> findActiveElectionTypes(){
+        return new ResponseEntity<>(electionService.findActiveElectionTypes(), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/election-types/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Retrieve all election types.")
+    public ResponseEntity<ElectionTypeResponse> findActiveElectionTypes(@PathVariable Long id){
+        electionService.updateActiveElectionTypes(id);
+        return new ResponseEntity<>(new ElectionTypeResponse("00", "Updated Successfully"), HttpStatus.OK);
     }
 
     @GetMapping(value = "/election", produces = MediaType.APPLICATION_JSON_VALUE)

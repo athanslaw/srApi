@@ -14,6 +14,7 @@ public class DashboardResponse extends BaseResponse{
     Integer totalRegisteredVotes;
     Integer totalAccreditedVotes;
     Integer totalVoteCounts;
+    Integer totalVoidVotes;
     Long totalWards;
     Long totalPollingUnits;
     Long totalPoliticalParties;
@@ -37,7 +38,7 @@ public class DashboardResponse extends BaseResponse{
         this.totalPollingUnits = totalPollingUnits;
     }
 
-    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived, List<PartyResult> partyResults, List<LgaResult> lgaResults, List<PartyLgaResult> partyLgaResults) {
+    public DashboardResponse(String code, String message, Long totalStates, Long totalLgas, Long totalSenatorialDistricts, Integer totalRegisteredVotes, Integer totalAccreditedVotes, Integer totalVoidVotes, Integer totalVoteCounts, Long totalWards, Long totalPollingUnits, Long lgaWithResults, Long wardsWithResults, Long pollingUnitsWithResults, Double resultsReceived, List<PartyResult> partyResults, List<LgaResult> lgaResults, List<PartyLgaResult> partyLgaResults) {
         super(code, message);
         this.totalStates = totalStates;
         this.totalLgas = totalLgas;
@@ -45,6 +46,7 @@ public class DashboardResponse extends BaseResponse{
         this.totalRegisteredVotes = totalRegisteredVotes;
         this.totalAccreditedVotes = totalAccreditedVotes;
         this.totalVoteCounts = totalVoteCounts;
+        this.totalVoidVotes = totalVoidVotes;
         this.totalWards = totalWards;
         this.totalPollingUnits = totalPollingUnits;
         this.resultReceived = resultsReceived;
@@ -217,5 +219,13 @@ public class DashboardResponse extends BaseResponse{
 
     public List<PartyLgaResult> getPartyLgaResults() {
         return partyLgaResults;
+    }
+
+    public Integer getTotalVoidVotes() {
+        return totalVoidVotes;
+    }
+
+    public void setTotalVoidVotes(Integer totalVoidVotes) {
+        this.totalVoidVotes = totalVoidVotes;
     }
 }
