@@ -13,6 +13,8 @@ import java.util.List;
 public class ElectionType {
 
     @Id
+    @Column(name = "Id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String code;
     private String name;
