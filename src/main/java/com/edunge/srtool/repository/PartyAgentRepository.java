@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface PartyAgentRepository extends JpaRepository<PartyAgent, Long> {
-    List<PartyAgent> findByFirstnameOrLastname(String firstname, String lastname);
+    List<PartyAgent> findByFirstnameOrLastnameOrPhone(String firstname, String lastname, String phone);
     PartyAgent findByPhone(String phone);
     List<PartyAgent> findByWard(Ward ward);
     List<PartyAgent> findByLga(Lga lga);

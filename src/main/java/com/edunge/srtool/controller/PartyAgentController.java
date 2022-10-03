@@ -31,9 +31,9 @@ public class PartyAgentController {
         return new ResponseEntity<>(partyAgentService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/party-agent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/party-agent/phone/{phone}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find party agent by code.")
-    public ResponseEntity<PartyAgentResponse> findPartyAgentByPhone(@RequestParam String phone) throws Exception {
+    public ResponseEntity<PartyAgentResponse> findPartyAgentByPhone(@PathVariable String phone) throws Exception {
         return ResponseEntity.ok(partyAgentService.findPartyAgentByPhone(phone));
     }
 

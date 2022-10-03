@@ -6,9 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-/**
- * Created by stephan on 20.03.16.
- */
 public class JwtUser implements UserDetails {
     private Long id;
     private final String username;

@@ -8,9 +8,9 @@ import com.edunge.srtool.response.ResultResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ResultService {
-    ResultResponse saveResult(ResultDto ward) throws NotFoundException;
+    ResultResponse saveResult(ResultDto resultDto) throws NotFoundException;
     ResultResponse findResultById(Long id) throws NotFoundException;
-    ResultResponse updateResult(Long id, ResultDto ward) throws NotFoundException;
+    ResultResponse updateResult(Long id, ResultDto resultDto) throws NotFoundException;
     ResultResponse deleteResultById(Long id) throws NotFoundException;
     ResultResponse findAll() ;
     ResultResponse findByStateId(Long stateId) ;

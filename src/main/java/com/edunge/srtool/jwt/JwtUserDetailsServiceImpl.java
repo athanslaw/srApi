@@ -2,29 +2,25 @@ package com.edunge.srtool.jwt;
 
 import com.edunge.srtool.exceptions.InvalidCredentialsException;
 import com.edunge.srtool.model.Login;
+import com.edunge.srtool.model.PartyAgent;
 import com.edunge.srtool.model.User;
+import com.edunge.srtool.repository.PartyAgentRepository;
 import com.edunge.srtool.repository.UserRepository;
 import com.edunge.srtool.response.LoginResponse;
-import com.edunge.srtool.service.LgaService;
-import com.edunge.srtool.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by adewale adeleye on 01/10/2019
- **/
+
 @Service
 @Primary
 public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
@@ -33,9 +29,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private LgaService lgaService;
-
+    private User user;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -47,13 +41,16 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
+        return retrieveUserByUsername(username);
+    }
+
+    public UserDetails retrieveUserByUsername(String username) throws UsernameNotFoundException {
+        user = userRepository.findByPhone(username);
         if(user==null){
-            List<User> users = userRepository.findByPhone(username);
-            if(users.size() <1) {
+            user = userRepository.findByEmail(username);
+            if(user == null) {
                 throw new UsernameNotFoundException("The provided username does not exist.");
             }
-            user = users.get(0);
         }
         return JwtUserFactory.create(user);
     }
@@ -89,7 +86,6 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         final String token = jwtTokenUtil.generateToken(details);
         authenticate(login.getUsername(), login.getPassword());
         User user = userRepository.findByEmail(login.getUsername());
-        Long stateId = lgaService.findLgaById(Long.valueOf(user.getLgaId())).getLga().getState().getId();
         return new LoginResponse("00","Login Successful.", token, user);
     }
 }

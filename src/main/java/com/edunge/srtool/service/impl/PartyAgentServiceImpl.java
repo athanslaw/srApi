@@ -1,6 +1,7 @@
 package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.dto.PartyAgentDto;
+import com.edunge.srtool.dto.UserDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.*;
@@ -28,7 +29,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private final PollingUnitRepository pollingUnitRepository;
     private final WardRepository wardRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
-    private final SenatorialDistrictRepository senatorialDistrictRepository;
+    private final UserServiceImpl userService;
     private final StateRepository stateRepository;
 
     private static final String SERVICE_NAME = "Party Agent";
@@ -56,13 +57,13 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private String fetchRecordTemplate;
 
     @Autowired
-    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, SenatorialDistrictRepository senatorialDistrictRepository, StateRepository stateRepository) {
+    public PartyAgentServiceImpl(LgaRepository lgaRepository, PartyAgentRepository partyAgentRepository, PollingUnitRepository pollingUnitRepository, WardRepository wardRepository, PoliticalPartyRepository politicalPartyRepository, UserServiceImpl userService, StateRepository stateRepository) {
         this.lgaRepository = lgaRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.pollingUnitRepository = pollingUnitRepository;
         this.wardRepository = wardRepository;
         this.politicalPartyRepository = politicalPartyRepository;
-        this.senatorialDistrictRepository = senatorialDistrictRepository;
+        this.userService = userService;
         this.stateRepository = stateRepository;
     }
 
@@ -84,10 +85,27 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             Optional<PoliticalParty> politicalParty = politicalPartyRepository.findById(partyAgentDto.getPoliticalPartyId());
             politicalParty.ifPresent(partyAgent::setPoliticalParty);
             partyAgent.setLga(lga);
+            partyAgent.setRole(partyAgentDto.getRole());
             partyAgentRepository.save(partyAgent);
+
+            // save in users table too
+            userService.saveAgent(partyAgentToUserDto(partyAgent, partyAgentDto.getPwd()));
+
             return new PartyAgentResponse("00", String.format(successTemplate, SERVICE_NAME), partyAgent);
         }
         throw new DuplicateException(String.format(duplicateTemplate, "Matching record"));
+    }
+
+    private UserDto partyAgentToUserDto(PartyAgent partyAgent, String pwd){
+        UserDto userDto = new UserDto();
+        userDto.setEmail(partyAgent.getEmail());
+        userDto.setFirstname(partyAgent.getFirstname());
+        userDto.setLastname(partyAgent.getLastname());
+        userDto.setPhone(partyAgent.getPhone());
+        userDto.setPassword(pwd);
+        userDto.setLgaId(partyAgent.getLga().getId().toString());
+        userDto.setRole("agent");
+        return userDto;
     }
 
     @Override
@@ -98,7 +116,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
 
     @Override
     public PartyAgentResponse findPartyAgentByName(String firstname, String lastname) throws NotFoundException {
-        List<PartyAgent> partyAgent = partyAgentRepository.findByFirstnameOrLastname(firstname, lastname);
+        List<PartyAgent> partyAgent = partyAgentRepository.findByFirstnameOrLastnameOrPhone(firstname, lastname, firstname);
         List<PartyAgentDto> partyAgentDtoList = new ArrayList<>();
         partyAgent.stream().forEach(agents->{
             PartyAgentDto partyAgentDto = new PartyAgentDto();
@@ -115,6 +133,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
             partyAgentDto.setId(agents.getId());
+            partyAgentDto.setRole(agents.getRole());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -143,6 +162,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
             partyAgentDto.setId(agents.getId());
+            partyAgentDto.setRole(agents.getRole());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -174,6 +194,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                         partyAgentDto.setEmail(agents.getEmail());
                         partyAgentDto.setPhone(agents.getPhone());
                         partyAgentDto.setId(agents.getId());
+                        partyAgentDto.setRole(agents.getRole());
                         partyAgentDtoList.add(partyAgentDto);
                     });
 
@@ -204,6 +225,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                         partyAgentDto.setEmail(agents.getEmail());
                         partyAgentDto.setPhone(agents.getPhone());
                         partyAgentDto.setId(agents.getId());
+                        partyAgentDto.setRole(agents.getRole());
                         partyAgentDtoList.add(partyAgentDto);
                     });
 
@@ -232,6 +254,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
             partyAgentDto.setId(agents.getId());
+            partyAgentDto.setRole(agents.getRole());
             partyAgentDtoList.add(partyAgentDto);
         });
         return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDtoList);
@@ -258,6 +281,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
             partyAgentDto.setEmail(agents.getEmail());
             partyAgentDto.setPhone(agents.getPhone());
             partyAgentDto.setId(agents.getId());
+            partyAgentDto.setRole(agents.getRole());
             partyAgentDtoList.add(partyAgentDto);
         });
         if(partyAgent==null){
@@ -272,15 +296,30 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         if(partyAgent==null){
             throw new NotFoundException(String.format(notFoundTemplate,SERVICE_NAME));
         }
-        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgent);
+        PartyAgentDto partyAgentDto = new PartyAgentDto();
+        partyAgentDto.setStateId(partyAgent.getPollingUnit().getState().getId());
+        partyAgentDto.setLgaName(partyAgent.getLga().getName());
+        partyAgentDto.setLgaId(partyAgent.getPollingUnit().getLga().getId()+"");
+        partyAgentDto.setPollingUnitId(partyAgent.getPollingUnit().getId()+"");
+        partyAgentDto.setPollingUnitName(partyAgent.getPollingUnit().getName());
+        partyAgentDto.setWardName(partyAgent.getWard().getName());
+        partyAgentDto.setWardId(partyAgent.getPollingUnit().getWard().getId()+"");
+        partyAgentDto.setAddress(partyAgent.getAddress());
+        partyAgentDto.setFirstname(partyAgent.getFirstname());
+        partyAgentDto.setLastname(partyAgent.getLastname());
+        partyAgentDto.setEmail(partyAgent.getEmail());
+        partyAgentDto.setPhone(partyAgent.getPhone());
+        partyAgentDto.setId(partyAgent.getId());
+        partyAgentDto.setRole(partyAgent.getRole());
+
+        return new PartyAgentResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), partyAgentDto);
     }
 
     @Override
     public PartyAgentResponse updatePartyAgent(Long id, PartyAgentDto partyAgentDto) throws NotFoundException {
-
         PollingUnit pollingUnit = getPollingUnit(Long.valueOf(partyAgentDto.getPollingUnitId()));
-        Lga lga = getLga(Long.valueOf(partyAgentDto.getLgaId()));
-        Ward ward = getWard(Long.valueOf(partyAgentDto.getWardId()));
+        Lga lga = pollingUnit.getLga();
+        Ward ward = pollingUnit.getWard();
         PartyAgent partyAgent = getPartyAgent(id);
         partyAgent.setFirstname(partyAgentDto.getFirstname());
         partyAgent.setLastname(partyAgentDto.getLastname());
@@ -292,7 +331,9 @@ public class PartyAgentServiceImpl implements PartyAgentService {
         Optional<PoliticalParty> politicalParty = politicalPartyRepository.findById(partyAgentDto.getPoliticalPartyId());
         politicalParty.ifPresent(partyAgent::setPoliticalParty);
         partyAgent.setLga(lga);
+        partyAgent.setRole(partyAgentDto.getRole());
         partyAgentRepository.save(partyAgent);
+        userService.saveAgent(partyAgentToUserDto(partyAgent, partyAgentDto.getPwd()));
         return new PartyAgentResponse("00", String.format(successTemplate, SERVICE_NAME), partyAgent);
     }
 
@@ -325,6 +366,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
                 partyAgentDto.setEmail(agents.getEmail());
                 partyAgentDto.setPhone(agents.getPhone());
                 partyAgentDto.setId(agents.getId());
+                partyAgentDto.setRole(agents.getRole());
                 partyAgentDtoList.add(partyAgentDto);
             });
         });
@@ -366,31 +408,30 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     }
 
     private void savePartyAgent(String surname,
-                                String otherNames,
+                                String firstName,
                                 String phoneNumber,
-                                String stateCode,
-                                String senatorialDistrictCode,
-                                String lgaCode,
-                                String wardCode,
                                 String pollingUnitCode,
-                                String pollingUnitName)  {
+                                String address,
+                                String password,
+                                String role)  {
 
-        Lga lga = lgaRepository .findByCode(lgaCode);
-        Ward ward = wardRepository.findByCode(wardCode);
-        PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
+        PollingUnit pollingUnit = pollingUnitRepository.findById(Long.valueOf(pollingUnitCode)).get();
         PartyAgent partyAgent = partyAgentRepository.findByPhone(phoneNumber);
 
         try{
             if(partyAgent==null){
                 partyAgent = new PartyAgent();
-                partyAgent.setFirstname(otherNames);
+                partyAgent.setFirstname(firstName);
                 partyAgent.setLastname(surname);
-                partyAgent.setAddress("KANO");
+                partyAgent.setAddress(address);
                 partyAgent.setPhone(phoneNumber);
                 partyAgent.setPollingUnit(pollingUnit);
-                partyAgent.setWard(ward);
-                partyAgent.setLga(lga);
+                partyAgent.setWard(pollingUnit.getWard());
+                partyAgent.setLga(pollingUnit.getLga());
+                partyAgent.setRole(role);
                 partyAgentRepository.save(partyAgent);
+
+                userService.saveAgent(partyAgentToUserDto(partyAgent, password));
             }
         }
         catch (Exception ex){
@@ -408,7 +449,7 @@ public class PartyAgentServiceImpl implements PartyAgentService {
     private PartyAgentResponse processUpload(List<String> lines){
         for (String line:lines) {
             String[] state = line.split(",");
-            savePartyAgent(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim(),state[6].trim(),state[7].trim(),state[8].trim());
+            savePartyAgent(state[0].trim(), state[1].trim(), state[2].trim(), state[3].trim(),state[4].trim(),state[5].trim(),state[6].trim());
         }
         return new PartyAgentResponse("00", "File Uploaded.");
     }

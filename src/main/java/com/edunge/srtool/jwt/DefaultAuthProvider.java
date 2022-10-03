@@ -12,9 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by adewale adeleye on 12/10/2019
- **/
+
 @Component
 public class DefaultAuthProvider implements AuthenticationProvider {
     @Autowired

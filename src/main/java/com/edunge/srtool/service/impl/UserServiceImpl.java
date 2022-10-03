@@ -25,6 +25,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final String AGENT = "agent";
     private final LgaRepository lgaRepository;
 
     private final StateService stateService;
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse saveUser(UserDto userDto) {
-        User existingUser = userRepository.findByEmail(userDto.getEmail());
+        User existingUser = userRepository.findByEmailAndRoleNot(userDto.getEmail(), AGENT);
         if(existingUser!=null){
             throw new DuplicateException(String.format("%s already exists.",userDto.getEmail()));
         }
@@ -72,6 +73,30 @@ public class UserServiceImpl implements UserService {
         user.setStateId(lgaRepository.findById(Long.valueOf(userDto.getLgaId())).get().getState().getId());
         userRepository.save(user);
         return new UserResponse("00", "User Registered Successfully.",null, user);
+    }
+    public void saveAgent(UserDto userDto) {
+        User existingUser = userRepository.findByPhoneAndRole(userDto.getPhone(), AGENT);
+        if(existingUser != null){
+            existingUser.setFirstname(userDto.getFirstname());
+            existingUser.setLastname(userDto.getLastname());
+            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            existingUser.setPhone(userDto.getPhone());
+            existingUser.setLgaId(userDto.getLgaId());
+            existingUser.setStateId(lgaRepository.findById(Long.valueOf(userDto.getLgaId())).get().getState().getId());
+            userRepository.save(existingUser);
+        }
+        else {
+            User user = new User();
+            user.setFirstname(userDto.getFirstname());
+            user.setLastname(userDto.getLastname());
+            user.setEmail(userDto.getEmail());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setPhone(userDto.getPhone());
+            user.setRole(AGENT);
+            user.setLgaId(userDto.getLgaId());
+            user.setStateId(lgaRepository.findById(Long.valueOf(userDto.getLgaId())).get().getState().getId());
+            userRepository.save(user);
+        }
     }
 
     @Override
@@ -100,7 +125,7 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public UserResponse updateUser(UserDto userDto) {
-        User existingUser = userRepository.findByEmail(userDto.getEmail());
+        User existingUser = userRepository.findByEmailAndRoleNot(userDto.getEmail(), AGENT);
         if(existingUser ==null){
             throw new DuplicateException(String.format("%s does not exist.",userDto.getEmail()));
         }
@@ -121,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateLga(UserDto userDto) {
-        User existingUser = userRepository.findByEmail(userDto.getEmail());
+        User existingUser = userRepository.findByEmailAndRoleNot(userDto.getEmail(), AGENT);
         if(existingUser ==null){
             throw new DuplicateException(String.format("%s does not exist.",userDto.getEmail()));
         }
@@ -142,29 +167,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse changePassword(UserDto userDto) {
-        User existingUser = userRepository.findByEmail(userDto.getEmail());
+        User existingUser = userRepository.findById(userDto.getId()).get();
         if(existingUser ==null){
             throw new DuplicateException(String.format("%s does not exist.",userDto.getEmail()));
         }
-        User user = new User();
-        user.setFirstname(existingUser.getFirstname());
-        user.setLastname(existingUser.getLastname());
-        user.setEmail(existingUser.getEmail());
-        user.setId(existingUser.getId());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setPhone(existingUser.getPhone());
-        user.setRole(existingUser.getRole());
-        user.setLgaId(existingUser.getLgaId());
-        user.setStateId(existingUser.getStateId());
-
-        userRepository.save(user);
-        return new UserResponse("00", "LGA Updated Successfully.",null, user);
+        existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userRepository.save(existingUser);
+        return new UserResponse("00", "LGA Updated Successfully.",null, existingUser);
     }
 
     @Override
     public UserResponse getAllUser(Long stateId) {
         List<User> users = userRepository.findByRole("Administrator");
-        users.addAll(userRepository.findByStateId(stateId));
+        users.addAll(userRepository.findByStateIdAndRoleNot(stateId, AGENT));
         return new UserResponse("00", "List of users", users);
     }
 
@@ -178,7 +193,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getAllUser() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findByRoleNot("Agent");
         users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
         return new UserResponse("00", "List of users", users);
     }
@@ -187,7 +202,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public LocationResponse getUserLgaById(String id){
         try {
-            String lga = userRepository.findByEmail(id).getLgaId();
+            String lga = userRepository.findByEmailAndRoleNot(id, AGENT).getLgaId();
 
             Lga lgaData = lgaService.findLgaById(Long.valueOf(lga)).getLga();
             return new LocationResponse("00", "Assigned location", lga, lgaData.getCode(),
@@ -218,7 +233,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = new ArrayList();
         List<Lga> lgas = lgaRepository.findByState(state);
         lgas.forEach(lga -> {
-            List<User> userList = userRepository.findByLgaId(lga.getId()+"");
+            List<User> userList = userRepository.findByLgaIdAndRoleNot(lga.getId()+"", AGENT);
             users.addAll(userList);
         });
         users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
@@ -232,7 +247,7 @@ public class UserServiceImpl implements UserService {
         if(senatorialDistrict.isPresent()) {
             List<Lga> lgas = lgaRepository.findBySenatorialDistrict(senatorialDistrict.get());
             lgas.forEach(lga -> {
-                List<User> userList = userRepository.findByLgaId(lga.getId()+"");
+                List<User> userList = userRepository.findByLgaIdAndRoleNot(lga.getId()+"", AGENT);
                 users.addAll(userList);
             });
         }
@@ -242,7 +257,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserByLga(String id) throws NotFoundException {
-        List<User> users = userRepository.findByLgaId(id);
+        List<User> users = userRepository.findByLgaIdAndRoleNot(id, AGENT);
         users.forEach(user -> user.setLgaId(getLgaById(user.getLgaId())));
         return new UserResponse("00","User retrieved", users);
     }

@@ -11,6 +11,7 @@ public class PartyAgentResponse extends BaseResponse{
     PartyAgent partyAgent;
     List<PartyAgent> partyAgents;
     List<PartyAgentDto> partyAgentDtoList;
+    PartyAgentDto partyAgentDto;
     Integer count;
 
     public Integer getCount() {
@@ -24,6 +25,11 @@ public class PartyAgentResponse extends BaseResponse{
     public PartyAgentResponse(String code, String message, List<PartyAgentDto> partyAgent) {
         super(code, message);
         this.partyAgentDtoList = partyAgent;
+    }
+
+    public PartyAgentResponse(String code, String message, PartyAgentDto partyAgentDto) {
+        super(code, message);
+        this.partyAgentDto = partyAgentDto;
     }
 
     public PartyAgentResponse(PartyAgent partyAgent) {
@@ -56,5 +62,13 @@ public class PartyAgentResponse extends BaseResponse{
 
     public void setPartyAgentDtoList(List<PartyAgentDto> partyAgentDtoList) {
         this.partyAgentDtoList = partyAgentDtoList;
+    }
+
+    public PartyAgentDto getPartyAgentDto() {
+        return partyAgentDto;
+    }
+
+    public void setPartyAgentDto(PartyAgentDto partyAgentDto) {
+        this.partyAgentDto = partyAgentDto;
     }
 }

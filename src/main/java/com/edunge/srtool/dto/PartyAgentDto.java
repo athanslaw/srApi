@@ -17,6 +17,8 @@ public class PartyAgentDto extends BaseModel {
     private String wardName;
     private String pollingUnitName;
     private Long stateId;
+    private String pwd;
+    private String role;
 
     public String getFirstname() {
         return firstname;
@@ -120,5 +122,21 @@ public class PartyAgentDto extends BaseModel {
 
     public void setStateId(Long stateId) {
         this.stateId = stateId;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

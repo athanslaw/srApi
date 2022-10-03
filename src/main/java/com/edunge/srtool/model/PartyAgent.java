@@ -15,6 +15,7 @@ public class PartyAgent extends BaseModel{
     @Column(nullable = true)
     private String email;
     private String address;
+    private String role;
 
     @ManyToOne
     @JoinColumn(name = "lga_id", nullable = false)
@@ -106,6 +107,14 @@ public class PartyAgent extends BaseModel{
 
     public void setPoliticalParty(PoliticalParty politicalParty) {
         this.politicalParty = politicalParty;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

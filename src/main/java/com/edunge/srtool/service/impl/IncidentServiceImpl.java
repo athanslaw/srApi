@@ -86,9 +86,8 @@ public class IncidentServiceImpl implements IncidentService {
 
         Incident incident = new Incident();
 
-        State state = getState();
-        incidentDto.setStateId(state.getId());
         Lga lga = getLga(incidentDto.getLgaId());
+        incidentDto.setStateId(lga.getState().getId());
         // validate incident levels
         if(incidentDto.getIncidentLevelId() == 2){
             // get all PUs in ward
@@ -185,7 +184,6 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentResponse updateIncident(Long id, IncidentDto incidentDto) throws NotFoundException {
         Incident incident = getIncident(id);
-        IncidentLevel incidentLevel = incidentLevel(incidentDto.getIncidentLevelId());
         IncidentStatus incidentStatus = getIncidentStatus(incidentDto.getIncidentStatusId());
         IncidentType incidentType = getIncidentType(incidentDto.getIncidentTypeId());
 
@@ -195,7 +193,6 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setLga(lga);
         incident.setWard(ward);
         incident.setPollingUnit(pollingUnit);
-        incident.setIncidentLevel(incidentLevel);
         incident.setIncidentStatus(incidentStatus);
         incident.setIncidentType(incidentType);
         incident.setLga(lga);
@@ -300,7 +297,7 @@ public class IncidentServiceImpl implements IncidentService {
     private PollingUnit getPollingUnit(Long id) throws NotFoundException {
         Optional<PollingUnit> currentPollingUnit = pollingUnitRepository.findById(id);
         if(!currentPollingUnit.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Polling Unit"));
+            return new PollingUnit();
         }
         return currentPollingUnit.get();
     }

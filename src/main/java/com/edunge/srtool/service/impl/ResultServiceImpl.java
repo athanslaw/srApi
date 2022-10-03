@@ -89,14 +89,14 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public ResultResponse saveResult(ResultDto resultDto) throws NotFoundException {
         PartyAgent partyAgent = partyAgentService.findPartyAgentById(resultDto.getPartyAgentId()).getPartyAgent();
-        SenatorialDistrict senatorialDistrict = getSenatorialDistrict(resultDto.getSenatorialDistrictId());
 
         Election election = getElection();
         VotingLevel votingLevel = getVotingLevel(resultDto.getVotingLevelId());
         PollingUnit pollingUnit = getPollingUnit(resultDto.getPollingUnitId());
         Ward ward = getWard(resultDto.getWardId());
-        State state = senatorialDistrict.getState();
         Lga lga = getLga(resultDto.getLgaId());
+        SenatorialDistrict senatorialDistrict = lga.getSenatorialDistrict();
+        State state = lga.getState();
         int pollingUnitCount = 1;
         boolean checkingRealTime = checkForDuplicate(election, votingLevel, lga, ward, resultDto.getElectionType());
 
@@ -278,7 +278,7 @@ public class ResultServiceImpl implements ResultService {
         resultRealTime.setResult(id);
         resultRealTime.setElectionType(resultDto.getElectionType());
         resultRealTime.setVoteCount(resultDto.getParty_1()+resultDto.getParty_2()+resultDto.getParty_3()+resultDto.getParty_4()+resultDto.getParty_5()+resultDto.getParty_6());
-
+        resultPerPartyRepository.deleteByResult(result);
         resultRepository.save(result);
         resultRealTimeRepository.save(resultRealTime);
         saveResultPerParty(resultDto, state, result);
