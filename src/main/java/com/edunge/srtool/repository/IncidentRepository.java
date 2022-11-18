@@ -10,22 +10,22 @@ import java.util.List;
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByCombinedKeysOrderByTimeStampDesc( String combinedKeys); // order by timestamp descending
-    List<Incident> findByLga(Lga lga);
-    List<Incident> findByStateId(long stateId);
-    List<Incident> findByGeoPoliticalZoneId(long zone);
-    List<Incident> findByWard(Ward ward);
-    List<Incident> findByPollingUnit(PollingUnit pollingUnit);
+    List<Incident> findByLgaAndIncidentGroupId(Lga lga, Long incidentGroupId);
+    List<Incident> findByStateIdAndIncidentGroupId(long stateId, Long incidentGroupId);
+    List<Incident> findByGeoPoliticalZoneIdAndIncidentGroupId(long zone, Long incidentGroupId);
+    List<Incident> findByWardAndIncidentGroupId(Ward ward, Long incidentGroupId);
+    List<Incident> findByPollingUnitAndIncidentGroupId(PollingUnit pollingUnit, Long incidentGroupId);
 
-    List<Incident> findByLgaAndIncidentType(Lga lga, IncidentType incidentType);
-    List<Incident> findByWardAndIncidentType(Ward ward, IncidentType incidentType);
-    List<Incident> findByPollingUnitAndIncidentType(PollingUnit pollingUnit, IncidentType incidentType);
+    List<Incident> findByLgaAndIncidentTypeAndIncidentGroupId(Lga lga, IncidentType incidentType, Long incidentGroupId);
+    List<Incident> findByWardAndIncidentTypeAndIncidentGroupId(Ward ward, IncidentType incidentType, Long incidentGroupId);
+    List<Incident> findByPollingUnitAndIncidentTypeAndIncidentGroupId(PollingUnit pollingUnit, IncidentType incidentType, Long incidentGroupId);
 
-    List<Incident> findByLgaAndWeight(Lga lga, int weight);
-    List<Incident> findByWardAndWeight(Ward ward, int weight);
-    List<Incident> findByPollingUnitAndWeight(PollingUnit pollingUnit, int weight);
+    List<Incident> findByLgaAndWeightAndIncidentGroupId(Lga lga, int weight, Long incidentGroupId);
+    List<Incident> findByWardAndWeightAndIncidentGroupId(Ward ward, int weight, Long incidentGroupId);
+    List<Incident> findByPollingUnitAndWeightAndIncidentGroupId(PollingUnit pollingUnit, int weight, Long incidentGroupId);
 
-    @Query(nativeQuery = true, value="SELECT * FROM incident a WHERE a.state_id=?1 ORDER BY a.id DESC LIMIT 10")
-    List<Incident> findTop10(State state);
-    List<Incident> findByWeight(int weight);
-    List<Incident> findByIncidentType(IncidentType incidentType);
+    @Query(nativeQuery = true, value="SELECT * FROM incident a WHERE a.state_id=?1 AND a.incident-group-id=?2 ORDER BY a.id DESC LIMIT 10")
+    List<Incident> findTop10(State state, Long incidentGroupId);
+    List<Incident> findByWeightAndIncidentGroupId(int weight, Long incidentGroupId);
+    List<Incident> findByIncidentTypeAndIncidentGroupId(IncidentType incidentType, Long incidentGroupId);
 }

@@ -38,6 +38,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentLevelRepository incidentLevelRepository;
     private final IncidentStatusRepository incidentStatusRepository;
     private final IncidentTypeRepository incidentTypeRepository;
+    private final IncidentGroupRepository incidentGroupRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(IncidentServiceImpl.class);
 
     private static final String SERVICE_NAME = "Incident";
@@ -66,7 +67,7 @@ public class IncidentServiceImpl implements IncidentService {
                                WardRepository wardRepository, LgaRepository lgaRepository, StateRepository stateRepository,
                                PollingUnitRepository pollingUnitRepository, VotingLevelRepository votingLevelRepository,
                                IncidentLevelRepository incidentLevelRepository, IncidentStatusRepository incidentStatusRepository,
-                               IncidentTypeRepository incidentTypeRepository) {
+                               IncidentTypeRepository incidentTypeRepository, IncidentGroupRepository incidentGroupRepository) {
         this.incidentRepository = incidentRepository;
         this.partyAgentRepository = partyAgentRepository;
         this.electionRepository = electionRepository;
@@ -79,6 +80,7 @@ public class IncidentServiceImpl implements IncidentService {
         this.incidentLevelRepository = incidentLevelRepository;
         this.incidentStatusRepository = incidentStatusRepository;
         this.incidentTypeRepository = incidentTypeRepository;
+        this.incidentGroupRepository = incidentGroupRepository;
     }
 
     @Override
@@ -88,6 +90,8 @@ public class IncidentServiceImpl implements IncidentService {
 
         Lga lga = getLga(incidentDto.getLgaId());
         incidentDto.setStateId(lga.getState().getId());
+        Long incidentGroupId = getActiveIncidentGroupId();
+        incidentDto.setIncidentGroupId(incidentGroupId);
         // validate incident levels
         if(incidentDto.getIncidentLevelId() == 2){
             // get all PUs in ward
@@ -125,6 +129,7 @@ public class IncidentServiceImpl implements IncidentService {
                 .append(incidentDto.getIncidentStatusId())
                 .append(incidentDto.getIncidentTypeId())
                 .append(incidentDto.getLgaId())
+                .append(incidentDto.getIncidentGroupId())
                 .append(incidentDto.getWardId()).toString();
 
         List<Incident> incidentChecks = incidentRepository.findByCombinedKeysOrderByTimeStampDesc(combinedKeys);
@@ -158,6 +163,7 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setReportedLocation(incidentDto.getReportedLocation());
         incident.setPhoneNumberToContact(incidentDto.getPhoneNumberToContact());
         incident.setWeight((int) incidentDto.getWeight());
+        incident.setIncidentGroupId(incidentDto.getIncidentGroupId());
         incidentRepository.save(incident);
         return incident;
     }
@@ -214,34 +220,27 @@ public class IncidentServiceImpl implements IncidentService {
     public IncidentResponse findAll(String incidentType, String incidentWeight) {
         State state = getState();
         List<Incident> elections = new ArrayList<>();
+        Long incidentGroup = getActiveIncidentGroupId();
         if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
             try {
                 if (incidentType == null || incidentType.equals("")) {
                     int weight = Integer.parseInt(incidentWeight.trim());
-                    elections = incidentRepository.findByWeight(weight);
+                    elections = incidentRepository.findByWeightAndIncidentGroupId(weight, incidentGroup);
                 } else if (incidentWeight == null || incidentWeight.equals("")) {
                     long type = Long.parseLong(incidentType.trim());
-                    elections = incidentRepository.findByIncidentType(getIncidentType(type));
+                    elections = incidentRepository.findByIncidentTypeAndIncidentGroupId(getIncidentType(type), incidentGroup);
                 } else {
                     int weight = Integer.parseInt(incidentWeight);
                     long type = Long.parseLong(incidentType.trim());
-                    elections = incidentRepository.findByWeight(weight);
+                    elections = incidentRepository.findByWeightAndIncidentGroupId(weight, incidentGroup);
                     elections = elections.stream().filter(election -> election.getIncidentType().getId()==type)
                             .collect(Collectors.toList());
                 }
             }catch (NotFoundException e){}
         }else{
-            elections = incidentRepository.findTop10(state);
+            elections = incidentRepository.findTop10(state, incidentGroup);
         }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
-    }
-
-    private Election getElection(Long id) throws NotFoundException {
-        Optional<Election> election = electionRepository.findById(id);
-        if(!election.isPresent()){
-            throw new NotFoundException(String.format(notFoundTemplate,"Election"));
-        }
-        return election.get();
     }
 
     private IncidentType getIncidentType(Long id) throws NotFoundException {
@@ -260,14 +259,16 @@ public class IncidentServiceImpl implements IncidentService {
         return lga.get();
     }
 
+    private Long getActiveIncidentGroupId() {
+        List<IncidentGroup> incidentGroups = incidentGroupRepository.findByStatus(true);
+        if(incidentGroups.size() > 0)
+            return incidentGroups.get(0).getId();
+        return 1L;
+    }
+
     private State getState() {
         State state = stateRepository.findByDefaultState(true);
         return state;
-    }
-
-    private SenatorialDistrict getSenatorialDistrict(long id) {
-        SenatorialDistrict senatorialDistrict = senatorialDistrictRepository.findById(id).get();
-        return senatorialDistrict;
     }
 
     private IncidentStatus getIncidentStatus(Long id) throws NotFoundException {
@@ -314,24 +315,25 @@ public class IncidentServiceImpl implements IncidentService {
     public IncidentResponse findIncidentByLga(Long id, String incidentType, String incidentWeight){
         Lga lga = new Lga(){{setId(id);}};
         List<Incident> elections;
+        Long incidentGroupId = getActiveIncidentGroupId();
         if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
             if(incidentType == null || incidentType.trim().equals("")){
                 int weight = Integer.parseInt(incidentWeight.trim());
-                elections = incidentRepository.findByLgaAndWeight(lga, weight);
+                elections = incidentRepository.findByLgaAndWeightAndIncidentGroupId(lga, weight, incidentGroupId);
             }
             else if(incidentWeight == null || incidentWeight.trim().equals("")){
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByLgaAndIncidentType(lga, new IncidentType(){{setId(type);}});
+                elections = incidentRepository.findByLgaAndIncidentTypeAndIncidentGroupId(lga, new IncidentType(){{setId(type);}}, incidentGroupId);
             }
             else{
                 int weight = Integer.parseInt(incidentWeight.trim());
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByLgaAndWeight(lga, weight);
+                elections = incidentRepository.findByLgaAndWeightAndIncidentGroupId(lga, weight, incidentGroupId);
                 elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
             }
         }
         else{
-            elections = incidentRepository.findByLga(lga);
+            elections = incidentRepository.findByLgaAndIncidentGroupId(lga, incidentGroupId);
         }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
@@ -361,7 +363,8 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     public IncidentResponse findIncidentByZone(Long id, String incidentType, String incidentWeight){
-        List<Incident> incidentList = incidentRepository.findByGeoPoliticalZoneId(id);
+        Long incidentGroupId = getActiveIncidentGroupId();
+        List<Incident> incidentList = incidentRepository.findByGeoPoliticalZoneIdAndIncidentGroupId(id, incidentGroupId);
 
         try{
             if(!incidentType.equals("") && !incidentWeight.equals("")){
@@ -383,7 +386,8 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
-        List<Incident> incidentList = incidentRepository.findByStateId(id);
+        Long incidentGroupId = getActiveIncidentGroupId();
+        List<Incident> incidentList = incidentRepository.findByStateIdAndIncidentGroupId(id, incidentGroupId);
         try{
             if(!incidentType.equals("") && !incidentWeight.equals("")){
                 Long incidentTypeId = Long.parseLong(incidentType.trim());
@@ -404,26 +408,27 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentResponse findIncidentByWard(Long id, String incidentType, String incidentWeight) throws NotFoundException {
         Ward ward = new Ward(){{setId(id);}};
+        Long incidentGroupId = getActiveIncidentGroupId();
         List<Incident> elections;
 
         if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
             if(incidentType == null || incidentType.trim().equals("")){
                 int weight = Integer.parseInt(incidentWeight.trim());
-                elections = incidentRepository.findByWardAndWeight(ward, weight);
+                elections = incidentRepository.findByWardAndWeightAndIncidentGroupId(ward, weight, incidentGroupId);
             }
             else if(incidentWeight == null || incidentWeight.trim().equals("")){
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByWardAndIncidentType(ward, new IncidentType(){{setId(type);}});
+                elections = incidentRepository.findByWardAndIncidentTypeAndIncidentGroupId(ward, new IncidentType(){{setId(type);}}, incidentGroupId);
             }
             else{
                 int weight = Integer.parseInt(incidentWeight.trim());
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByWardAndWeight(ward, weight);
+                elections = incidentRepository.findByWardAndWeightAndIncidentGroupId(ward, weight, incidentGroupId);
                 elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
             }
         }
         else{
-            elections = incidentRepository.findByWard(ward);
+            elections = incidentRepository.findByWardAndIncidentGroupId(ward, incidentGroupId);
         }
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
     }
@@ -432,25 +437,26 @@ public class IncidentServiceImpl implements IncidentService {
     public IncidentResponse findIncidentByPollingUnit(Long id, String incidentType, String incidentWeight) throws NotFoundException {
         PollingUnit pollingUnit = new PollingUnit(){{setId(id);}};
         List<Incident> elections;
+        Long incidentGroupId = getActiveIncidentGroupId();
 
         if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
             if(incidentType == null || incidentType.trim().equals("")){
                 int weight = Integer.parseInt(incidentWeight.trim());
-                elections = incidentRepository.findByPollingUnitAndWeight(pollingUnit, weight);
+                elections = incidentRepository.findByPollingUnitAndWeightAndIncidentGroupId(pollingUnit, weight, incidentGroupId);
             }
             else if(incidentWeight == null || incidentWeight.trim().equals("")){
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByPollingUnitAndIncidentType(pollingUnit, new IncidentType(){{setId(type);}});
+                elections = incidentRepository.findByPollingUnitAndIncidentTypeAndIncidentGroupId(pollingUnit, new IncidentType(){{setId(type);}}, incidentGroupId);
             }
             else{
                 int weight = Integer.parseInt(incidentWeight.trim());
                 long type = Long.parseLong(incidentType.trim());
-                elections = incidentRepository.findByPollingUnitAndWeight(pollingUnit, weight);
+                elections = incidentRepository.findByPollingUnitAndWeightAndIncidentGroupId(pollingUnit, weight, incidentGroupId);
                 elections = elections.stream().filter(election -> election.getIncidentType().getId()==type).collect(Collectors.toList());
             }
         }
         else{
-            elections = incidentRepository.findByPollingUnit(pollingUnit);
+            elections = incidentRepository.findByPollingUnitAndIncidentGroupId(pollingUnit, incidentGroupId);
         }
 
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), elections);
@@ -469,6 +475,7 @@ public class IncidentServiceImpl implements IncidentService {
                               String severity
     ) {
         try{
+            Long incidentGroupId = getActiveIncidentGroupId();
             Lga lga = lgaRepository.findByCode(lgaCode);
             Ward ward = wardRepository.findByCode(wardCode);
             PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitCode);
@@ -485,6 +492,7 @@ public class IncidentServiceImpl implements IncidentService {
             incident.setReportedLocation(reportedLocation);
             incident.setIncidentLevel(incidentLevel);
             incident.setPhoneNumberToContact(phoneNumberToContact);
+            incident.setIncidentGroupId(incidentGroupId);
             try{
                 int weight = Integer.parseInt(severity);
                 incident.setWeight(weight);

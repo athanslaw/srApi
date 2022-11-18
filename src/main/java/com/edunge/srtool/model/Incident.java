@@ -21,6 +21,7 @@ public class Incident extends BaseModel{
     private LocalDateTime timeStamp;
     private int weight;
     private Long stateId;
+    private Long incidentGroupId;
 
     @ManyToOne
     @JoinColumn(name = "ward_id",nullable = false)
@@ -156,5 +157,13 @@ public class Incident extends BaseModel{
 
     public void setGeoPoliticalZoneId(Long geoPoliticalZoneId) {
         this.geoPoliticalZoneId = geoPoliticalZoneId;
+    }
+
+    public Long getIncidentGroupId() {
+        return incidentGroupId;
+    }
+
+    public void setIncidentGroupId(Long incidentGroupId) {
+        this.incidentGroupId = incidentGroupId;
     }
 }

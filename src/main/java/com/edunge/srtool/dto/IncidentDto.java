@@ -29,6 +29,7 @@ public class IncidentDto extends AbstractBaseModel {
     private LocalDateTime timeStamp;
     private long weight;
     private long stateId;
+    private long incidentGroupId;
 
     public String getDescription() {
         return description;
@@ -141,5 +142,13 @@ public class IncidentDto extends AbstractBaseModel {
 
     public void setStateId(long stateId) {
         this.stateId = stateId;
+    }
+
+    public long getIncidentGroupId() {
+        return incidentGroupId;
+    }
+
+    public void setIncidentGroupId(long incidentGroupId) {
+        this.incidentGroupId = incidentGroupId;
     }
 }
