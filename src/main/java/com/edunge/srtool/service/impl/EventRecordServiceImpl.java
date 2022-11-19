@@ -51,16 +51,16 @@ public class EventRecordServiceImpl implements EventRecordService {
     public EventRecordResponse saveEventRecord(EventRecordDto eventRecordDto) {
 
         try {
-            String combinedKeys = eventRecordDto.getPollingUnitId() + "" + eventRecordDto.getEventId();
+            String combinedKeys = eventRecordDto.getPollingUnit() + "" + eventRecordDto.getEventId();
             EventRecord eventRecord = new EventRecord();
-            PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnitId()).get();
+            PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnit()).get();
 
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
             eventRecord.setAgentId(eventRecordDto.getAgentId());
             eventRecord.setCombinedKeys(combinedKeys);
             eventRecord.setEventId(eventRecordDto.getEventId());
             eventRecord.setDescription(eventRecordDto.getDescription());
-            eventRecord.setLga(eventRecordDto.getLgaId());
+            eventRecord.setLga(eventRecordDto.getLga());
             eventRecord.setWard(pu.getWard().getId());
             eventRecord.setPollingUnit(eventRecord.getPollingUnit());
             eventRecord.setGeoPoliticalZoneId(pu.getState().getGeoPoliticalZone().getId());
