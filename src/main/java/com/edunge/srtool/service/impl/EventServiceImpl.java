@@ -80,6 +80,7 @@ public class EventServiceImpl implements EventService {
             event.setDescription(eventDto.getDescription());
             event.setCode(eventDto.getCode());
             event.setStatus(eventDto.getStatus());
+            eventRepository.save(event);
             return new EventResponse("00", String.format(updateTemplate, SERVICE_NAME), event);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -92,6 +93,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEvent(id);
         try {
             event.setStatus(true);
+            eventRepository.save(event);
             return new EventResponse("00", String.format(updateTemplate, SERVICE_NAME), event);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -104,6 +106,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEvent(id);
         try {
             event.setStatus(false);
+            eventRepository.save(event);
             return new EventResponse("00", String.format(updateTemplate, SERVICE_NAME), event);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

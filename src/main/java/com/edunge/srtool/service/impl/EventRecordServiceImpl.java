@@ -156,6 +156,7 @@ public class EventRecordServiceImpl implements EventRecordService {
             eventRecord.setEventId(eventRecordDto.getEventId());
             eventRecord.setDescription(eventRecordDto.getDescription());
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
+            eventRecordRepository.save(eventRecord);
             return new EventRecordResponse("00", String.format(updateTemplate, SERVICE_NAME), eventRecord);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
