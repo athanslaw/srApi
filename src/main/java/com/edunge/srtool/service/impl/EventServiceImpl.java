@@ -74,12 +74,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse updateEvent(Long id, EventDto eventDto) throws NotFoundException {
-        Event eventRecord = getEvent(id);
+        Event event = getEvent(id);
         try {
-            eventRecord.setId(id);
-            eventRecord.setDescription(eventDto.getDescription());
-            eventRecord.setStatus(eventDto.getStatus());
-            return new EventResponse("00", String.format(updateTemplate, SERVICE_NAME), eventRecord);
+            event.setId(id);
+            event.setDescription(eventDto.getDescription());
+            event.setCode(eventDto.getCode());
+            event.setStatus(eventDto.getStatus());
+            return new EventResponse("00", String.format(updateTemplate, SERVICE_NAME), event);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
