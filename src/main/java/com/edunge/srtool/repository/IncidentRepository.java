@@ -24,7 +24,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByWardAndWeightAndIncidentGroupId(Ward ward, int weight, Long incidentGroupId);
     List<Incident> findByPollingUnitAndWeightAndIncidentGroupId(PollingUnit pollingUnit, int weight, Long incidentGroupId);
 
-    @Query(nativeQuery = true, value="SELECT * FROM incident a WHERE a.state_id=?1 AND a.incident-group-id=?2 ORDER BY a.id DESC LIMIT 10")
+    @Query(nativeQuery = true, value="SELECT * FROM incident a WHERE a.state_id=?1 AND a.incident_group_id=?2 ORDER BY a.id DESC LIMIT 10")
     List<Incident> findTop10(State state, Long incidentGroupId);
     List<Incident> findByWeightAndIncidentGroupId(int weight, Long incidentGroupId);
     List<Incident> findByIncidentTypeAndIncidentGroupId(IncidentType incidentType, Long incidentGroupId);
