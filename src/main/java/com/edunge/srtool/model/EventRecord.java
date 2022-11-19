@@ -11,13 +11,20 @@ public class EventRecord extends BaseModel{
     private String combinedKeys;
     private LocalDateTime timeStamp;
     private Long lga;
+    private String lgaName;
     private Long geoPoliticalZoneId;
+    private String geoPoliticalZoneName;
+    private Long senatorialDistrictId;
+    private String senatorialDistrictName;
     private Long eventId;
     private Long stateId;
+    private String stateName;
 
     private Long ward;
+    private String wardName;
 
     private Long pollingUnit;
+    private String pollingUnitName;
 
     private Boolean eventStatus;
     private Long agentId;
@@ -109,5 +116,61 @@ public class EventRecord extends BaseModel{
 
     public void setAgentId(Long agentId) {
         this.agentId = agentId;
+    }
+
+    public String getLgaName() {
+        return lgaName;
+    }
+
+    public void setLgaName(String lgaName) {
+        this.lgaName = lgaName;
+    }
+
+    public String getGeoPoliticalZoneName() {
+        return geoPoliticalZoneName;
+    }
+
+    public void setGeoPoliticalZoneName(String geoPoliticalZoneName) {
+        this.geoPoliticalZoneName = geoPoliticalZoneName;
+    }
+
+    public Long getSenatorialDistrictId() {
+        return senatorialDistrictId;
+    }
+
+    public void setSenatorialDistrictId(Long senatorialDistrictId) {
+        this.senatorialDistrictId = senatorialDistrictId;
+    }
+
+    public String getSenatorialDistrictName() {
+        return senatorialDistrictName;
+    }
+
+    public void setSenatorialDistrictName(String senatorialDistrictName) {
+        this.senatorialDistrictName = senatorialDistrictName;
+    }
+
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    public String getWardName() {
+        return wardName;
+    }
+
+    public void setWardName(String wardName) {
+        this.wardName = wardName;
+    }
+
+    public String getPollingUnitName() {
+        return pollingUnitName;
+    }
+
+    public void setPollingUnitName(String pollingUnitName) {
+        this.pollingUnitName = pollingUnitName;
     }
 }

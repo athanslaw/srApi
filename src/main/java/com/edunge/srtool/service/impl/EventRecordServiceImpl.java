@@ -56,6 +56,13 @@ public class EventRecordServiceImpl implements EventRecordService {
             PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnit()).get();
 
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
+            eventRecord.setPollingUnitName(pu.getCode()+" - "+pu.getName());
+            eventRecord.setLgaName(pu.getLga().getName());
+            eventRecord.setSenatorialDistrictId(pu.getSenatorialDistrict().getId());
+            eventRecord.setSenatorialDistrictName(pu.getSenatorialDistrict().getName());
+            eventRecord.setWardName(pu.getWard().getCode()+" - "+pu.getWard().getName());
+            eventRecord.setStateName(pu.getState().getName());
+            eventRecord.setGeoPoliticalZoneName(pu.getState().getGeoPoliticalZone().getName());
             eventRecord.setAgentId(eventRecordDto.getAgentId());
             eventRecord.setCombinedKeys(combinedKeys);
             eventRecord.setEventId(eventRecordDto.getEventId());
@@ -92,10 +99,15 @@ public class EventRecordServiceImpl implements EventRecordService {
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
+    private String getPollingUnit(Long id){
+        PollingUnit pu = pollingUnitRepository.findById(id).get();
+        return pu.getCode()+" - "+pu.getName();
+    }
+
     @Override
     public EventRecordResponse findEventRecordByWard(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByWard(id);
-        return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
+        List<EventRecord> eventRecord = eventRecordRepository.findByWard(id);
+        return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), eventRecord);
     }
 
     @Override
