@@ -53,7 +53,9 @@ public class EventServiceImpl implements EventService {
         try {
             Event event = new Event();
 
-            event.setStatus(eventDto.getStatus());
+            event.setStatus(true);
+            event.setCode(eventDto.getCode());
+            event.setName("");
             event.setDescription(eventDto.getDescription());
 
             eventRepository.save(event);
