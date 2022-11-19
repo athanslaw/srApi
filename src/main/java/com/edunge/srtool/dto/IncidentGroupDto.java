@@ -3,6 +3,7 @@ package com.edunge.srtool.dto;
 import com.edunge.srtool.model.AbstractBaseModel;
 
 public class IncidentGroupDto extends AbstractBaseModel {
+    private String code;
     private String description;
     private Integer year;
 
@@ -22,4 +23,13 @@ public class IncidentGroupDto extends AbstractBaseModel {
         this.year = year;
     }
 
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public void setCode(String code) {
+        this.code = code;
+    }
 }

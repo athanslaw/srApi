@@ -51,11 +51,13 @@ public class EventRecordServiceImpl implements EventRecordService {
     public EventRecordResponse saveEventRecord(EventRecordDto eventRecordDto) {
 
         try {
+            String combinedKeys = eventRecordDto.getPollingUnitId() + "" + eventRecordDto.getEventId();
             EventRecord eventRecord = new EventRecord();
             PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnitId()).get();
 
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
             eventRecord.setAgentId(eventRecordDto.getAgentId());
+            eventRecord.setCombinedKeys(combinedKeys);
             eventRecord.setEventId(eventRecordDto.getEventId());
             eventRecord.setDescription(eventRecordDto.getDescription());
             eventRecord.setLga(eventRecordDto.getLgaId());
@@ -183,7 +185,7 @@ public class EventRecordServiceImpl implements EventRecordService {
     @Override
     public void updateEventRecordStatus(Long id, Boolean status){
         EventRecord eventRecord = eventRecordRepository.findById(id).get();
-        eventRecord.setEventStatus(!eventRecord.getEventStatus());
+        eventRecord.setEventStatus(status);
         eventRecordRepository.save(eventRecord);
     }
 

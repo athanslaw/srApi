@@ -7,14 +7,11 @@ import java.time.LocalDateTime;
 
 public class EventRecordDto extends AbstractBaseModel {
     private Boolean eventStatus;
-    @NotNull
-    private Long  lgaId;
+    private Long  lga;
     @NotNull
     private Long  eventId;
     @NotNull
-    private Long  wardId;
-    @NotNull
-    private Long pollingUnitId;
+    private Long pollingUnit;
     @NotNull
     private String description;
     @NotNull
@@ -29,30 +26,6 @@ public class EventRecordDto extends AbstractBaseModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getLgaId() {
-        return lgaId;
-    }
-
-    public void setLgaId(Long lgaId) {
-        this.lgaId = lgaId;
-    }
-
-    public Long getWardId() {
-        return wardId;
-    }
-
-    public void setWardId(Long wardId) {
-        this.wardId = wardId;
-    }
-
-    public Long getPollingUnitId() {
-        return pollingUnitId;
-    }
-
-    public void setPollingUnitId(Long pollingUnitId) {
-        this.pollingUnitId = pollingUnitId;
     }
 
     public String getCombinedKeys() {
@@ -101,5 +74,21 @@ public class EventRecordDto extends AbstractBaseModel {
 
     public void setAgentId(Long agentId) {
         this.agentId = agentId;
+    }
+
+    public Long getLga() {
+        return lga;
+    }
+
+    public void setLga(Long lga) {
+        this.lga = lga;
+    }
+
+    public Long getPollingUnit() {
+        return pollingUnit;
+    }
+
+    public void setPollingUnit(Long pollingUnit) {
+        this.pollingUnit = pollingUnit;
     }
 }

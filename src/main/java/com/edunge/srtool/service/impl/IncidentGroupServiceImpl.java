@@ -51,7 +51,7 @@ public class IncidentGroupServiceImpl implements IncidentGroupService {
         try {
             IncidentGroup incidentGroup = new IncidentGroup();
             incidentGroup.setCode(incidentGroupDto.getCode());
-            incidentGroup.setName(incidentGroupDto.getName());
+            incidentGroup.setName("");
             incidentGroup.setDescription(incidentGroupDto.getDescription());
             incidentGroup.setYear(incidentGroupDto.getYear());
             incidentGroupRepository.save(incidentGroup);
