@@ -56,6 +56,19 @@ public class EventsController {
         }
     }
 
+    @GetMapping(value = "/event-record/senatorial-events", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find Event Record by district.")
+    public ResponseEntity<EventRecordResponse> findEventRecordBySenetorialAndEventId(@RequestParam("senatorial") String senatorial, @RequestParam(value = "eventId", required = false) String eventId) throws Exception {
+        try{
+            Long senatorialId = Long.valueOf(senatorial);
+            if(eventId == null) return ResponseEntity.ok(eventRecordService.findEventRecordBySenatorial(senatorialId));
+            Long id = Long.valueOf(eventId);
+            return ResponseEntity.ok(eventRecordService.findEventRecordBySenatorialAndEventId(senatorialId, id));
+        }catch (Exception e){
+            return ResponseEntity.ok(new EventRecordResponse("04","No records found"));
+        }
+    }
+
     @GetMapping(value = "/event-record/zone-events", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find Event Record by zone.")
     public ResponseEntity<EventRecordResponse> findEventRecordByZoneAndEventId(@RequestParam("zone") String zone, @RequestParam(value = "eventId", required = false) String eventId) throws Exception {

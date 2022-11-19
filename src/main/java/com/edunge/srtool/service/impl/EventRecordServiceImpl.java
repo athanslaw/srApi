@@ -123,6 +123,12 @@ public class EventRecordServiceImpl implements EventRecordService {
     }
 
     @Override
+    public EventRecordResponse findEventRecordBySenatorial(Long id) throws NotFoundException {
+        List<EventRecord> EventRecord = eventRecordRepository.findBySenatorial(id);
+        return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
+    }
+
+    @Override
     public EventRecordResponse findEventRecordByZone(Long id) throws NotFoundException {
         List<EventRecord> EventRecord = eventRecordRepository.findByGeoPoliticalZoneId(id);
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
@@ -149,6 +155,12 @@ public class EventRecordServiceImpl implements EventRecordService {
 
     @Override
     public EventRecordResponse findEventRecordByStateAndEventId(Long id, Long eventId) throws NotFoundException {
+        List<EventRecord> EventRecord = eventRecordRepository.findByStateIdAndEventId(id, eventId);
+        return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
+    }
+
+    @Override
+    public EventRecordResponse findEventRecordBySenatorialAndEventId(Long id, Long eventId) throws NotFoundException {
         List<EventRecord> EventRecord = eventRecordRepository.findByStateIdAndEventId(id, eventId);
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
