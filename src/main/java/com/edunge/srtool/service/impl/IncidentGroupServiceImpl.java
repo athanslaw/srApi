@@ -96,6 +96,7 @@ public class IncidentGroupServiceImpl implements IncidentGroupService {
         IncidentGroup incidentGroup = getIncidentGroup(id);
         try {
             incidentGroup.setStatus(true);
+            incidentGroupRepository.save(incidentGroup);
             return new IncidentGroupResponse("00", String.format(updateTemplate, SERVICE_NAME), incidentGroup);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
