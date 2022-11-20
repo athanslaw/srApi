@@ -14,14 +14,14 @@ public interface EventRecordRepository extends JpaRepository<EventRecord,Long> {
     List<EventRecord> findByGeoPoliticalZoneId(Long geoPoliticalZoneId);
     List<EventRecord> findByEventId(Long eventId);
     List<EventRecord> findByStateId(Long stateId);
-    List<EventRecord> findBySenatorial(Long senatorial);
+    List<EventRecord> findBySenatorialDistrictId(Long senatorial);
     List<EventRecord> findByWard(Long ward);
 
     List<EventRecord> findByPollingUnitAndEventId(Long pollingUnit, Long eventId);
     List<EventRecord> findByLgaAndEventId(Long lga, Long eventId);
     List<EventRecord> findByGeoPoliticalZoneIdAndEventId(Long geoPoliticalZoneId, Long eventId);
     List<EventRecord> findByStateIdAndEventId(Long stateId, Long eventId);
-    List<EventRecord> findBySenatorialIdAndEventId(Long senatorial, Long eventId);
+    List<EventRecord> findBySenatorialDistrictIdAndEventId(Long senatorial, Long eventId);
     List<EventRecord> findByWardAndEventId(Long ward, Long eventId);
 
 }
