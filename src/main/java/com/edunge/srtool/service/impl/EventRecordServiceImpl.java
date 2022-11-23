@@ -77,7 +77,7 @@ public class EventRecordServiceImpl implements EventRecordService {
             eventRecord.setDescription(eventRecordDto.getDescription());
             eventRecord.setLga(eventRecordDto.getLga());
             eventRecord.setWard(pu.getWard().getId());
-            eventRecord.setPollingUnit(eventRecord.getPollingUnit());
+            eventRecord.setPollingUnit(eventRecordDto.getPollingUnit());
             eventRecord.setGeoPoliticalZoneId(pu.getState().getGeoPoliticalZone().getId());
             eventRecord.setStateId(pu.getState().getId());
 
