@@ -15,7 +15,7 @@ public class EventRecordDto extends AbstractBaseModel {
     @NotNull
     private String description;
     @NotNull
-    private Long agentId;
+    private String agentId;
     private String combinedKeys;
     private LocalDateTime timeStamp;
     private long stateId;
@@ -68,11 +68,11 @@ public class EventRecordDto extends AbstractBaseModel {
         this.eventId = eventId;
     }
 
-    public Long getAgentId() {
+    public String getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(Long agentId) {
+    public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
 

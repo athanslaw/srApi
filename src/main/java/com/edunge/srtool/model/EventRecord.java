@@ -27,7 +27,7 @@ public class EventRecord extends BaseModel{
     private String pollingUnitName;
 
     private Boolean eventStatus;
-    private Long agentId;
+    private String agentId;
     private String description;
 
     public String getDescription() {
@@ -110,11 +110,11 @@ public class EventRecord extends BaseModel{
         this.eventStatus = eventStatus;
     }
 
-    public Long getAgentId() {
+    public String getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(Long agentId) {
+    public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
 
