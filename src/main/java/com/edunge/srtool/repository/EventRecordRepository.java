@@ -13,6 +13,7 @@ public interface EventRecordRepository extends JpaRepository<EventRecord,Long> {
     List<EventRecord> findByLga(Long lga);
     List<EventRecord> findByGeoPoliticalZoneId(Long geoPoliticalZoneId);
     List<EventRecord> findByEventId(Long eventId);
+    List<EventRecord> findByCombinedKeys(String combinedKey);
     List<EventRecord> findByStateId(Long stateId);
     List<EventRecord> findBySenatorialDistrictId(Long senatorial);
     List<EventRecord> findByWard(Long ward);

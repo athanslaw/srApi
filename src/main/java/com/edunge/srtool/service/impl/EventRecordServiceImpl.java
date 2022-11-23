@@ -51,8 +51,16 @@ public class EventRecordServiceImpl implements EventRecordService {
     public EventRecordResponse saveEventRecord(EventRecordDto eventRecordDto) {
 
         try {
-            String combinedKeys = eventRecordDto.getPollingUnit() + "" + eventRecordDto.getEventId();
-            EventRecord eventRecord = new EventRecord();
+            String combinedKeys = eventRecordDto.getPollingUnit() + "_" + eventRecordDto.getEventId();
+            List<EventRecord> eventRecords = eventRecordRepository.findByCombinedKeys(combinedKeys);
+            EventRecord eventRecord;
+            if(eventRecords.size() > 0){
+                eventRecord = eventRecords.get(0);
+                eventRecord.setEventStatus(eventRecordDto.getEventStatus());
+                eventRecordRepository.save(eventRecord);
+                return new EventRecordResponse("00", String.format(successTemplate, SERVICE_NAME), eventRecord);
+            }
+            eventRecord = new EventRecord();
             PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnit()).get();
 
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
