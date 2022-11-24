@@ -136,4 +136,13 @@ public class IncidentGroupServiceImpl implements IncidentGroupService {
         }
         return currentIncidentGroup.get();
     }
+
+    @Override
+    public Long getActiveIncidentGroupId() {
+        List<IncidentGroup> incidentGroups = incidentGroupRepository.findByStatus(true);
+        if(incidentGroups.size() > 0)
+            return incidentGroups.get(0).getId();
+        return 1L;
+    }
+
 }

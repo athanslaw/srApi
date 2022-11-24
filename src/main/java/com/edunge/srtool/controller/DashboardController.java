@@ -5,6 +5,7 @@ import com.edunge.srtool.response.DashboardResponse;
 import com.edunge.srtool.response.IncidentDashboardResponse;
 import com.edunge.srtool.response.NationalDashboardResponse;
 import com.edunge.srtool.service.DashboardService;
+import com.edunge.srtool.service.EventRecordDashboardService;
 import com.edunge.srtool.service.IncidentDashboardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,11 +23,14 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     private final IncidentDashboardService incidentDashboardService;
+    private final EventRecordDashboardService eventRecordDashboardService;
 
     @Autowired
-    public DashboardController(DashboardService dashboardService, IncidentDashboardService incidentDashboardService) {
+    public DashboardController(DashboardService dashboardService, IncidentDashboardService incidentDashboardService,
+                               EventRecordDashboardService eventRecordDashboardService) {
         this.dashboardService = dashboardService;
         this.incidentDashboardService = incidentDashboardService;
+        this.eventRecordDashboardService = eventRecordDashboardService;
     }
 
     @GetMapping(value = "/dashboard/{electionType}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -110,5 +114,35 @@ public class DashboardController {
     @ApiOperation(value = "Get Incident Dashboard By Lga")
     public ResponseEntity<IncidentDashboardResponse> getIncidentDashboardByLga(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(incidentDashboardService.getDashboardByLga(id));
+    }
+
+
+
+
+
+
+
+    @GetMapping(value = "/dashboard/events", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Events Dashboard By State")
+    public ResponseEntity<IncidentDashboardResponse> getEventDashboardByState() throws Exception {
+        return ResponseEntity.ok(eventRecordDashboardService.getDashboardByState());
+    }
+
+    @GetMapping(value = "/dashboard/events/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Event Dashboard By State")
+    public ResponseEntity<IncidentDashboardResponse> getEventDashboardByState(@PathVariable Long stateId) throws Exception {
+        return ResponseEntity.ok(eventRecordDashboardService.getDashboardByState(stateId));
+    }
+
+    @GetMapping(value = "/dashboard/events/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Event Dashboard By District")
+    public ResponseEntity<IncidentDashboardResponse> getEventDashboardByDistrict(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(eventRecordDashboardService.getDashboardBySenatorialDistrict(id));
+    }
+
+    @GetMapping(value = "/dashboard/events/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Event Dashboard By Lga")
+    public ResponseEntity<IncidentDashboardResponse> getEventDashboardByLga(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(eventRecordDashboardService.getDashboardByLga(id));
     }
 }

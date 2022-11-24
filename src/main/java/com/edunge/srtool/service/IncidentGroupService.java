@@ -13,4 +13,5 @@ public interface IncidentGroupService {
     IncidentGroupResponse findAll();
     IncidentGroupResponse findActiveIncidentGroups();
     void updateActiveIncidentGroup(Long id);
+    Long getActiveIncidentGroupId();
 }

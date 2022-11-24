@@ -10,7 +10,7 @@ public interface EventRecordService {
     EventRecordResponse findEventRecordByEventId(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByPollingUnit(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByWard(Long id) throws NotFoundException;
-    EventRecordResponse findEventRecordByLga(Long id) throws NotFoundException;
+    EventRecordResponse findEventRecordByLga(Long id);
     EventRecordResponse findEventRecordByState(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordBySenatorial(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByZone(Long id) throws NotFoundException;

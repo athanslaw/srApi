@@ -29,6 +29,7 @@ public class EventRecord extends BaseModel{
     private Boolean eventStatus;
     private String agentId;
     private String description;
+    private Long incidentGroupId;
 
     public String getDescription() {
         return description;
@@ -172,5 +173,13 @@ public class EventRecord extends BaseModel{
 
     public void setPollingUnitName(String pollingUnitName) {
         this.pollingUnitName = pollingUnitName;
+    }
+
+    public Long getIncidentGroupId() {
+        return incidentGroupId;
+    }
+
+    public void setIncidentGroupId(Long incidentGroupId) {
+        this.incidentGroupId = incidentGroupId;
     }
 }

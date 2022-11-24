@@ -4,11 +4,13 @@ import com.edunge.srtool.dto.EventRecordDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.EventRecord;
+import com.edunge.srtool.model.IncidentGroup;
 import com.edunge.srtool.model.PollingUnit;
 import com.edunge.srtool.repository.EventRecordRepository;
 import com.edunge.srtool.repository.PollingUnitRepository;
 import com.edunge.srtool.response.EventRecordResponse;
 import com.edunge.srtool.service.EventRecordService;
+import com.edunge.srtool.service.IncidentGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class EventRecordServiceImpl implements EventRecordService {
 
     @Autowired
     private EventRecordRepository eventRecordRepository;
+    @Autowired
+    private IncidentGroupService incidentGroupService;
 
     @Autowired
     private PollingUnitRepository pollingUnitRepository;
@@ -51,7 +55,8 @@ public class EventRecordServiceImpl implements EventRecordService {
     public EventRecordResponse saveEventRecord(EventRecordDto eventRecordDto) {
 
         try {
-            String combinedKeys = eventRecordDto.getPollingUnit() + "_" + eventRecordDto.getEventId();
+            Long incidentGroupId = incidentGroupService.getActiveIncidentGroupId();
+            String combinedKeys = eventRecordDto.getPollingUnit() + "_" + eventRecordDto.getEventId() + "_" + incidentGroupId;
             List<EventRecord> eventRecords = eventRecordRepository.findByCombinedKeys(combinedKeys);
             EventRecord eventRecord;
             if(eventRecords.size() > 0){
@@ -64,6 +69,7 @@ public class EventRecordServiceImpl implements EventRecordService {
             PollingUnit pu = pollingUnitRepository.findById(eventRecordDto.getPollingUnit()).get();
 
             eventRecord.setEventStatus(eventRecordDto.getEventStatus());
+            eventRecord.setIncidentGroupId(incidentGroupId);
             eventRecord.setPollingUnitName(pu.getCode()+" - "+pu.getName());
             eventRecord.setLgaName(pu.getLga().getName());
             eventRecord.setSenatorialDistrictId(pu.getSenatorialDistrict().getId());
@@ -97,13 +103,13 @@ public class EventRecordServiceImpl implements EventRecordService {
 
     @Override
     public EventRecordResponse findEventRecordByEventId(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByEventId(id);
+        List<EventRecord> EventRecord = eventRecordRepository.findByEventIdAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByPollingUnit(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByPollingUnit(id);
+        List<EventRecord> EventRecord = eventRecordRepository.findByPollingUnitAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
@@ -114,68 +120,68 @@ public class EventRecordServiceImpl implements EventRecordService {
 
     @Override
     public EventRecordResponse findEventRecordByWard(Long id) throws NotFoundException {
-        List<EventRecord> eventRecord = eventRecordRepository.findByWard(id);
+        List<EventRecord> eventRecord = eventRecordRepository.findByWardAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), eventRecord);
     }
 
     @Override
-    public EventRecordResponse findEventRecordByLga(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByLga(id);
+    public EventRecordResponse findEventRecordByLga(Long id) {
+        List<EventRecord> EventRecord = eventRecordRepository.findByLgaAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByState(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByStateId(id);
+        List<EventRecord> EventRecord = eventRecordRepository.findByStateIdAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordBySenatorial(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findBySenatorialDistrictId(id);
+        List<EventRecord> EventRecord = eventRecordRepository.findBySenatorialDistrictIdAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByZone(Long id) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByGeoPoliticalZoneId(id);
+        List<EventRecord> EventRecord = eventRecordRepository.findByGeoPoliticalZoneIdAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
 
     @Override
     public EventRecordResponse findEventRecordByPollingUnitAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByPollingUnitAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findByPollingUnitAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByWardAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByWardAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findByWardAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByLgaAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByLgaAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findByLgaAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByStateAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByStateIdAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findByStateIdAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordBySenatorialAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findBySenatorialDistrictIdAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findBySenatorialDistrictIdAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
     public EventRecordResponse findEventRecordByZoneAndEventId(Long id, Long eventId) throws NotFoundException {
-        List<EventRecord> EventRecord = eventRecordRepository.findByGeoPoliticalZoneIdAndEventId(id, eventId);
+        List<EventRecord> EventRecord = eventRecordRepository.findByGeoPoliticalZoneIdAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
@@ -212,7 +218,11 @@ public class EventRecordServiceImpl implements EventRecordService {
     @Override
     public EventRecordResponse findEventRecordByStatus(Boolean status) {
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME),
-                eventRecordRepository.findByEventStatus(status));
+                eventRecordRepository.findByEventStatusAndIncidentGroupId(status, getActiveIncidentGroupId()));
+    }
+
+    private Long getActiveIncidentGroupId(){
+        return incidentGroupService.getActiveIncidentGroupId();
     }
 
     @Override
