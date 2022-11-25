@@ -4,7 +4,6 @@ import com.edunge.srtool.dto.EventRecordDto;
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.EventRecord;
-import com.edunge.srtool.model.IncidentGroup;
 import com.edunge.srtool.model.PollingUnit;
 import com.edunge.srtool.repository.EventRecordRepository;
 import com.edunge.srtool.repository.PollingUnitRepository;

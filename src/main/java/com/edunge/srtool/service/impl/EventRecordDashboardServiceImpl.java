@@ -3,6 +3,7 @@ package com.edunge.srtool.service.impl;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.EventRecord;
 import com.edunge.srtool.model.Lga;
+import com.edunge.srtool.model.SenatorialDistrict;
 import com.edunge.srtool.model.State;
 import com.edunge.srtool.response.IncidentDashboardResponse;
 import com.edunge.srtool.response.IncidentReport;
@@ -126,15 +127,15 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     public IncidentDashboardResponse getDashboardByLga(Long lgaId) throws NotFoundException {
         Integer totalEvents = getLgaEventRecordsCount(lgaId);
         if(totalEvents == 0) {
-            new IncidentDashboardResponse("00","Incident Report loaded.",totalEvents, null, null);
+            new IncidentDashboardResponse("00","Events Report loaded.",totalEvents, null, null);
         }
         try {
             List<IncidentReport> eventReports = getEventReport(lgaId);
             List<IncidentReport> lgaIncidentReport = getLgaReports(lgaId);
-            return new IncidentDashboardResponse("00","Incident Report loaded.",totalEvents, eventReports, lgaIncidentReport);
+            return new IncidentDashboardResponse("00","Events Report loaded.",totalEvents, eventReports, lgaIncidentReport);
         }catch (Exception e){
             System.out.println("Exception: "+e.getStackTrace());
-            return new IncidentDashboardResponse("00","Incident Report loaded.",totalEvents, null, null);
+            return new IncidentDashboardResponse("00","Events Report loaded.",totalEvents, null, null);
         }
     }
 
@@ -150,19 +151,19 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                     Integer currentValue = eventMap.getOrDefault(event, 0);
                     eventMap.put(event, currentValue+1);
                 });
-        Integer totalEvent = getStateEventRecordsCount(state);
-        if(totalEvent < 1){
+        Integer totalPUs = (int)pollingUnitService.countByState(state);
+        if(eventList.size() < 1){
             return new ArrayList<>();
         }
         eventMap.forEach((event, count)->{
-            Double percent = (count * 100.0)/totalEvent;
+            Double percent = (count * 100.0)/totalPUs;
             eventReports.add(new IncidentReport(event, count, percent));
         });
         return eventReports;
     }
 
-    private List<IncidentReport> getEventReport(long lga){
-        List<EventRecord> eventList = getLgaEventsRecord(lga);
+    private List<IncidentReport> getEventReport(long lgaId){
+        List<EventRecord> eventList = getLgaEventsRecord(lgaId);
         HashMap<String, Integer> eventMap = new HashMap<>();
         List<IncidentReport> eventReports = new ArrayList<>();
         eventList
@@ -171,12 +172,13 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                     Integer currentValue = eventMap.getOrDefault(eventType, 0);
                     eventMap.put(eventType, currentValue+1);
                 });
-        Integer totalEvent = getLgaEventRecordsCount(lga);
-        if(totalEvent < 1){
+        Lga lga = new Lga(){{ setId(lgaId);}};
+        Integer totalPUs = (int)pollingUnitService.countByLga(lga);
+        if(eventList.size() < 1){
             return new ArrayList<IncidentReport>();
         }
         eventMap.forEach((event, count)->{
-            Double percent = (count * 100.0)/totalEvent;
+            Double percent = (count * 100.0)/totalPUs;
             eventReports.add(new IncidentReport(event, count, percent));
         });
         return eventReports;
@@ -192,12 +194,12 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                     Integer currentValue = eventMap.getOrDefault(event, 0);
                     eventMap.put(event, currentValue+1);
                 });
-        Integer totalEvent = getDistrictEventsCount(senatorialDistrict);
-        if(totalEvent < 1){
+        Integer totalPUs = (int)pollingUnitService.countBySenatorialDistrict(new SenatorialDistrict(){{setId(senatorialDistrict);}});
+        if(eventList.size() < 1){
             return new ArrayList<IncidentReport>();
         }
         eventMap.forEach((event, count)->{
-            Double percent = (count * 100.0)/totalEvent;
+            Double percent = (count * 100.0)/totalPUs;
             eventReports.add(new IncidentReport(event, count, percent));
         });
         return eventReports;
@@ -228,17 +230,24 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
         return (int)pollingUnitService.findCountByLga(lga);
     }
 
+    private int totalPUsByState(long state){
+        return (int)pollingUnitService.findCountByState(state);
+    }
+
+    private int totalPUsBySenatorialDistrict(long district){
+        return (int)pollingUnitService.findCountBySenatorialDistrict(district);
+    }
+
     private List<IncidentReport> getLgaReports(long lga){
         List<IncidentReport> eventReports  = new ArrayList<>();
         List<EventRecord> eventList = getLgaEventsRecord(lga);
 
         try {
             Lga lgaInfo = lgaService.findLgaById(lga).getLga();
-            Integer totalEvents = getLgaEventRecordsCount(lga);
-            if (totalEvents > 0) {
+
+            if (eventList.size() > 0) {
                 HashMap<String, Integer> eventsMap = new HashMap<>();
                 AtomicInteger totalEvent = new AtomicInteger(0);
-                AtomicInteger totalWeight = new AtomicInteger(0);
                 // no of PU with incidents
                 Set<Long> distinctPUs = new LinkedHashSet<>();
 
@@ -253,18 +262,15 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                             distinctPUs.add(eventRecord.getPollingUnit());
                             totalEvent.addAndGet(1);
                         });
+
+                int totalPUs = (int)pollingUnitService.countByLga(lgaInfo);
                 if (totalEvent.get() > 0) {
                     eventsMap.forEach((event, count) -> {
-                        Double percent = (count * 100.0) / totalEvent.get();
+                        Double percent = (count * 100.0) / totalPUs;
                         eventReports.add(new IncidentReport(lgaInfo, event, count, percent, totalEvent.get(), 0));
                     });
                 }
 
-                int weight = (int) Math.ceil((totalWeight.get() * distinctPUs.size() * 2.0) / (totalEvents * this.totalPUsByLga(lga)));
-                eventReports
-                        .forEach(incidentReport -> {
-                            incidentReport.setWeight(weight);
-                        });
             }
         }catch (NotFoundException e){}
         return eventReports;
@@ -276,33 +282,32 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
             List<IncidentReport> eventReports = new ArrayList<>();
             List<EventRecord> eventList = getStateEvents(state);
             lgas.forEach(lga -> {
-                Integer totalEvents = getLgaEventRecordsCount(lga.getId());
-                if (totalEvents > 0) {
-                    HashMap<String, Integer> eventTypeMap = new HashMap<>();
-                    AtomicInteger totalEvent = new AtomicInteger(0);
-                    // no of PU with incidents
-                    Set<Long> distinctPUs = new LinkedHashSet<>();
+                HashMap<String, Integer> eventTypeMap = new HashMap<>();
+                AtomicInteger totalEvent = new AtomicInteger(0);
+                // no of PU with incidents
+                Set<Long> distinctPUs = new LinkedHashSet<>();
 
-                    eventList.stream()
-                            .filter(eventRecord -> eventRecord.getLga().equals(lga.getId()))
-                            .forEach(eventRecord -> {
-                                String eventRecordDescription = eventRecord.getDescription();
-                                Integer currentValue = eventTypeMap.getOrDefault(eventRecordDescription, 0);
-                                eventTypeMap.put(eventRecordDescription, currentValue + 1);
-                            });
-                    eventList.stream()
-                            .filter(eventRecord -> eventRecord.getLga().equals(lga.getId()))
-                            .filter(eventRecord -> eventRecord.getEventStatus())
-                            .forEach(incident -> {
-                                distinctPUs.add(incident.getPollingUnit());
-                                totalEvent.addAndGet(1);
-                            });
-                    if (totalEvent.get() > 0) {
-                        eventTypeMap.forEach((type, count) -> {
-                            Double percent = (count * 100.0) / totalEvent.get();
-                            eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
+                eventList.stream()
+                        .filter(eventRecord -> eventRecord.getLga().equals(lga.getId()))
+                        .forEach(eventRecord -> {
+                            String eventRecordDescription = eventRecord.getDescription();
+                            Integer currentValue = eventTypeMap.getOrDefault(eventRecordDescription, 0);
+                            eventTypeMap.put(eventRecordDescription, currentValue + 1);
                         });
-                    }
+                eventList.stream()
+                        .filter(eventRecord -> eventRecord.getLga().equals(lga.getId()))
+                        .filter(eventRecord -> eventRecord.getEventStatus())
+                        .forEach(incident -> {
+                            distinctPUs.add(incident.getPollingUnit());
+                            totalEvent.addAndGet(1);
+                        });
+
+                int totalPUs = (int)pollingUnitService.countByLga(lga);
+                if (totalEvent.get() > 0) {
+                    eventTypeMap.forEach((type, count) -> {
+                        Double percent = (count * 100.0) / totalPUs;
+                        eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
+                    });
                 }
             });
             return eventReports;
@@ -311,41 +316,40 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
         }
     }
 
-    private List<IncidentReport> getLgaReportsByDistrict(long senatorialDistrict) throws NotFoundException{
-        List<Lga> lgas = lgaService.findLgaBySenatorialDistrictCode(senatorialDistrict).getLgas();
+    private List<IncidentReport> getLgaReportsByDistrict(long senatorialDistrictId) throws NotFoundException{
+        List<Lga> lgas = lgaService.findLgaBySenatorialDistrictCode(senatorialDistrictId).getLgas();
         List<IncidentReport> eventReports  = new ArrayList<>();
-        List<EventRecord> eventList = getDistrictEvents(senatorialDistrict);
+        List<EventRecord> eventList = getDistrictEvents(senatorialDistrictId);
         lgas.forEach(lga -> {
-                    Integer totalEvents = getLgaEventRecordsCount(lga.getId());
-                    if(totalEvents > 0) {
-                        HashMap<String, Integer> eventeMap = new HashMap<>();
-                        AtomicInteger totalEvent = new AtomicInteger(0);
-                        // no of PU with incidents
-                        Set<Long> distinctPUs = new LinkedHashSet<>();
+            HashMap<String, Integer> eventeMap = new HashMap<>();
+            AtomicInteger totalEvent = new AtomicInteger(0);
+            // no of PU with incidents
+            Set<Long> distinctPUs = new LinkedHashSet<>();
 
-                        eventList.stream()
-                                .filter(incident -> incident.getLga().equals(lga.getId()))
-                                .forEach(incident -> {
-                                    String description = incident.getDescription();
-                                    Integer currentValue = eventeMap.getOrDefault(description, 0);
-                                    eventeMap.put(description, currentValue + 1);
-                                });
-                        eventList.stream()
-                                .filter(incident -> incident.getLga().equals(lga.getId()))
-                                .filter(incident -> incident.getEventStatus())
-                                .forEach(incident -> {
-                                    distinctPUs.add(incident.getPollingUnit());
-                                    totalEvent.addAndGet(1);
-                                });
-                        if(totalEvent.get() > 0) {
-                            eventeMap.forEach((type, count) -> {
-                                Double percent = (count * 100.0) / totalEvent.get();
-                                eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
-                            });
-                        }
-
-                    }
+            eventList.stream()
+                    .filter(incident -> incident.getLga().equals(lga.getId()))
+                    .forEach(incident -> {
+                        String description = incident.getDescription();
+                        Integer currentValue = eventeMap.getOrDefault(description, 0);
+                        eventeMap.put(description, currentValue + 1);
+                    });
+            eventList.stream()
+                    .filter(incident -> incident.getLga().equals(lga.getId()))
+                    .filter(incident -> incident.getEventStatus())
+                    .forEach(incident -> {
+                        distinctPUs.add(incident.getPollingUnit());
+                        totalEvent.addAndGet(1);
+                    });
+            SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(senatorialDistrictId);}};
+            int totalPUs = (int)pollingUnitService.countBySenatorialDistrict(senatorialDistrict);
+            if(totalEvent.get() > 0) {
+                eventeMap.forEach((type, count) -> {
+                    Double percent = (count * 100.0) / totalPUs;
+                    eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
                 });
+            }
+
+        });
         return eventReports;
     }
 
