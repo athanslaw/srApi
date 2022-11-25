@@ -275,10 +275,9 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                             totalEvent.addAndGet(1);
                         });
 
-                int totalPUs = (int)pollingUnitService.countByLga(lga);
                 if (totalEvent.get() > 0) {
                     eventTypeMap.forEach((type, count) -> {
-                        Double percent = (count * 100.0) / totalPUs;
+                        Double percent = (count * 100.0) / distinctPUs.size();
                         eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), weight));
                     });
                 }
@@ -317,11 +316,9 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                         distinctPUs.add(incident.getPollingUnit());
                         totalEvent.addAndGet(1);
                     });
-            SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(senatorialDistrictId);}};
-            int totalPUs = (int)pollingUnitService.countBySenatorialDistrict(senatorialDistrict);
             if(totalEvent.get() > 0) {
                 eventeMap.forEach((type, count) -> {
-                    Double percent = (count * 100.0) / totalPUs;
+                    Double percent = (count * 100.0) / distinctPUs.size();
                     eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), weight));
                 });
             }
