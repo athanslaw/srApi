@@ -97,21 +97,15 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     }
 
     private List<EventRecord> getStateEvents(State state) throws NotFoundException {
-        return eventRecordService.findEventRecordByState(state.getId()).getEventRecords()
-                .stream().filter(eventRecord -> eventRecord.getEventStatus())
-                .collect(Collectors.toList());
+        return eventRecordService.findEventRecordByState(state.getId()).getEventRecords();
     }
 
     public List<EventRecord> getDistrictEvents(long senatorialDistrict) throws NotFoundException {
-        return eventRecordService.findEventRecordBySenatorial(senatorialDistrict).getEventRecords()
-                .stream().filter(eventRecord -> eventRecord.getEventStatus())
-                .collect(Collectors.toList());
+        return eventRecordService.findEventRecordBySenatorial(senatorialDistrict).getEventRecords();
     }
 
     public List<EventRecord> getLgaEventsRecord(long lga){
-        return eventRecordService.findEventRecordByLga(lga).getEventRecords()
-                .stream().filter(eventRecord -> eventRecord.getEventStatus())
-                .collect(Collectors.toList());
+        return eventRecordService.findEventRecordByLga(lga).getEventRecords();
     }
 
     private State getState() {
@@ -140,7 +134,7 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     }
 
     private List<IncidentReport> getEventReport(State state) throws NotFoundException {
-        List<EventRecord> eventList = getStateEvents(state);
+        List<EventRecord> eventList = getStateEvents(state).stream().filter(eventRecord -> eventRecord.getEventStatus()).collect(Collectors.toList());
         HashMap<String, Integer> eventMap = new HashMap<>();
         List<IncidentReport> eventReports = new ArrayList<>();
 
@@ -164,6 +158,7 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
 
     private List<IncidentReport> getEventReport(long lgaId){
         List<EventRecord> eventList = getLgaEventsRecord(lgaId);
+        eventList.stream().filter(eventRecord -> eventRecord.getEventStatus()).collect(Collectors.toList());
         HashMap<String, Integer> eventMap = new HashMap<>();
         List<IncidentReport> eventReports = new ArrayList<>();
         eventList
@@ -185,7 +180,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     }
 
     private List<IncidentReport> getEventReportDistrict(long senatorialDistrict) throws NotFoundException {
-        List<EventRecord> eventList = getDistrictEvents(senatorialDistrict);
+        List<EventRecord> eventList = getDistrictEvents(senatorialDistrict).stream().filter(
+                eventRecord -> eventRecord.getEventStatus()
+        ).collect(Collectors.toList());
+
         HashMap<String, Integer> eventMap = new HashMap<>();
         List<IncidentReport> eventReports = new ArrayList<>();
         eventList
@@ -205,42 +203,12 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
         return eventReports;
     }
 
-    private List<IncidentReport> getEventReportLga(long lga){
-        List<EventRecord> eventList = getLgaEventsRecord(lga);
-        HashMap<String, Integer> eventMap = new HashMap<>();
-        List<IncidentReport> eventReports = new ArrayList<>();
-        eventList
-                .forEach(eventRecord -> {
-                    String eventType = eventRecord.getDescription();
-                    Integer currentValue = eventMap.getOrDefault(eventType, 0);
-                    eventMap.put(eventType, currentValue+1);
-                });
-        Integer totalIncident = getLgaEventRecordsCount(lga);
-        if(totalIncident < 1){
-            return new ArrayList<IncidentReport>();
-        }
-        eventMap.forEach((type, count)->{
-            Double percent = (count * 100.0)/totalIncident;
-            eventReports.add(new IncidentReport(type, count, percent));
-        });
-        return eventReports;
-    }
-
-    private int totalPUsByLga(long lga){
-        return (int)pollingUnitService.findCountByLga(lga);
-    }
-
-    private int totalPUsByState(long state){
-        return (int)pollingUnitService.findCountByState(state);
-    }
-
-    private int totalPUsBySenatorialDistrict(long district){
-        return (int)pollingUnitService.findCountBySenatorialDistrict(district);
-    }
-
     private List<IncidentReport> getLgaReports(long lga){
         List<IncidentReport> eventReports  = new ArrayList<>();
         List<EventRecord> eventList = getLgaEventsRecord(lga);
+        int totalEvents = eventList.size();
+        eventList.stream().filter(eventRecord -> eventRecord.getEventStatus()).collect(Collectors.toList());
+        int weight = totalEvents - eventList.size();
 
         try {
             Lga lgaInfo = lgaService.findLgaById(lga).getLga();
@@ -267,7 +235,7 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                 if (totalEvent.get() > 0) {
                     eventsMap.forEach((event, count) -> {
                         Double percent = (count * 100.0) / totalPUs;
-                        eventReports.add(new IncidentReport(lgaInfo, event, count, percent, totalEvent.get(), 0));
+                        eventReports.add(new IncidentReport(lgaInfo, event, count, percent, totalEvent.get(), weight));
                     });
                 }
 
@@ -281,6 +249,11 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
             List<Lga> lgas = lgaService.findLgaByStateCode(state.getId()).getLgas();
             List<IncidentReport> eventReports = new ArrayList<>();
             List<EventRecord> eventList = getStateEvents(state);
+
+            int totalEvents = eventList.size();
+            eventList.stream().filter(eventRecord -> eventRecord.getEventStatus()).collect(Collectors.toList());
+            int weight = totalEvents - eventList.size();
+
             lgas.forEach(lga -> {
                 HashMap<String, Integer> eventTypeMap = new HashMap<>();
                 AtomicInteger totalEvent = new AtomicInteger(0);
@@ -306,7 +279,7 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
                 if (totalEvent.get() > 0) {
                     eventTypeMap.forEach((type, count) -> {
                         Double percent = (count * 100.0) / totalPUs;
-                        eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
+                        eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), weight));
                     });
                 }
             });
@@ -320,6 +293,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
         List<Lga> lgas = lgaService.findLgaBySenatorialDistrictCode(senatorialDistrictId).getLgas();
         List<IncidentReport> eventReports  = new ArrayList<>();
         List<EventRecord> eventList = getDistrictEvents(senatorialDistrictId);
+        int totalEvents = eventList.size();
+        eventList.stream().filter(eventRecord -> eventRecord.getEventStatus()).collect(Collectors.toList());
+        int weight = totalEvents - eventList.size();
+
         lgas.forEach(lga -> {
             HashMap<String, Integer> eventeMap = new HashMap<>();
             AtomicInteger totalEvent = new AtomicInteger(0);
@@ -345,7 +322,7 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
             if(totalEvent.get() > 0) {
                 eventeMap.forEach((type, count) -> {
                     Double percent = (count * 100.0) / totalPUs;
-                    eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), 0));
+                    eventReports.add(new IncidentReport(lga, type, count, percent, totalEvent.get(), weight));
                 });
             }
 
