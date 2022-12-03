@@ -41,10 +41,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
 
         State state = new State(){{setId(stateId);}};
         List<EventRecord> eventList = getStateEvents(state, eventId);
-        if(eventList == null || eventList.size() == 0) {
-            return new EventRecordDashboardResponse(0l, 0l, 0l);
-        }
         Integer totalPUs = (int)pollingUnitService.countByState(state);
+        if(eventList == null || eventList.size() == 0) {
+            return new EventRecordDashboardResponse(0l, 0l, totalPUs);
+        }
 
         return getEventRecordDashboardResponse(eventList, totalPUs);
     }
@@ -54,10 +54,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
 
         SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(id);}};
         List<EventRecord> eventList = getDistrictEvents(id, eventId);
-        if(eventList == null || eventList.size() == 0) {
-            return new EventRecordDashboardResponse(0l, 0l, 0l);
-        }
         Integer totalPUs = (int)pollingUnitService.countBySenatorialDistrict(senatorialDistrict);
+        if(eventList == null || eventList.size() == 0) {
+            return new EventRecordDashboardResponse(0l, 0l, totalPUs);
+        }
 
         return getEventRecordDashboardResponse(eventList, totalPUs);
     }
@@ -66,10 +66,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     public EventRecordDashboardResponse getDashboardByLga(Long lgaId, String eventId) throws NotFoundException {
         Lga lga = new Lga(){{setId(lgaId);}};
         List<EventRecord> eventList = getLgaEventsRecord(lgaId, eventId);
-        if(eventList == null || eventList.size() == 0) {
-            return new EventRecordDashboardResponse(0l, 0l, 0l);
-        }
         Integer totalPUs = (int)pollingUnitService.countByLga(lga);
+        if(eventList == null || eventList.size() == 0) {
+            return new EventRecordDashboardResponse(0l, 0l, totalPUs);
+        }
 
         return getEventRecordDashboardResponse(eventList, totalPUs);
     }
@@ -78,10 +78,10 @@ public class EventRecordDashboardServiceImpl implements EventRecordDashboardServ
     public EventRecordDashboardResponse getDashboardByWard(Long wardId, String eventId) throws NotFoundException {
         Ward ward = new Ward(){{setId(wardId);}};
         List<EventRecord> eventList = getWardEventsRecord(wardId, eventId);
-        if(eventList == null || eventList.size() == 0) {
-            return new EventRecordDashboardResponse(0l, 0l, 0l);
-        }
         Integer totalPUs = (int)pollingUnitService.countByWard(ward);
+        if(eventList == null || eventList.size() == 0) {
+            return new EventRecordDashboardResponse(0l, 0l, totalPUs);
+        }
 
         return getEventRecordDashboardResponse(eventList, totalPUs);
     }
