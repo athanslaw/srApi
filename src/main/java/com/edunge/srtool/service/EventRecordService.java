@@ -9,14 +9,14 @@ public interface EventRecordService {
     EventRecordResponse findEventRecordById(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByEventId(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByPollingUnit(Long id) throws NotFoundException;
-    EventRecordResponse findEventRecordByWard(Long id) throws NotFoundException;
+    EventRecordResponse findEventRecordByWard(Long id);
     EventRecordResponse findEventRecordByLga(Long id);
     EventRecordResponse findEventRecordByState(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordBySenatorial(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByZone(Long id) throws NotFoundException;
     EventRecordResponse findEventRecordByPollingUnitAndEventId(Long id, Long eventId) throws NotFoundException;
-    EventRecordResponse findEventRecordByWardAndEventId(Long id, Long eventId) throws NotFoundException;
-    EventRecordResponse findEventRecordByLgaAndEventId(Long id, Long eventId) throws NotFoundException;
+    EventRecordResponse findEventRecordByWardAndEventId(Long id, Long eventId);
+    EventRecordResponse findEventRecordByLgaAndEventId(Long id, Long eventId);
     EventRecordResponse findEventRecordByStateAndEventId(Long id, Long eventId) throws NotFoundException;
     EventRecordResponse findEventRecordBySenatorialAndEventId(Long id, Long eventId) throws NotFoundException;
     EventRecordResponse findEventRecordByZoneAndEventId(Long id, Long eventId) throws NotFoundException;

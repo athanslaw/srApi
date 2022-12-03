@@ -1,10 +1,11 @@
 package com.edunge.srtool.repository;
 
-import com.edunge.srtool.model.EventRecord;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.edunge.srtool.model.EventRecord;
 
 @Repository
 public interface EventRecordRepository extends JpaRepository<EventRecord,Long> {

@@ -118,7 +118,7 @@ public class EventRecordServiceImpl implements EventRecordService {
     }
 
     @Override
-    public EventRecordResponse findEventRecordByWard(Long id) throws NotFoundException {
+    public EventRecordResponse findEventRecordByWard(Long id) {
         List<EventRecord> eventRecord = eventRecordRepository.findByWardAndIncidentGroupId(id, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), eventRecord);
     }
@@ -155,13 +155,13 @@ public class EventRecordServiceImpl implements EventRecordService {
     }
 
     @Override
-    public EventRecordResponse findEventRecordByWardAndEventId(Long id, Long eventId) throws NotFoundException {
+    public EventRecordResponse findEventRecordByWardAndEventId(Long id, Long eventId) {
         List<EventRecord> EventRecord = eventRecordRepository.findByWardAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }
 
     @Override
-    public EventRecordResponse findEventRecordByLgaAndEventId(Long id, Long eventId) throws NotFoundException {
+    public EventRecordResponse findEventRecordByLgaAndEventId(Long id, Long eventId) {
         List<EventRecord> EventRecord = eventRecordRepository.findByLgaAndEventIdAndIncidentGroupId(id, eventId, getActiveIncidentGroupId());
         return new EventRecordResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), EventRecord);
     }

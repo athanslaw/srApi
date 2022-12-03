@@ -1,12 +1,13 @@
 package com.edunge.srtool.service;
 
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.response.IncidentDashboardResponse;
+import com.edunge.srtool.response.EventRecordDashboardResponse;
 
 public interface EventRecordDashboardService {
-    IncidentDashboardResponse getDashboardByState() throws NotFoundException;
-    IncidentDashboardResponse getDashboardByState(Long stateId) throws NotFoundException;
+    EventRecordDashboardResponse getDashboardByState(String eventId) throws NotFoundException;
+    EventRecordDashboardResponse getDashboardByState(Long stateId, String eventId) throws NotFoundException;
 
-    IncidentDashboardResponse getDashboardBySenatorialDistrict(Long lgaId) throws NotFoundException;
-    IncidentDashboardResponse getDashboardByLga(Long lgaId) throws NotFoundException;
+    EventRecordDashboardResponse getDashboardBySenatorialDistrict(Long lgaId, String eventId) throws NotFoundException;
+    EventRecordDashboardResponse getDashboardByLga(Long lgaId, String eventId) throws NotFoundException;
+    EventRecordDashboardResponse getDashboardByWard(Long lgaId, String eventId) throws NotFoundException;
 }
