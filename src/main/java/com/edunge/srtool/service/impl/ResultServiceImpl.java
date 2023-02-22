@@ -107,7 +107,7 @@ public class ResultServiceImpl implements ResultService {
         if(votingLevel.getCode().equals(VOTING_LEVEL_WARD)){
             result = resultRepository.findByElectionAndWardAndVotingLevelAndElectionType(election, ward, votingLevel, resultDto.getElectionType());
             if(result != null){
-                throw new DuplicateException(String.format("Result for %s in %s already exists.", ward.getName(), election.getDescription()));
+                throw new DuplicateException(String.format("Result for %s ward in %s lga has been previously submitted. Please reconfirm.", ward.getName(), lga.getName()));
             }
             result = new Result();
             if(checkingRealTime) resultRealTimeRepository.deleteByWard(ward);
@@ -116,7 +116,7 @@ public class ResultServiceImpl implements ResultService {
         else if(votingLevel.getCode().equals(VOTING_LEVEL_LGA)){
             List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionAndLgaAndVotingLevelAndElectionType(election, lga, votingLevel, resultDto.getElectionType());
             if(resultRealTimeList.size() >0){
-                throw new DuplicateException(String.format("Result for %s in %s already exists.", lga.getName(), election.getDescription()));
+                throw new DuplicateException(String.format("Result for %s lga in %s has been previously submitted. Please reconfirm.", lga.getName(), state.getName()));
             }
             result = new Result();
             if(checkingRealTime) resultRealTimeRepository.deleteByLga(lga);
@@ -126,7 +126,7 @@ public class ResultServiceImpl implements ResultService {
         else if(votingLevel.getCode().equals(VOTING_LEVEL_POLLING_UNIT)){
             result = resultRepository.findByElectionAndPollingUnitAndElectionType(election, pollingUnit, resultDto.getElectionType());
             if(result != null){
-                throw new DuplicateException(String.format("Result for %s in %s already exists.", pollingUnit.getName(), election.getDescription()));
+                throw new DuplicateException(String.format("Result for %s PU in %s Ward has been previously submitted. Please reconfirm.", pollingUnit.getName(), ward.getName()));
             }
             result = new Result();
         }
