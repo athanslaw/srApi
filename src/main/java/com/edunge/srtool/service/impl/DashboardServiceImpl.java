@@ -261,8 +261,8 @@ public class DashboardServiceImpl implements DashboardService {
                 party2Sum.addAndGet(result.getParty_2());
                 party3Sum.addAndGet(result.getParty_3());
                 party4Sum.addAndGet(result.getParty_4());
-                party5Sum.addAndGet(result.getParty_4());
-                party6Sum.addAndGet(result.getParty_4());
+                party5Sum.addAndGet(result.getParty_5());
+                party6Sum.addAndGet(result.getParty_6());
                 voteCount.addAndGet(result.getVoteCount());
                 totalPU.addAndGet(result.getPollingUnitCount());
             });
@@ -306,8 +306,8 @@ public class DashboardServiceImpl implements DashboardService {
                 party2Sum.addAndGet(result.getParty_2());
                 party3Sum.addAndGet(result.getParty_3());
                 party4Sum.addAndGet(result.getParty_4());
-                party5Sum.addAndGet(result.getParty_4());
-                party6Sum.addAndGet(result.getParty_4());
+                party5Sum.addAndGet(result.getParty_5());
+                party6Sum.addAndGet(result.getParty_6());
                 voteCount.addAndGet(result.getVoteCount());
                 totalPU.addAndGet(result.getPollingUnitCount());
             });
