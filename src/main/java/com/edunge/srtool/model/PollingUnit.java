@@ -1,9 +1,6 @@
 package com.edunge.srtool.model;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -24,7 +21,7 @@ public class PollingUnit extends AbstractBaseModel{
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
-    @OneToMany(mappedBy = "pollingUnit")
+    @OneToMany(mappedBy = "pollingUnit", fetch = FetchType.LAZY)
     private Set<PartyAgent> partyAgents;
 
     public State getState() {
