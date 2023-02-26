@@ -59,18 +59,14 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardResponse saveWard(WardDto wardDto) throws NotFoundException {
         Lga lga = getLga(wardDto.getLgaId());
-        Ward ward = wardRepository.findByCode(wardDto.getCode());
-        if(ward==null){
-            ward = new Ward();
-            ward.setSenatorialDistrict(lga.getSenatorialDistrict());
-            ward.setState(lga.getState());
-            ward.setCode(wardDto.getCode());
-            ward.setName(wardDto.getName());
-            ward.setLga(lga);
-            wardRepository.save(ward);
-            return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
-        }
-        throw new DuplicateException(String.format(duplicateTemplate, wardDto.getCode()));
+        Ward ward = new Ward();
+        ward.setSenatorialDistrict(lga.getSenatorialDistrict());
+        ward.setState(lga.getState());
+        ward.setCode(wardDto.getCode());
+        ward.setName(wardDto.getName());
+        ward.setLga(lga);
+        wardRepository.save(ward);
+        return new WardResponse("00", String.format(successTemplate,SERVICE_NAME), ward);
     }
     @Override
     public WardResponse findWardById(Long id) throws NotFoundException {

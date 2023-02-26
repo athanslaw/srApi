@@ -66,21 +66,16 @@ public class PollingUnitServiceImpl implements PollingUnitService {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(pollingUnitDto.getSenatorialDistrictId());
         Lga lga = getLga(pollingUnitDto.getLgaId());
         Ward ward = getWard(pollingUnitDto.getWardId());
-        PollingUnit pollingUnit = pollingUnitRepository.findByCode(pollingUnitDto.getCode());
 
-
-        if(pollingUnit == null){
-            PollingUnit pollingUnit1 = new PollingUnit();
-            pollingUnit1.setSenatorialDistrict(senatorialDistrict);
-            pollingUnit1.setState(state);
-            pollingUnit1.setCode(pollingUnitDto.getCode());
-            pollingUnit1.setName(pollingUnitDto.getName());
-            pollingUnit1.setLga(lga);
-            pollingUnit1.setWard(ward);
-            pollingUnitRepository.save(pollingUnit1);
-            return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit1);
-        }
-        throw new DuplicateException(String.format(duplicateTemplate, pollingUnitDto.getCode()));
+        PollingUnit pollingUnit1 = new PollingUnit();
+        pollingUnit1.setSenatorialDistrict(senatorialDistrict);
+        pollingUnit1.setState(state);
+        pollingUnit1.setCode(pollingUnitDto.getCode());
+        pollingUnit1.setName(pollingUnitDto.getName());
+        pollingUnit1.setLga(lga);
+        pollingUnit1.setWard(ward);
+        pollingUnitRepository.save(pollingUnit1);
+        return new PollingUnitResponse("00", String.format(successTemplate,SERVICE_NAME), pollingUnit1);
     }
 
     @Override

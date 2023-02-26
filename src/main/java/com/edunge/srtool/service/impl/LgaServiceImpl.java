@@ -61,17 +61,14 @@ public class LgaServiceImpl implements LgaService {
         State state = getState(lgaDto.getStateId());
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(lgaDto.getSenatorialDistrictId());
 
-        Lga lga = lgaRepository.findByCode(lgaDto.getCode());
-        if(lga==null){
-            lga = new Lga();
-            lga.setSenatorialDistrict(senatorialDistrict);
-            lga.setState(state);
-            lga.setCode(lgaDto.getCode());
-            lga.setName(lgaDto.getName());
-            lgaRepository.save(lga);
-            return new LgaResponse("00", String.format(successTemplate, SERVICE_NAME), lga);
-        }
-        throw new DuplicateException(String.format(duplicateTemplate, lgaDto.getCode()));
+        Lga lga = new Lga();
+        lga.setSenatorialDistrict(senatorialDistrict);
+        lga.setState(state);
+        lga.setCode(lgaDto.getCode());
+        lga.setName(lgaDto.getName());
+        lgaRepository.save(lga);
+        return new LgaResponse("00", String.format(successTemplate, SERVICE_NAME), lga);
+
     }
 
     @Override
