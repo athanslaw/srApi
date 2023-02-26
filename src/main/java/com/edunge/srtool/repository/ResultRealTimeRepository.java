@@ -22,6 +22,8 @@ public interface ResultRealTimeRepository extends JpaRepository<ResultRealTime, 
     List<ResultRealTime> findByElectionAndElectionTypeAndStateId(Election election, Long electionType, Long stateId);
     List<ResultRealTime> findBySenatorialDistrictAndElectionTypeAndElection(SenatorialDistrict senatorialDistrict, Long electionType, Election election);
     List<ResultRealTime> findByStateIdAndElectionTypeAndElection(long stateId, Long electionType, Election election);
+    List<ResultRealTime> deleteByLgaAndElectionTypeAndElection(Lga lga, Long electionType, Election election);
+    List<ResultRealTime> deleteByWardAndElectionTypeAndElection(Ward ward, Long electionType, Election election);
     void deleteByLga(Lga lga);
     @Query(nativeQuery = true, value="SELECT SUM(registered_voters_count) FROM result_real_time WHERE election_id=?1 AND election_type=?2")
     Long findSumRegisteredVotes(Election election, Long electionType);
