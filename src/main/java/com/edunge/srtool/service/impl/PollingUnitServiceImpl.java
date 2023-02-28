@@ -156,7 +156,7 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     @Override
     public PollingUnitResponse findByWardCode(Long wardCode) throws NotFoundException {
         Ward ward = getWard(wardCode);
-        List<PollingUnit> pollingUnit = pollingUnitRepository.findByWard(ward);
+        List<PollingUnit> pollingUnit = pollingUnitRepository.findByWardOrderByCodeAsc(ward);
         if(pollingUnit!=null){
             return new PollingUnitResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), pollingUnit);
         }

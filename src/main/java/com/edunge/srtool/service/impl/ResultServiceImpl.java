@@ -110,7 +110,7 @@ public class ResultServiceImpl implements ResultService {
                 throw new DuplicateException(String.format("Result for %s ward in %s lga has been previously submitted. Please reconfirm.", ward.getName(), lga.getName()));
             }
             result = new Result();
-            if(checkingRealTime) resultRealTimeRepository.deleteByWard(ward);
+            if(checkingRealTime) resultRealTimeRepository.deleteByWardAndElectionTypeAndElection(ward, resultDto.getElectionType(), election);
             pollingUnitCount = (int)pollingUnitService.findCountByWard(ward.getId());
         }
         else if(votingLevel.getCode().equals(VOTING_LEVEL_LGA)){
@@ -119,7 +119,7 @@ public class ResultServiceImpl implements ResultService {
                 throw new DuplicateException(String.format("Result for %s lga in %s has been previously submitted. Please reconfirm.", lga.getName(), state.getName()));
             }
             result = new Result();
-            if(checkingRealTime) resultRealTimeRepository.deleteByLga(lga);
+            if(checkingRealTime) resultRealTimeRepository.deleteByLgaAndElectionTypeAndElection(lga, resultDto.getElectionType(), election);
             pollingUnitCount = (int)pollingUnitService.findCountByLga(lga.getId());
         }
 

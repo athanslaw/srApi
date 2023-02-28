@@ -8,6 +8,7 @@ import java.util.List;
 public interface PollingUnitRepository extends JpaRepository<PollingUnit, Long> {
     PollingUnit findByCode(String wardCode);
     List<PollingUnit> findByNameStartingWith(String name);
+    List<PollingUnit> findByWardOrderByCodeAsc(Ward ward);
     List<PollingUnit> findByWard(Ward ward);
     List<PollingUnit> findByLga(Lga lga);
     long countByLga(Lga lga);

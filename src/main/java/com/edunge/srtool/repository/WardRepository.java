@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface WardRepository extends JpaRepository<Ward, Long> {
     Ward findByCode(String wardCode);
-    List<Ward> findByNameStartingWith(String name);
+    List<Ward> findByNameStartingWithOrderByCodeAsc(String name);
+    List<Ward> findByLgaOrderByCodeAsc(Lga lga);
     List<Ward> findByLga(Lga lga);
     List<Ward> findByState(State state);
     long countByState(State state);

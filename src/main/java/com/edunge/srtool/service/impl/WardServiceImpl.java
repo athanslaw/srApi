@@ -159,7 +159,7 @@ public class WardServiceImpl implements WardService {
     public WardResponse searchWardByFilter(Long stateId, Long senatorialDistrictId, Long lgaId) {
         List<Ward> filter;
             if (lgaId > 0) {
-                filter = wardRepository.findByLga(new Lga(){{setId(lgaId);}});
+                filter = wardRepository.findByLgaOrderByCodeAsc(new Lga(){{setId(lgaId);}});
             } else if (senatorialDistrictId > 0) {
                 filter = wardRepository.findBySenatorialDistrict(new SenatorialDistrict(){{setId(senatorialDistrictId);}});
             } else if (stateId > 0) {
@@ -173,7 +173,7 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse filterByName(String name) throws NotFoundException {
-        List<Ward> ward = wardRepository.findByNameStartingWith(name);
+        List<Ward> ward = wardRepository.findByNameStartingWithOrderByCodeAsc(name);
         if(ward!=null){
             return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), ward);
         }
@@ -182,7 +182,7 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardResponse findByLga(Long lgaCode) throws NotFoundException {
-        List<Ward> ward = wardRepository.findByLga(new Lga(){{setId(lgaCode);}});
+        List<Ward> ward = wardRepository.findByLgaOrderByCodeAsc(new Lga(){{setId(lgaCode);}});
         if(ward!=null){
             return new WardResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), ward);
         }
