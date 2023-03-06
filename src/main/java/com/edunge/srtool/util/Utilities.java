@@ -9,4 +9,7 @@ public class Utilities {
         long diff = ChronoUnit.MINUTES.between(date, now);
         return diff < interval;
     }
+
+    public static String[] electionTypeArray = new String[]{"","Gubernatorial","Presidential","Senatorial",
+            "Federal House of Representative","State House of Assembly","LGA Chairmanship","Councilorship"};
 }

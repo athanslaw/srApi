@@ -1,5 +1,7 @@
 package com.edunge.srtool.model;
 
+import com.edunge.srtool.util.Utilities;
+
 import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,6 +20,11 @@ public class Result extends AbstractElectionDetails {
     private Integer registeredVotersCount;
     private Integer pollingUnitCount;
     private Integer voidVotes;
+
+
+    public String getElectionTypeName() {
+        return Utilities.electionTypeArray[Math.toIntExact(super.getElectionType())];
+    }
 
     public PartyAgent getPartyAgent() {
         return partyAgent;
