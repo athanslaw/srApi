@@ -23,7 +23,7 @@ public class Result extends AbstractElectionDetails {
 
 
     public String getElectionTypeName() {
-        return Utilities.electionTypeArray[Math.toIntExact(super.getElectionType())];
+        return super.getElectionType() != null?Utilities.electionTypeArray[Math.toIntExact(super.getElectionType())]:"";
     }
 
     public PartyAgent getPartyAgent() {
