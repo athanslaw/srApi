@@ -13,9 +13,6 @@ public class Lga extends AbstractBaseModel {
     @JoinColumn(name = "senatorial_district_id", nullable = false)
     private SenatorialDistrict senatorialDistrict;
 
-    @OneToMany(mappedBy = "lga", fetch = FetchType.LAZY)
-    private Set<PartyAgent> partyAgent;
-
     public State getState() {
         return state;
     }

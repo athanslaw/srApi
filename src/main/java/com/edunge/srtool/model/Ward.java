@@ -17,10 +17,6 @@ public class Ward extends AbstractBaseModel {
     @ManyToOne
     @JoinColumn(name = "lga_id")
     private Lga lga;
-
-    @OneToMany(mappedBy = "ward", fetch = FetchType.LAZY)
-    private Set<PartyAgent> partyAgents;
-
     public State getState() {
         return state;
     }

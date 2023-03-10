@@ -12,15 +12,6 @@ public class SenatorialDistrict extends AbstractBaseModel {
     @JsonIgnore
     private State state;
 
-    @OneToMany(mappedBy="senatorialDistrict")
-    Set<Lga> lgaSet;
-
-    @OneToMany(mappedBy="senatorialDistrict")
-    Set<Ward> wards;
-
-    @OneToMany(mappedBy="senatorialDistrict")
-    Set<PollingUnit> pollingUnits;
-
     public State getState() {
         return state;
     }

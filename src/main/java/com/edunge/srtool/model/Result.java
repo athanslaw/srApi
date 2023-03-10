@@ -13,7 +13,7 @@ public class Result extends AbstractElectionDetails {
     @JoinColumn(name = "party_agent_id",nullable = false)
     private PartyAgent partyAgent;
 
-    @OneToMany(mappedBy = "result", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "result")
     Set<ResultPerParty> resultPerParties;
 
     private Integer accreditedVotersCount;

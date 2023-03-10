@@ -1,9 +1,7 @@
 package com.edunge.srtool.model;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 public class Election extends AbstractBaseModel{
@@ -11,10 +9,6 @@ public class Election extends AbstractBaseModel{
     private Integer year;
     private Date dateOfElection;
     private Boolean status;
-
-    @OneToMany(mappedBy = "election")
-    private Set<Result> results;
-
     public String getDescription() {
         return description;
     }
@@ -53,7 +47,6 @@ public class Election extends AbstractBaseModel{
                 "description='" + description + '\'' +
                 ", year=" + year +
                 ", dateOfElection=" + dateOfElection +
-                ", results=" + results +
                 '}';
     }
 }
