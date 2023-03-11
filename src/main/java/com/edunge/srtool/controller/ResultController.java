@@ -1,6 +1,7 @@
 package com.edunge.srtool.controller;
 
 import com.edunge.srtool.dto.ResultDto;
+import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.ResultRealTimeResponse;
 import com.edunge.srtool.response.ResultResponse;
 import com.edunge.srtool.service.ResultService;
@@ -28,15 +29,15 @@ public class ResultController {
 
     @GetMapping(value = "/result/filter/zone/{zoneId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
-    public ResponseEntity<ResultResponse> findResultsByZone(@PathVariable Long zoneId){
-        return new ResponseEntity<>(resultService.findByZoneId(zoneId), HttpStatus.OK);
+    public ResponseEntity<ResultResponse> findResultsByZone(@PathVariable Long zoneId, @RequestParam(value = "electionType", required = false) Long electionType) throws NotFoundException{
+        return new ResponseEntity<>(resultService.findByZoneId(zoneId, electionType), HttpStatus.OK);
     }
 
 
     @GetMapping(value = "/result/filter/state/{stateId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
-    public ResponseEntity<ResultResponse> findAllResults(@PathVariable Long stateId){
-        return new ResponseEntity<>(resultService.findByStateId(stateId), HttpStatus.OK);
+    public ResponseEntity<ResultResponse> findAllResults(@PathVariable Long stateId, @RequestParam(value = "electionType", required = false) Long electionType) throws NotFoundException {
+        return new ResponseEntity<>(resultService.findByStateId(stateId, electionType), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/result", method = RequestMethod.POST)
@@ -65,26 +66,26 @@ public class ResultController {
 
     @GetMapping(value = "/result/filter/senatorialDistrict/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by senatorial district.")
-    public ResponseEntity<ResultResponse> filterResultBySenatorialDistrict(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(resultService.filterBySenatorialDistrict(id));
+    public ResponseEntity<ResultResponse> filterResultBySenatorialDistrict(@PathVariable Long id, @RequestParam(value = "electionType", required = false) Long electionType) throws Exception {
+        return ResponseEntity.ok(resultService.filterBySenatorialDistrict(id, electionType));
     }
 
     @GetMapping(value = "/result/filter/lga/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by name.")
-    public ResponseEntity<ResultResponse> filterResultByLga(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(resultService.filterByLga(id));
+    public ResponseEntity<ResultResponse> filterResultByLga(@PathVariable Long id, @RequestParam(value = "electionType", required = false) Long electionType) throws Exception {
+        return ResponseEntity.ok(resultService.filterByLga(id, electionType));
     }
 
     @GetMapping(value = "/result/filter/ward/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by name.")
-    public ResponseEntity<ResultResponse> filterResultByWard(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(resultService.filterByWard(id));
+    public ResponseEntity<ResultResponse> filterResultByWard(@PathVariable Long id, @RequestParam(value = "electionType", required = false) Long electionType) throws Exception {
+        return ResponseEntity.ok(resultService.filterByWard(id, electionType));
     }
 
     @GetMapping(value = "/result/filter/polling-unit/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Filter by name.")
-    public ResponseEntity<ResultResponse> filterResultByPollingUnit(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(resultService.filterByPollingUnit(id));
+    public ResponseEntity<ResultResponse> filterResultByPollingUnit(@PathVariable Long id, @RequestParam(value = "electionType", required = false) Long electionType) throws Exception {
+        return ResponseEntity.ok(resultService.filterByPollingUnit(id, electionType));
     }
 
     @PostMapping("/result/upload")

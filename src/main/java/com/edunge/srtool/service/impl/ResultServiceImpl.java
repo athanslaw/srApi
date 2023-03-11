@@ -1,14 +1,10 @@
 package com.edunge.srtool.service.impl;
 
-import com.edunge.srtool.dto.ResultDto;
-import com.edunge.srtool.exceptions.DuplicateException;
-import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.*;
-import com.edunge.srtool.repository.*;
-import com.edunge.srtool.response.ResultResponse;
-import com.edunge.srtool.service.FileProcessingService;
-import com.edunge.srtool.service.ResultService;
-import com.edunge.srtool.util.FileUtil;
+import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +12,30 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import com.edunge.srtool.dto.ResultDto;
+import com.edunge.srtool.exceptions.DuplicateException;
+import com.edunge.srtool.exceptions.NotFoundException;
+import com.edunge.srtool.model.Election;
+import com.edunge.srtool.model.Lga;
+import com.edunge.srtool.model.PartyAgent;
+import com.edunge.srtool.model.PoliticalParty;
+import com.edunge.srtool.model.PollingUnit;
+import com.edunge.srtool.model.Result;
+import com.edunge.srtool.model.ResultPerParty;
+import com.edunge.srtool.model.ResultRealTime;
+import com.edunge.srtool.model.SenatorialDistrict;
+import com.edunge.srtool.model.State;
+import com.edunge.srtool.model.VotingLevel;
+import com.edunge.srtool.model.Ward;
+import com.edunge.srtool.repository.ElectionRepository;
+import com.edunge.srtool.repository.ResultPerPartyRepository;
+import com.edunge.srtool.repository.ResultRealTimeRepository;
+import com.edunge.srtool.repository.ResultRepository;
+import com.edunge.srtool.repository.VotingLevelRepository;
+import com.edunge.srtool.response.ResultResponse;
+import com.edunge.srtool.service.FileProcessingService;
+import com.edunge.srtool.service.ResultService;
+import com.edunge.srtool.util.FileUtil;
 
 @Transactional
 @Service
@@ -124,8 +141,8 @@ public class ResultServiceImpl implements ResultService {
         }
 
         else if(votingLevel.getCode().equals(VOTING_LEVEL_POLLING_UNIT)){
-            result = resultRepository.findByElectionAndPollingUnitAndElectionType(election, pollingUnit, resultDto.getElectionType());
-            if(result != null){
+            List<Result> results = resultRepository.findByElectionAndPollingUnitAndElectionType(election, pollingUnit, resultDto.getElectionType());
+            if(results.size() > 0){
                 throw new DuplicateException(String.format("Result for %s PU in %s Ward has been previously submitted. Please reconfirm.", pollingUnit.getName(), ward.getName()));
             }
             result = new Result();
@@ -303,13 +320,21 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ResultResponse findByStateId(Long stateId) {
-        List<Result> results = resultRepository.findByStateId(stateId);
+    public ResultResponse findByStateId(Long stateId, Long electionType) throws NotFoundException {
+        Election election = getElection();
+        List<Result> results;
+        State state = new State(){{setId(stateId);}};
+        if(electionType == null) {
+            results = resultRepository.findByElectionAndState(election, state);
+        }else{
+            results = resultRepository.findByElectionAndStateAndElectionType(election, state, electionType);
+        }
         return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), results);
     }
 
     @Override
-    public ResultResponse findByZoneId(Long zoneId) {
+    public ResultResponse findByZoneId(Long zoneId, Long electionType) {
+
         List<Result> results = resultRepository.findByGeoPoliticalZoneId(zoneId);
         return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), results);
     }
@@ -380,30 +405,55 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ResultResponse filterByLga(Long lgaId) throws NotFoundException {
+    public ResultResponse filterByLga(Long lgaId, Long electionType) throws NotFoundException {
         Lga lga = getLga(lgaId);
-        List<Result> results = resultRepository.findByLga(lga);
+        Election election = getElection();
+        List<Result> results;
+        if(electionType == null) {
+            results = resultRepository.findByElectionAndLga(election, lga);
+        }else{
+            results = resultRepository.findByElectionAndLgaAndElectionType(election, lga, electionType);
+        }
         return new ResultResponse("00", "Results fetched",results);
     }
 
     @Override
-    public ResultResponse filterBySenatorialDistrict(Long id) throws NotFoundException {
+    public ResultResponse filterBySenatorialDistrict(Long id, Long electionType) throws NotFoundException {
         SenatorialDistrict senatorialDistrict = getSenatorialDistrict(id);
-        List<Result> results = resultRepository.findBySenatorialDistrict(senatorialDistrict);
+        Election election = getElection();
+        List<Result> results;
+        if(electionType == null) {
+            results = resultRepository.findByElectionAndSenatorialDistrict(election, senatorialDistrict);
+        }else{
+            results = resultRepository.findByElectionAndSenatorialDistrictAndElectionType(election, senatorialDistrict, electionType);
+        }
+
         return new ResultResponse("00", "Results fetched",results);
     }
 
     @Override
-    public ResultResponse filterByWard(Long wardId) throws NotFoundException {
+    public ResultResponse filterByWard(Long wardId, Long electionType) throws NotFoundException {
         Ward ward = getWard(wardId);
-        List<Result> results = resultRepository.findByWard(ward);
+        Election election = getElection();
+        List<Result> results;
+        if(electionType == null) {
+            results = resultRepository.findByElectionAndWard(election, ward);
+        }else{
+            results = resultRepository.findByElectionAndWardAndElectionType(election, ward, electionType);
+        }
         return new ResultResponse("00", "Results fetched",results);
     }
 
     @Override
-    public ResultResponse filterByPollingUnit(Long pollingUnitId) throws NotFoundException {
+    public ResultResponse filterByPollingUnit(Long pollingUnitId, Long electionType) throws NotFoundException {
         PollingUnit pollingUnit = getPollingUnit(pollingUnitId);
-        List<Result> results = resultRepository.findByPollingUnit(pollingUnit);
+        Election election = getElection();
+        List<Result> results;
+        if(electionType == null) {
+            results = resultRepository.findByElectionAndPollingUnit(election, pollingUnit);
+        }else{
+            results = resultRepository.findByElectionAndPollingUnitAndElectionType(election, pollingUnit, electionType);
+        }
         return new ResultResponse("00", "Results fetched",results);
     }
 
