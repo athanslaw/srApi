@@ -17,10 +17,14 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByPollingUnitAndIncidentGroupId(PollingUnit pollingUnit, Long incidentGroupId);
 
     List<Incident> findByLgaAndIncidentTypeAndIncidentGroupId(Lga lga, IncidentType incidentType, Long incidentGroupId);
+    List<Incident> findByStateIdAndIncidentTypeAndIncidentGroupId(Long stateId, IncidentType incidentType, Long incidentGroupId);
+    List<Incident> findByGeoPoliticalZoneIdAndIncidentTypeAndIncidentGroupId(Long geopoliticalZoneId, IncidentType incidentType, Long incidentGroupId);
     List<Incident> findByWardAndIncidentTypeAndIncidentGroupId(Ward ward, IncidentType incidentType, Long incidentGroupId);
     List<Incident> findByPollingUnitAndIncidentTypeAndIncidentGroupId(PollingUnit pollingUnit, IncidentType incidentType, Long incidentGroupId);
 
     List<Incident> findByLgaAndWeightAndIncidentGroupId(Lga lga, int weight, Long incidentGroupId);
+    List<Incident> findByStateIdAndWeightAndIncidentGroupId(Long stateId, int weight, Long incidentGroupId);
+    List<Incident> findByGeoPoliticalZoneIdAndWeightAndIncidentGroupId(Long geoPoliticalZoneId, int weight, Long incidentGroupId);
     List<Incident> findByWardAndWeightAndIncidentGroupId(Ward ward, int weight, Long incidentGroupId);
     List<Incident> findByPollingUnitAndWeightAndIncidentGroupId(PollingUnit pollingUnit, int weight, Long incidentGroupId);
 

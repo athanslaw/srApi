@@ -358,22 +358,29 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentResponse findIncidentByZone(Long id, String incidentType, String incidentWeight){
         Long incidentGroupId = incidentGroupService.getActiveIncidentGroupId();
-        List<Incident> incidentList = incidentRepository.findByGeoPoliticalZoneIdAndIncidentGroupId(id, incidentGroupId);
+        List<Incident> incidentList;
 
-        try{
-            if(!incidentType.equals("") && !incidentWeight.equals("")){
-                Long incidentTypeId = Long.parseLong(incidentType.trim());
-                incidentList.stream()
-                    .filter(incident -> incident.getIncidentType().getId() == incidentTypeId)
-                    .collect(Collectors.toList());
+
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            if(incidentType == null || incidentType.trim().equals("")){
+                int weight = Integer.parseInt(incidentWeight.trim());
+                incidentList = incidentRepository.findByStateIdAndWeightAndIncidentGroupId(id, weight, incidentGroupId);
             }
-        }catch (Exception e){}
-        try{
-            Long incidentWeightId = Long.parseLong(incidentWeight);
-            incidentList.stream()
-                    .filter(election -> election.getWeight() == incidentWeightId)
-                    .collect(Collectors.toList());
-        }catch (Exception e){}
+            else if(incidentWeight == null || incidentWeight.trim().equals("")){
+                long type = Long.parseLong(incidentType.trim());
+                incidentList = incidentRepository.findByGeoPoliticalZoneIdAndIncidentTypeAndIncidentGroupId(id, new IncidentType(){{setId(type);}}, incidentGroupId);
+            }
+            else{
+                int weight = Integer.parseInt(incidentWeight.trim());
+                long type = Long.parseLong(incidentType.trim());
+                incidentList = incidentRepository.findByGeoPoliticalZoneIdAndWeightAndIncidentGroupId(id, weight, incidentGroupId);
+                incidentList = incidentList.stream().filter(incident -> incident.getIncidentType().getId()==type).collect(Collectors.toList());
+            }
+        }
+        else{
+            incidentList = incidentRepository.findByGeoPoliticalZoneIdAndIncidentGroupId(id, incidentGroupId);
+        }
+
 
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
@@ -381,21 +388,29 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentResponse findIncidentByStateId(Long id, String incidentType, String incidentWeight){
         Long incidentGroupId = incidentGroupService.getActiveIncidentGroupId();
-        List<Incident> incidentList = incidentRepository.findByStateIdAndIncidentGroupId(id, incidentGroupId);
-        try{
-            if(!incidentType.equals("") && !incidentWeight.equals("")){
-                Long incidentTypeId = Long.parseLong(incidentType.trim());
-                incidentList.stream()
-                    .filter(incident -> incident.getIncidentType().getId() == incidentTypeId)
-                    .collect(Collectors.toList());
+        List<Incident> incidentList;
+
+        if((incidentType != null && !incidentType.trim().equals("")) || (incidentWeight != null && !incidentWeight.trim().equals(""))){
+            if(incidentType == null || incidentType.trim().equals("")){
+                int weight = Integer.parseInt(incidentWeight.trim());
+                incidentList = incidentRepository.findByStateIdAndWeightAndIncidentGroupId(id, weight, incidentGroupId);
             }
-        }catch (Exception e){}
-        try{
-            Long incidentWeightId = Long.parseLong(incidentWeight);
-            incidentList.stream()
-                    .filter(election -> election.getWeight() == incidentWeightId)
-                    .collect(Collectors.toList());
-        }catch (Exception e){}
+            else if(incidentWeight == null || incidentWeight.trim().equals("")){
+                long type = Long.parseLong(incidentType.trim());
+                incidentList = incidentRepository.findByStateIdAndIncidentTypeAndIncidentGroupId(id, new IncidentType(){{setId(type);}}, incidentGroupId);
+            }
+            else{
+                int weight = Integer.parseInt(incidentWeight.trim());
+                long type = Long.parseLong(incidentType.trim());
+                incidentList = incidentRepository.findByStateIdAndWeightAndIncidentGroupId(id, weight, incidentGroupId);
+                incidentList = incidentList.stream().filter(incident -> incident.getIncidentType().getId()==type).collect(Collectors.toList());
+            }
+        }
+        else{
+            incidentList = incidentRepository.findByStateIdAndIncidentGroupId(id, incidentGroupId);
+        }
+
+
         return new IncidentResponse("00", String.format(fetchRecordTemplate,SERVICE_NAME), incidentList);
     }
 
