@@ -17,8 +17,8 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
     List<Result> findByElectionAndWardAndElectionType(Election election, Ward ward, Long electionType);
     List<Result> findByElectionAndLga(Election election, Lga lga);
     List<Result> findByElectionAndLgaAndElectionType(Election election, Lga lga, Long electionType);
-    List<Result> findByElectionAndState(Election election, State state);
-    List<Result> findByElectionAndStateAndElectionType(Election election, State state, Long electionType);
+    List<Result> findByElectionAndStateId(Election election, Long state);
+    List<Result> findByElectionAndStateIdAndElectionType(Election election, Long state, Long electionType);
     List<Result> findByElectionAndSenatorialDistrict(Election election, SenatorialDistrict senatorialDistrict);
     List<Result> findByElectionAndSenatorialDistrictAndElectionType(Election election, SenatorialDistrict senatorialDistrict, Long electionType);
     Result findByElectionAndWardAndVotingLevelAndElectionType(Election election, Ward ward, VotingLevel votingLevel, Long electionType);

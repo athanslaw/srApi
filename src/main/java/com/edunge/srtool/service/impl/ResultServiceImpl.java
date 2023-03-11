@@ -323,11 +323,10 @@ public class ResultServiceImpl implements ResultService {
     public ResultResponse findByStateId(Long stateId, Long electionType) throws NotFoundException {
         Election election = getElection();
         List<Result> results;
-        State state = new State(){{setId(stateId);}};
         if(electionType == null) {
-            results = resultRepository.findByElectionAndState(election, state);
+            results = resultRepository.findByElectionAndStateId(election, stateId);
         }else{
-            results = resultRepository.findByElectionAndStateAndElectionType(election, state, electionType);
+            results = resultRepository.findByElectionAndStateIdAndElectionType(election, stateId, electionType);
         }
         return new ResultResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), results);
     }
