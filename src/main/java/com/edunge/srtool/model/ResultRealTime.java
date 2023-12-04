@@ -1,14 +1,23 @@
 package com.edunge.srtool.model;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
-public class ResultRealTime extends AbstractElectionDetails {
-    @ManyToOne
-    @JoinColumn(name = "party_agent_id",nullable = false)
-    private PartyAgent partyAgent;
+@Table(name="result_real_time", indexes = {
+        @Index(name = "idx_electionId", columnList = "election_id"),
+        @Index(name = "idx_electionType", columnList = "election_type"),
+        @Index(name = "idx_electionIdStateId", columnList = "election_id, state_id"),
+        @Index(name = "idx_stateId", columnList = "state_id"),
+        @Index(name = "idx_District", columnList = "geo_political_zone_id"),
+        @Index(name = "idx_lgaId", columnList = "lga_id"),
+        @Index(name = "idx_electionIdElectionTypeStateId", columnList = "election_id, election_type, state_id"),
+        @Index(name = "idx_electionIdZoneId", columnList = "election_id, geo_political_zone_id"),
+        @Index(name = "idx_electionIdDistrictId", columnList = "election_id, senatorial_district_id"),
+        @Index(name = "idx_electionIdElectionType", columnList = "election_id, election_type"),
+        @Index(name = "idx_electionIdAndLgaAndVotingLevelAndElectionType", columnList = "election_id, lga_id, voting_level_id, election_type"),
+        @Index(name = "idx_electionIdLgaId", columnList = "election_id, lga_id")
+})
+public class ResultRealTime extends BaseModel {
 
     private Integer accreditedVotersCount;
     private Integer registeredVotersCount;
@@ -23,12 +32,120 @@ public class ResultRealTime extends AbstractElectionDetails {
     private Integer pollingUnitCount;
     private Integer voidVotes;
 
+    @ManyToOne
+    @JoinColumn(name = "election_id",nullable = false)
+    private Election election;
+
+    @ManyToOne
+    @JoinColumn(name = "party_agent_id",nullable = false)
+    private PartyAgent partyAgent;
+
+    @Column(name="geo_political_zone_id")
+    private Long geoPoliticalZoneId;
+
+    @ManyToOne
+    @JoinColumn(name = "senatorial_district_id",nullable = false)
+    private SenatorialDistrict senatorialDistrict;
+
+    @ManyToOne
+    @JoinColumn(name = "lga_id")
+    private Lga lga;
+
+    @ManyToOne
+    @JoinColumn(name = "ward_id")
+    private Ward ward;
+
+    @ManyToOne
+    @JoinColumn(name = "polling_unit_id")
+    private PollingUnit pollingUnit;
+
+    @ManyToOne
+    @JoinColumn(name = "voting_level_id",nullable = false)
+    private VotingLevel votingLevel;
+
+    @Column(name="state_id")
+    private Long stateId;
+    @Column(name="election_type")
+    private Long electionType;
+
+    public Election getElection() {
+        return election;
+    }
+
+    public void setElection(Election election) {
+        this.election = election;
+    }
+
     public PartyAgent getPartyAgent() {
         return partyAgent;
     }
 
     public void setPartyAgent(PartyAgent partyAgent) {
         this.partyAgent = partyAgent;
+    }
+
+    public SenatorialDistrict getSenatorialDistrict() {
+        return senatorialDistrict;
+    }
+
+    public void setSenatorialDistrict(SenatorialDistrict senatorialDistrict) {
+        this.senatorialDistrict = senatorialDistrict;
+    }
+
+    public Lga getLga() {
+        return lga;
+    }
+
+    public void setLga(Lga lga) {
+        this.lga = lga;
+    }
+
+    public Ward getWard() {
+        return ward;
+    }
+
+    public void setWard(Ward ward) {
+        this.ward = ward;
+    }
+
+    public PollingUnit getPollingUnit() {
+        return pollingUnit;
+    }
+
+    public void setPollingUnit(PollingUnit pollingUnit) {
+        this.pollingUnit = pollingUnit;
+    }
+
+    public VotingLevel getVotingLevel() {
+        return votingLevel;
+    }
+
+    public void setVotingLevel(VotingLevel votingLevel) {
+        this.votingLevel = votingLevel;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
+    }
+
+    public Long getElectionType() {
+        return electionType;
+    }
+
+    public void setElectionType(Long electionType) {
+        this.electionType = electionType;
+    }
+
+    public Long getGeoPoliticalZoneId() {
+        return geoPoliticalZoneId;
+    }
+
+    public void setGeoPoliticalZoneId(Long geoPoliticalZoneId) {
+        this.geoPoliticalZoneId = geoPoliticalZoneId;
     }
 
     public Integer getAccreditedVotersCount() {

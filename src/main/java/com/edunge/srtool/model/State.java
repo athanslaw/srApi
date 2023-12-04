@@ -3,6 +3,9 @@ package com.edunge.srtool.model;
 import javax.persistence.*;
 
 @Entity
+@Table(name="state", indexes = {
+        @Index(name = "idx_code", columnList = "code")
+})
 public class State extends AbstractBaseModel {
 
     @ManyToOne

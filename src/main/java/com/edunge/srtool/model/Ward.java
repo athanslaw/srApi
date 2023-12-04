@@ -6,15 +6,15 @@ import java.util.Set;
 @Entity
 public class Ward extends AbstractBaseModel {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "state_id")
     private State state;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "senatorial_district_id")
     private SenatorialDistrict senatorialDistrict;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lga_id")
     private Lga lga;
     public State getState() {

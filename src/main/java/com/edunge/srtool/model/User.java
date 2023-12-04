@@ -10,7 +10,12 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="users")
+@Table(name="users", indexes = {
+        @Index(name = "idx_phone", columnList = "phone"),
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_email_password", columnList = "email, password"),
+        @Index(name = "idx_phone_password", columnList = "phone, password")
+})
 public class User extends BaseModel {
     private String phone;
     private String firstname;
