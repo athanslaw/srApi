@@ -2,7 +2,10 @@ package com.edunge.srtool.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class PartyAgent extends BaseModel{
@@ -14,12 +17,12 @@ public class PartyAgent extends BaseModel{
     private String address;
     private String role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "lga_id", nullable = false)
     @JsonIgnore
     private Lga lga;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "ward_id", nullable = false)
     @JsonIgnore
     private Ward ward;
@@ -29,7 +32,7 @@ public class PartyAgent extends BaseModel{
     @JsonIgnore
     private PoliticalParty politicalParty;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "polling_unit_id", nullable = false)
     @JsonIgnore
     private PollingUnit pollingUnit;
