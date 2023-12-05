@@ -9,6 +9,7 @@ import com.edunge.srtool.response.WardResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.LgaService;
 import com.edunge.srtool.service.WardService;
+import com.edunge.srtool.util.Constants;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,17 +82,32 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public long countWardByState(State state) {
-        return wardRepository.countByState(state);
+        if(TerritorialDataCount.get(Constants.WARD+Constants.ZONE+state.getId()) != -1){
+            return TerritorialDataCount.get(Constants.WARD+Constants.ZONE+state.getId());
+        }
+        long data = wardRepository.countByState(state);
+        TerritorialDataCount.set(Constants.WARD+Constants.STATE+state.getId(), data);
+        return data;
     }
 
     @Override
     public long countWardByLga(Lga lga) {
-        return wardRepository.countByLga(lga);
+        if(TerritorialDataCount.get(Constants.WARD+Constants.LGA+lga.getId()) != -1){
+            return TerritorialDataCount.get(Constants.WARD+Constants.LGA+lga.getId());
+        }
+        long data = wardRepository.countByLga(lga);
+        TerritorialDataCount.set(Constants.WARD+Constants.LGA+lga.getId(), data);
+        return data;
     }
 
     @Override
     public long countWard() {
-        return wardRepository.count();
+        if(TerritorialDataCount.get(Constants.WARD) != -1){
+            return TerritorialDataCount.get(Constants.WARD);
+        }
+        long data = wardRepository.count();
+        TerritorialDataCount.set(Constants.WARD, data);
+        return data;
     }
 
     @Override
@@ -117,7 +133,12 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public long countWardBySenatorialDistrict(SenatorialDistrict senatorialDistrict) {
-        return wardRepository.countBySenatorialDistrict(senatorialDistrict);
+        if(TerritorialDataCount.get(Constants.WARD+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId()) != -1){
+            return TerritorialDataCount.get(Constants.WARD+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId());
+        }
+        long data = wardRepository.countBySenatorialDistrict(senatorialDistrict);
+        TerritorialDataCount.set(Constants.WARD+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId(), data);
+        return data;
     }
 
     @Override

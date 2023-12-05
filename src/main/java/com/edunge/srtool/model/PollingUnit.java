@@ -4,6 +4,12 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_pu_state", columnList = "state_id"),
+        @Index(name = "idx_pu_senatorial_district", columnList = "senatorial_district_id"),
+        @Index(name = "idx_pu_lga", columnList = "lga_id"),
+        @Index(name = "idx_pu_ward", columnList = "ward_id")
+})
 public class PollingUnit extends AbstractBaseModel{
     @ManyToOne
     @JoinColumn(name = "state_id")

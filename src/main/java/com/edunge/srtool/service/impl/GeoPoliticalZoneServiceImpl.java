@@ -2,10 +2,12 @@ package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.GeoPoliticalZone;
+import com.edunge.srtool.model.TerritorialDataCount;
 import com.edunge.srtool.repository.GeoPoliticalZoneRepository;
 import com.edunge.srtool.response.GeoPoliticalZoneResponse;
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.GeoPoliticalZoneService;
+import com.edunge.srtool.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,12 @@ public class GeoPoliticalZoneServiceImpl implements GeoPoliticalZoneService {
 
     @Override
     public long countGeoPoliticalZone() {
-        return geoPoliticalZoneRepository.count();
+        if(TerritorialDataCount.get(Constants.ZONE) != -1){
+            return TerritorialDataCount.get(Constants.ZONE);
+        }
+        long data = geoPoliticalZoneRepository.count();
+        TerritorialDataCount.set(Constants.ZONE, data);
+        return data;
     }
 
     @Override

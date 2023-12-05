@@ -1,9 +1,14 @@
 package com.edunge.srtool.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_status", columnList = "status")
+})
 public class Election extends AbstractBaseModel{
     private String description;
     private Integer year;

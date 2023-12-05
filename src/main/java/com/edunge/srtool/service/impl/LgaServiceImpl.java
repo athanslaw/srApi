@@ -7,6 +7,7 @@ import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.response.LgaResponse;
 import com.edunge.srtool.service.*;
+import com.edunge.srtool.util.Constants;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,19 +162,33 @@ public class LgaServiceImpl implements LgaService {
 
     @Override
     public long countLgaByStateCode(Long stateCode) {
+        if(TerritorialDataCount.get(Constants.LGA+Constants.STATE+stateCode) != -1){
+            return TerritorialDataCount.get(Constants.LGA+Constants.STATE+stateCode);
+        }
         State state = new State(){{setId(stateCode);}};
-        return lgaRepository.countByState(state);
+        long data = lgaRepository.countByState(state);
+        TerritorialDataCount.set(Constants.LGA+Constants.STATE+stateCode, data);
+        return data;
     }
 
     @Override
     public long countLga() {
+        if(TerritorialDataCount.get(Constants.LGA) != -1){
+            return TerritorialDataCount.get(Constants.LGA);
+        }
         return lgaRepository.count();
     }
 
     @Override
     public long countLgaBySenatorialDistrict(Long districtCode) {
+        if(TerritorialDataCount.get(Constants.LGA+Constants.SENATORIAL_DISTRICT+districtCode) != -1){
+            return TerritorialDataCount.get(Constants.LGA+Constants.SENATORIAL_DISTRICT+districtCode);
+        }
         SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(districtCode);}};
-        return lgaRepository.countBySenatorialDistrict(senatorialDistrict);
+
+        long data = lgaRepository.countBySenatorialDistrict(senatorialDistrict);
+        TerritorialDataCount.set(Constants.LGA+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId(), data);
+        return data;
     }
 
     @Override

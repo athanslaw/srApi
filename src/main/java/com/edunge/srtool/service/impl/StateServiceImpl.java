@@ -2,16 +2,14 @@ package com.edunge.srtool.service.impl;
 
 import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
-import com.edunge.srtool.model.AbstractBaseModel;
-import com.edunge.srtool.model.GeoPoliticalZone;
-import com.edunge.srtool.model.Lga;
-import com.edunge.srtool.model.State;
+import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.GeoPoliticalZoneRepository;
 import com.edunge.srtool.repository.LgaRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.StateService;
+import com.edunge.srtool.util.Constants;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +140,9 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public long countState() {
+        if(TerritorialDataCount.get(Constants.STATE) != -1){
+            return TerritorialDataCount.get(Constants.STATE);
+        }
         return stateRepository.count();
     }
 

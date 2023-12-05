@@ -5,12 +5,14 @@ import com.edunge.srtool.exceptions.DuplicateException;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.model.SenatorialDistrict;
 import com.edunge.srtool.model.State;
+import com.edunge.srtool.model.TerritorialDataCount;
 import com.edunge.srtool.repository.SenatorialDistrictRepository;
 import com.edunge.srtool.repository.StateRepository;
 import com.edunge.srtool.response.SenatorialDistrictResponse;
 import com.edunge.srtool.service.FileProcessingService;
 import com.edunge.srtool.service.SenatorialDistrictService;
 import com.edunge.srtool.service.StateService;
+import com.edunge.srtool.util.Constants;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,12 +83,22 @@ public class SenatorialDistrictServiceImpl implements SenatorialDistrictService 
 
     @Override
     public long countSenatorialDistrictByState(State state) {
-        return senatorialDistrictRepository.countByState(state);
+        if(TerritorialDataCount.get(Constants.SENATORIAL_DISTRICT+Constants.STATE+state.getId()) != -1){
+            return TerritorialDataCount.get(Constants.SENATORIAL_DISTRICT+Constants.STATE+state.getId());
+        }
+        long data = senatorialDistrictRepository.countByState(state);
+        TerritorialDataCount.set(Constants.SENATORIAL_DISTRICT+Constants.STATE+state.getId(), data);
+        return data;
     }
 
     @Override
     public long countSenatorialDistrict() {
-        return senatorialDistrictRepository.count();
+        if(TerritorialDataCount.get(Constants.SENATORIAL_DISTRICT) != -1){
+            return TerritorialDataCount.get(Constants.SENATORIAL_DISTRICT);
+        }
+        long data = senatorialDistrictRepository.count();
+        TerritorialDataCount.set(Constants.SENATORIAL_DISTRICT, data);
+        return data;
     }
 
     @Override

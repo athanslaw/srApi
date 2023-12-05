@@ -7,6 +7,7 @@ import com.edunge.srtool.model.*;
 import com.edunge.srtool.repository.*;
 import com.edunge.srtool.response.PollingUnitResponse;
 import com.edunge.srtool.service.*;
+import com.edunge.srtool.util.Constants;
 import com.edunge.srtool.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,29 +177,45 @@ public class PollingUnitServiceImpl implements PollingUnitService {
     @Override
     public long findCountByLga(Long lgaCode) {
         Lga lga = new Lga(){{setId(lgaCode);}};
-        long pollingUnit = pollingUnitRepository.countByLga(lga);
-        return pollingUnit;
-
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.LGA+lga.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.LGA+lga.getId());
+        }
+        long data = pollingUnitRepository.countByLga(lga);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.LGA+lga.getId(), data);
+        return data;
     }
 
     @Override
     public long findCountByWard(Long wardCode) {
         Ward ward = new Ward(){{setId(wardCode);}};
-        return pollingUnitRepository.countByWard(ward);
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.WARD+ward.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.WARD+ward.getId());
+        }
+        long data = pollingUnitRepository.countByWard(ward);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.WARD+ward.getId(), data);
+        return data;
     }
 
     @Override
     public long findCountBySenatorialDistrict(Long districtCode) {
         SenatorialDistrict senatorialDistrict = new SenatorialDistrict(){{setId(districtCode);}};
-        long pollingUnit = pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
-        return pollingUnit;
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId());
+        }
+        long data = pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId(), data);
+        return data;
     }
 
     @Override
     public long findCountByState(Long stateId) {
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.STATE+stateId) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.STATE+stateId);
+        }
         State state = new State(){{setId(stateId);}};
-        long pollingUnit = pollingUnitRepository.countByState(state);
-        return pollingUnit;
+        long data = pollingUnitRepository.countByState(state);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.STATE+stateId, data);
+        return data;
     }
 
     @Override
@@ -213,24 +230,50 @@ public class PollingUnitServiceImpl implements PollingUnitService {
 
     @Override
     public long countByState(State state){
-        return pollingUnitRepository.countByState(state);
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.STATE+state.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.STATE+state.getId());
+        }
+        long data = pollingUnitRepository.countByState(state);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.STATE+state.getId(), data);
+        return data;
     }
 
     @Override
     public long countBySenatorialDistrict(SenatorialDistrict senatorialDistrict){
-        return pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId());
+        }
+        long data = pollingUnitRepository.countBySenatorialDistrict(senatorialDistrict);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.SENATORIAL_DISTRICT+senatorialDistrict.getId(), data);
+        return data;
     }
     @Override
     public long countByLga(Lga lga){
-        return pollingUnitRepository.countByLga(lga);
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.LGA+lga.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.LGA+lga.getId());
+        }
+        long data = pollingUnitRepository.countByLga(lga);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.LGA+lga.getId(), data);
+        return data;
     }
     @Override
     public long countByWard(Ward ward){
-        return pollingUnitRepository.countByWard(ward);
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.WARD+ward.getId()) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT+Constants.WARD+ward.getId());
+        }
+        long data = pollingUnitRepository.countByWard(ward);
+        TerritorialDataCount.set(Constants.POLLING_UNIT+Constants.WARD+ward.getId(), data);
+        return data;
     }
     @Override
     public long countPollingUnit(){
-        return pollingUnitRepository.count();
+
+        if(TerritorialDataCount.get(Constants.POLLING_UNIT) != -1){
+            return TerritorialDataCount.get(Constants.POLLING_UNIT);
+        }
+        long data = pollingUnitRepository.count();
+        TerritorialDataCount.set(Constants.POLLING_UNIT, data);
+        return data;
     }
     @Override
     public PollingUnitResponse findBySenatorialDistrict(Long senatorialDistrictCode) throws NotFoundException {

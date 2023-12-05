@@ -4,6 +4,10 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_lga_state", columnList = "state_id"),
+        @Index(name = "idx_lga_senatorial_district", columnList = "senatorial_district_id")
+})
 public class Lga extends AbstractBaseModel {
     @ManyToOne
     @JoinColumn(name="state_id", nullable=false)
