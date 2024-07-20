@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface PoliticalPartyRepository extends JpaRepository<PoliticalParty, Long> {
-    PoliticalParty findByCodeAndStateId(String code, Long stateId);
+    List<PoliticalParty> findByCodeAndStateId(String code, Long stateId);
     List<PoliticalParty> findByCode(String code);
     List<PoliticalParty> findByNameStartingWithAndStateId(String name, Long stateId);
     List<PoliticalParty> findByStateId(Long stateId);

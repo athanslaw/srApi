@@ -51,14 +51,15 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     public PoliticalPartyResponse savePoliticalParty(PoliticalPartyDto politicalParty) throws NotFoundException {
 
         long state = getActiveState();
-        PoliticalParty existingPoliticalParty = politicalPartyRepository.findByCodeAndStateId(politicalParty.getCode(), state);
+        List<PoliticalParty> existingPoliticalParty = politicalPartyRepository.findByCodeAndStateId(politicalParty.getCode(), state);
+
         if(existingPoliticalParty==null){
-            existingPoliticalParty = new PoliticalParty();
-            existingPoliticalParty.setCode(politicalParty.getCode());
-            existingPoliticalParty.setName(politicalParty.getName());
-            existingPoliticalParty.setColorCode(politicalParty.getColorCode());
-            existingPoliticalParty.setStateId(state);
-            politicalPartyRepository.save(existingPoliticalParty);
+            PoliticalParty party = new PoliticalParty();
+            party.setCode(politicalParty.getCode());
+            party.setName(politicalParty.getName());
+            party.setColorCode(politicalParty.getColorCode());
+            party.setStateId(state);
+            politicalPartyRepository.save(party);
             return new PoliticalPartyResponse("00", String.format(successTemplate,SERVICE_NAME), existingPoliticalParty);
         }
         throw new DuplicateException(String.format(duplicateTemplate, politicalParty.getCode()));
@@ -78,20 +79,28 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
 
     @Override
     public PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code) {
-        PoliticalParty currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, getActiveState());
+        List<PoliticalParty> currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, getActiveState());
+        PoliticalParty politicalParty;
         if(currentPoliticalParty==null){
-            currentPoliticalParty = politicalPartyRepository.findByCode(code).get(0);
+            politicalParty = politicalPartyRepository.findByCode(code).get(0);
         }
-        return new PoliticalPartyResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), currentPoliticalParty);
+        else {
+            politicalParty = currentPoliticalParty.get(0);
+        }
+        return new PoliticalPartyResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), politicalParty);
     }
 
     @Override
     public PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code, State state) {
-        PoliticalParty currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, state.getId());
+        List<PoliticalParty> currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, state.getId());
+        PoliticalParty politicalParty;
         if(currentPoliticalParty==null){
-            currentPoliticalParty = politicalPartyRepository.findByCode(code).get(0);
+            politicalParty = politicalPartyRepository.findByCode(code).get(0);
         }
-        return new PoliticalPartyResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), currentPoliticalParty);
+        else {
+            politicalParty = currentPoliticalParty.get(0);
+        }
+        return new PoliticalPartyResponse("00", String.format(fetchRecordTemplate, SERVICE_NAME), politicalParty);
     }
 
     @Override
