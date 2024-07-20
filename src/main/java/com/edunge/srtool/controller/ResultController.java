@@ -27,12 +27,6 @@ public class ResultController {
         this.resultService = resultService;
     }
 
-    @GetMapping(value = "/result/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all results.")
-    public ResponseEntity<ResultResponse> findAllResults(){
-        return new ResponseEntity<>(resultService.findAll(), HttpStatus.OK);
-    }
-
     @GetMapping(value = "/result/filter/zone/{zoneId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve all results.")
     public ResponseEntity<ResultResponse> findResultsByZone(@PathVariable Long zoneId, @RequestParam(value = "electionType", required = false) Long electionType) throws NotFoundException{
