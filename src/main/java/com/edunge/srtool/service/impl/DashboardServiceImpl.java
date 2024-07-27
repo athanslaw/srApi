@@ -27,7 +27,6 @@ public class DashboardServiceImpl implements DashboardService {
     private final PoliticalPartyServiceImpl politicalPartyService;
     private final ResultServiceImpl resultService;
     private final ResultRealTimeRepository resultRealTimeRepository;
-    private final ResultRepository resultRepository;
     private static final String FIRST_PARTY = "party_1";
     private static final String SECOND_PARTY = "party_2";
     private static final String THIRD_PARTY = "party_3";
@@ -53,7 +52,6 @@ public class DashboardServiceImpl implements DashboardService {
         this.politicalPartyService = politicalPartyService;
         this.resultService = resultService;
         this.resultRealTimeRepository = resultRealTimeRepository;
-        this.resultRepository = resultRepository;
     }
 
     private Long getTotalStates(){
@@ -118,7 +116,7 @@ public class DashboardServiceImpl implements DashboardService {
         int voteCount;
         int accreditedVotersCount;
         int registeredVotersCount;
-        int voidVotes;
+        int voidVotes = 0;
         int totalPU;
         party1Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_1).sum();
         party2Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_2).sum();
@@ -128,6 +126,7 @@ public class DashboardServiceImpl implements DashboardService {
         party6Sum = resultRealTime.stream().mapToInt(ResultRealTime::getParty_6).sum();
         voteCount = resultRealTime.stream().mapToInt(ResultRealTime::getVoteCount).sum();
         voidVotes = resultRealTime.stream().mapToInt(ResultRealTime::getVoidVotes).sum();
+
         accreditedVotersCount = resultRealTime.stream().mapToInt(ResultRealTime::getAccreditedVotersCount).sum();
         registeredVotersCount = resultRealTime.stream().mapToInt(ResultRealTime::getRegisteredVotersCount).sum();
         totalPU = resultRealTime.stream().mapToInt(ResultRealTime::getPollingUnitCount).sum();
@@ -714,9 +713,9 @@ public class DashboardServiceImpl implements DashboardService {
         Election election = resultService.getElection();
         Long totalStates = getTotalStates();
         Long totalZones = countGeoPoliticalZone();
-        List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionAndElectionType(election, electionType);
+        List<ResultRealTime> resultRealTimeList = resultRealTimeRepository.findByElectionIdAndElectionType(election.getId(), electionType);
         Long totalSenatorialDistricts = senatorialDistrict(); // totalZone
-        Long totalPollingUnits = Long.valueOf(countPollingUnit()); // global by electionId
+        Long totalPollingUnits = countPollingUnit(); // global by electionId
         Long totalLgas = lgaService.countLga();
         Long lgasWithResults = getLgasWithResult(resultRealTimeList); // global by electionId;
         Long wardsWithResults = getWardsWithResult(resultRealTimeList); // global by electionId; stateWithResults
