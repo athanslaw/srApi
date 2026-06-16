@@ -2,8 +2,8 @@ package com.edunge.srtool.controller;
 
 import com.edunge.srtool.response.StateResponse;
 import com.edunge.srtool.service.StateService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="Manage States", description="Endpoints to manage States")
+@Tag(name = "Manage States", description = "Endpoints to manage States")
 @CrossOrigin(maxAge = 3600)
 public class StateController {
     private static final Logger logger = LoggerFactory.getLogger(StateController.class);
@@ -32,50 +32,50 @@ public class StateController {
     }
 
     @GetMapping(value = "/states", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all states.")
+    @Operation(summary = "Retrieve all states.")
     public ResponseEntity<StateResponse> findAllStates(){
         return new ResponseEntity<>(stateService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/states/zone/{zoneId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all states.")
+    @Operation(summary = "Retrieve all states.")
     public ResponseEntity<StateResponse> findStatesByZone(@PathVariable Long zoneId){
         return new ResponseEntity<>(stateService.findByZone(zoneId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/state", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find state by state code.")
+    @Operation(summary = "Find state by state code.")
     public ResponseEntity<StateResponse> findStateByCode(@RequestParam String code) throws Exception {
         return ResponseEntity.ok(stateService.findStateByCode(code));
     }
 
     @GetMapping(value = "/state/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find state by id.")
+    @Operation(summary = "Find state by id.")
     public ResponseEntity<StateResponse> findStateById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(stateService.findStateById(id));
     }
 
 
     @PostMapping(value =  "/state")
-    @ApiOperation(value = "Save state to the DB")
+    @Operation(summary = "Save state to the DB")
     public ResponseEntity<StateResponse> storeState( @RequestParam String code, @RequestParam String name, @RequestParam Long geoPoliticalZone, @RequestParam(required = false) MultipartFile file) throws Exception {
         return ResponseEntity.ok(stateService.saveState(code, name, geoPoliticalZone, file));
     }
 
     @PutMapping(value = "/state/{id}")
-    @ApiOperation(value = "Update state to the DB")
+    @Operation(summary = "Update state to the DB")
     public ResponseEntity<StateResponse> updateState(@PathVariable Long id, @RequestParam String code, @RequestParam String name, @RequestParam Long geoPoliticalZone, @RequestParam(required = false) MultipartFile file) throws Exception {
         return ResponseEntity.ok(stateService.editState(id, code, name, geoPoliticalZone, file));
     }
 
     @RequestMapping(value = "/state/delete/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "Delete state by id.")
+    @Operation(summary = "Delete state by id.")
     public ResponseEntity<StateResponse> deleteStateById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(stateService.deleteStateById(id));
     }
 
     @GetMapping(value = "/state/filter", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Filter state by name.")
+    @Operation(summary = "Filter state by name.")
     public ResponseEntity<StateResponse> filterStateByCode(@RequestParam String name) throws Exception {
         return ResponseEntity.ok(stateService.filterByName(name));
     }
@@ -105,15 +105,14 @@ public class StateController {
     }
 
     @GetMapping(value = "/state/default", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get default state")
+    @Operation(summary = "Get default state")
     public ResponseEntity<StateResponse> getDefaultState() throws Exception {
         return ResponseEntity.ok(stateService.getDefaultState());
     }
 
 
     @GetMapping(value = "/state/set-default/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Set default state")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Set default state")
     public ResponseEntity<StateResponse> setDefaultState(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(stateService.setDefaultState(id));
     }

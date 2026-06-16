@@ -6,8 +6,8 @@ import com.edunge.srtool.service.LgaService;
 import com.edunge.srtool.service.PollingUnitService;
 import com.edunge.srtool.service.SenatorialDistrictService;
 import com.edunge.srtool.service.WardService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="Manage Senatorial District", description="Endpoints to manage Senatorial District")
+@Tag(name = "Manage Senatorial District", description = "Endpoints to manage Senatorial District")
 @CrossOrigin(maxAge = 3600)
 public class SenatorialDistrictController {
 
@@ -36,32 +36,32 @@ public class SenatorialDistrictController {
     }
 
     @GetMapping(value = "/senatorial-districts", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all states.")
+    @Operation(summary = "Retrieve all states.")
     public ResponseEntity<SenatorialDistrictResponse> findAllSenatorialDistricts(){
         return new ResponseEntity<>(senatorialDistrictService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/senatorial-district", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find state by state code.")
+    @Operation(summary = "Find state by state code.")
     public ResponseEntity<SenatorialDistrictResponse> findSenatorialDistrictByCode(@RequestParam String code) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictByCode(code));
     }
 
     @GetMapping(value = "/senatorial-district/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find senatorial district by id.")
+    @Operation(summary = "Find senatorial district by id.")
     public ResponseEntity<SenatorialDistrictResponse> findSenatorialDistrictById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictById(id));
     }
 
 
     @RequestMapping(value = "/senatorial-district", method = RequestMethod.POST)
-    @ApiOperation(value = "Save senatorial district to the DB")
+    @Operation(summary = "Save senatorial district to the DB")
     public ResponseEntity<SenatorialDistrictResponse> storeSenatorialDistrict(@RequestBody SenatorialDistrictDto senatorialDistrictDto) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.saveSenatorialDistrict(senatorialDistrictDto));
     }
 
     @RequestMapping(value = "/senatorial-district/{id}", method = RequestMethod.PUT)
-    @ApiOperation(value = "Update senatorial district to the DB")
+    @Operation(summary = "Update senatorial district to the DB")
     public ResponseEntity<SenatorialDistrictResponse> updateSenatorialDistrict(@PathVariable Long id, @RequestBody SenatorialDistrictDto senatorialDistrictDto) throws Exception {
         SenatorialDistrictResponse senatorialDistrictResponse = senatorialDistrictService.updateSenatorialDistrict(id,senatorialDistrictDto);
         lgaService.updateLgaDistrict(id, senatorialDistrictResponse.getSenatorialDistrict());
@@ -71,25 +71,25 @@ public class SenatorialDistrictController {
     }
 
     @RequestMapping(value = "/senatorial-district/delete/{id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "Delete senatorial district by id.")
+    @Operation(summary = "Delete senatorial district by id.")
     public ResponseEntity<SenatorialDistrictResponse> deleteSenatorialDistrictById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.deleteSenatorialDistrictById(id));
     }
 
     @GetMapping(value = "/senatorial-district/filter", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Filter senatorial district by code.")
+    @Operation(summary = "Filter senatorial district by code.")
     public ResponseEntity<SenatorialDistrictResponse> filterSenatorialDistrictByCode(@RequestParam String name) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.filterByName(name));
     }
 
     @GetMapping(value = "/senatorial-district/state/{stateCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find senatorial district by stateCode.")
+    @Operation(summary = "Find senatorial district by stateCode.")
     public ResponseEntity<SenatorialDistrictResponse> filterLGAByStateCode(@PathVariable Long stateCode) throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictByStateCode(stateCode));
     }
 
     @GetMapping(value = "/senatorial-district/state/default", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find senatorial district for default state.")
+    @Operation(summary = "Find senatorial district for default state.")
     public ResponseEntity<SenatorialDistrictResponse> filterSenatorialDistrictForDefaultState() throws Exception {
         return ResponseEntity.ok(senatorialDistrictService.findSenatorialDistrictForDefaultState());
     }

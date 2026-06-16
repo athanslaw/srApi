@@ -3,8 +3,8 @@ package com.edunge.srtool.controller;
 import com.edunge.srtool.exceptions.NotFoundException;
 import com.edunge.srtool.response.PoliticalPartyCandidateResponse;
 import com.edunge.srtool.service.PoliticalPartyCandidateService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="Manage Political Party Candidate", description="Endpoints to manage Political Party Candidates")
+@Tag(name = "Manage Political Party Candidate", description = "Endpoints to manage Political Party Candidates")
 @CrossOrigin(maxAge = 3600)
 public class PoliticalPartyCandidateController {
     private final PoliticalPartyCandidateService politicalPartyCandidateService;
@@ -34,19 +34,19 @@ public class PoliticalPartyCandidateController {
     }
 
     @GetMapping(value = "/political-party-candidate/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all Political Parties.")
+    @Operation(summary = "Retrieve all Political Parties.")
     public ResponseEntity<PoliticalPartyCandidateResponse> findAllParties(){
         return new ResponseEntity<>(politicalPartyCandidateService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/political-party-candidate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Retrieve all Political Party by Id")
+    @Operation(summary = "Retrieve all Political Party by Id")
     public ResponseEntity<PoliticalPartyCandidateResponse> findCandidateById(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(politicalPartyCandidateService.findById(id), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/political-party-candidate/delete/{id}")
-    @ApiOperation(value = "Retrieve all Political Party by Id")
+    @Operation(summary = "Retrieve all Political Party by Id")
     public ResponseEntity<PoliticalPartyCandidateResponse> deleteCandidate(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(politicalPartyCandidateService.deleteById(id), HttpStatus.OK);
     }
@@ -103,7 +103,7 @@ public class PoliticalPartyCandidateController {
 
 
     @GetMapping(value = "/political-party-candidate/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find candidate agent by name.")
+    @Operation(summary = "Find candidate agent by name.")
     public ResponseEntity<PoliticalPartyCandidateResponse> filterPartyAgentByName(@RequestParam(required = false) String firstname, @RequestParam(required = false) String lastname) throws Exception {
         return ResponseEntity.ok(politicalPartyCandidateService.findCandidateByName(firstname, lastname));
     }

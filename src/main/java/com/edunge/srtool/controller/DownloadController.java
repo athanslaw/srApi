@@ -3,7 +3,7 @@ package com.edunge.srtool.controller;
 import com.edunge.srtool.service.DownloadService;
 import com.edunge.srtool.service.impl.DownloadServiceImpl;
 import com.edunge.srtool.service.impl.DownloadServiceImpl.ResultDownload;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="Download Results", description="Download election results")
+@Tag(name = "Download Results", description = "Download election results")
 @CrossOrigin(maxAge = 3600)
 public class DownloadController {
     private final DownloadService downloadService;

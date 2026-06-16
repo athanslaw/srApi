@@ -10,8 +10,8 @@ import com.edunge.srtool.jwt.JwtUserDetailsService;
 import com.edunge.srtool.model.Login;
 import com.edunge.srtool.response.*;
 import com.edunge.srtool.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +25,7 @@ import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(value="User Registration", description="New user registration endpoint.")
+@Tag(name = "User Registration", description = "New user registration endpoint.")
 @CrossOrigin(maxAge = 3600)
 public class UserController {
     private final JwtUserDetailsService userDetailsService;
@@ -65,64 +65,64 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ApiOperation(value = "Login with username and password")
+    @Operation(summary = "Login with username and password")
     public ResponseEntity<LoginResponse> createAuthenticationToken(@RequestBody Login authenticationRequest) throws Exception {
         return ResponseEntity.ok(userDetailsService.login(authenticationRequest));
     }
 
     @RequestMapping(value = "/users/state/{stateId}", method = RequestMethod.POST)
     @PreAuthorize("hasRole=ADMIN")
-    @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
+    @Operation(summary = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
     public ResponseEntity<UserResponse> getAllUsers(@PathVariable Long stateId) throws Exception {
         return ResponseEntity.ok(userService.getAllUser(stateId));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    @ApiOperation(value = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
+    @Operation(summary = "This method fetches all registered users. This can only be accessed by users with administrative privilege.")
     public ResponseEntity<UserResponse> getUsers() throws Exception {
         return ResponseEntity.ok(userService.getAllUser());
     }
 
     @GetMapping(value = "/users/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find users by name.")
+    @Operation(summary = "Find users by name.")
     public ResponseEntity<UserResponse> filterUsersByName(@RequestParam(required = false) String name) throws Exception {
         return ResponseEntity.ok(userService.findUsersAgentByName(name));
     }
 
     @RequestMapping(value = "/users/location", method = RequestMethod.GET)
-    @ApiOperation(value = "This method fetches registered user's location.")
+    @Operation(summary = "This method fetches registered user's location.")
     public ResponseEntity<LocationResponse> getUserLocation(@RequestHeader("Authorization") String token) throws Exception {
         return ResponseEntity.ok(userService.getUserLgaById(jwtTokenUtil.getUsernameFromToken(token.split(" ")[1])));
     }
 
     @RequestMapping(value = "/user/id/{id}", method = RequestMethod.POST)
     @PreAuthorize("hasRole=ADMIN")
-    @ApiOperation(value = "Fetch the user details by Id. Admin view")
+    @Operation(summary = "Fetch the user details by Id. Admin view")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) throws Exception {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @RequestMapping(value = "/user/state/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch the user details by State. Admin view")
+    @Operation(summary = "Fetch the user details by State. Admin view")
     public ResponseEntity<UserResponse> getUserByState(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.getUserByState(id));
     }
 
     @RequestMapping(value = "/user/senatorial-district/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch the user details by District. Admin view")
+    @Operation(summary = "Fetch the user details by District. Admin view")
     public ResponseEntity<UserResponse> getUserByDistrict(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.getUserByDistrict(id));
     }
 
     @RequestMapping(value = "/user/lga/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch the user details by LGA. Admin view")
+    @Operation(summary = "Fetch the user details by LGA. Admin view")
     public ResponseEntity<UserResponse> getUserByLga(@PathVariable String id) throws Exception {
         return ResponseEntity.ok(userService.getUserByLga(id));
     }
 
     @RequestMapping(value = "/user/id/{id}", method = RequestMethod.DELETE)
 //    @PreAuthorize("hasRole=ADMIN")
-    @ApiOperation(value = "Delete user details by Id. Admin view")
+    @Operation(summary = "Delete user details by Id. Admin view")
     public ResponseEntity<UserResponse> deleteUserById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.deleteUserById(id));
     }
