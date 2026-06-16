@@ -12,3 +12,15 @@ RUN ./mvnw dependency:go-offline
 COPY src src
 
 RUN ./mvnw clean package -DskipTests
+
+
+# ===== RUNTIME STAGE =====
+FROM eclipse-temurin:8-jre
+
+WORKDIR /app
+
+COPY --from=build /workspace/app/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
