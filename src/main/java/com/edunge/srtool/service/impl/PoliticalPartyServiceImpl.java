@@ -94,7 +94,7 @@ public class PoliticalPartyServiceImpl implements PoliticalPartyService {
     public PoliticalPartyResponse findPoliticalPartyByCodeAndDefaultState(String code, State state) {
         List<PoliticalParty> currentPoliticalParty = politicalPartyRepository.findByCodeAndStateId(code, state.getId());
         PoliticalParty politicalParty;
-        if(currentPoliticalParty==null){
+        if(currentPoliticalParty.isEmpty()){
             politicalParty = politicalPartyRepository.findByCode(code).get(0);
         }
         else {

@@ -58,9 +58,15 @@ public class ResultController {
         return ResponseEntity.ok(resultService.deleteResultById(id));
     }
 
+    @GetMapping(value = "/result", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get election results")
+    public ResponseEntity<ResultResponse> filterResult() throws NotFoundException  {
+        return ResponseEntity.ok(resultService.findAll());
+    }
+
     @GetMapping(value = "/result/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Filter result by name.")
-    public ResponseEntity<ResultResponse> filterResultByCode(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ResultResponse> filterResultByCode(@PathVariable Long id) throws NotFoundException  {
         return ResponseEntity.ok(resultService.findResultById(id));
     }
 
